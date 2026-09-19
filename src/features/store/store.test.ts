@@ -8,6 +8,7 @@ import {
   StorageBlockedError,
   type DraftRecord,
 } from '../../storage'
+import { exportResume } from '../../storage/export-import'
 import { aiStore } from './ai-store'
 import {
   addSectionItem,
@@ -16,6 +17,7 @@ import {
   duplicateDraft,
   flushAutosave,
   handleExternalMessage,
+  importDraftAction,
   initStoreSync,
   loadDraftAction,
   moveSectionItem,
@@ -353,5 +355,48 @@ describe('multi-tab (state-management.md §6)', () => {
 describe('AI store', () => {
   it('exists as an inert basket and stays empty', () => {
     expect(aiStore.getState()).toEqual({})
+  })
+})
+
+describe('importDraftAction', () => {
+  it('imports a valid envelope as a NEW draft and opens it (Task 9)', async () => {
+    await createDraft()
+    updateBasics({ name: 'Citra Lestari' })
+    await flushAutosave()
+    const exportedJson = exportResume(requireDocument())
+
+    const result = await importDraftAction(exportedJson)
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+    const { document, draftId } = documentStore.getState()
+    expect(draftId).toBe(result.draftId)
+    expect(document?.basics.name).toBe('Citra Lestari')
+    // The import added a draft instead of overwriting: two summaries now exist.
+    expect(draftStore.getState().summaries).toHaveLength(2)
+  })
+
+  it('reports the specific ImportError reason and never touches the open draft', async () => {
+    await createDraft()
+    updateBasics({ name: 'Sebelum Impor' })
+    const before = documentStore.getState().document
+
+    const result = await importDraftAction('bukan json sama sekali')
+
+    expect(result).toEqual({ ok: false, reason: 'NOT_JSON' })
+    expect(documentStore.getState().document).toBe(before)
+    expect(documentStore.getState().document?.basics.name).toBe('Sebelum Impor')
+  })
+
+  it('rejects an envelope of the wrong format without touching the open draft', async () => {
+    await createDraft()
+    const before = documentStore.getState().document
+
+    const result = await importDraftAction(
+      JSON.stringify({ format: 'salah', kind: 'resume', formatVersion: '1.0.0', data: {} }),
+    )
+
+    expect(result).toEqual({ ok: false, reason: 'WRONG_FORMAT_ID' })
+    expect(documentStore.getState().document).toBe(before)
   })
 })

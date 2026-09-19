@@ -18,6 +18,8 @@ import {
   StorageBlockedError,
   type SyncMessage,
 } from '../../storage'
+import { importResume } from '../../storage/export-import'
+import { ImportError, type ImportErrorReason } from '../../storage/export-import-types'
 import { documentStore } from './document-store'
 import { draftStore } from './draft-store'
 import { uiStore, type ResumeMode } from './ui-store'
@@ -312,6 +314,39 @@ export async function refreshDrafts(): Promise<void> {
     draftStore.setState({ summaries: await listDrafts() })
   } catch {
     uiStore.setState({ storageMessage: MSG_LIST_FAILED })
+  }
+}
+
+export type ImportDraftResult =
+  { ok: true; draftId: string } | { ok: false; reason: ImportErrorReason | 'STORAGE' }
+
+/**
+ * Imports an exported envelope as a NEW draft and opens it. The active
+ * document is only touched after `importResume` validated the input
+ * (import-export-spec §6) — a failed import never overwrites the open draft.
+ * The failure reason is returned, not announced: the UI maps it to localized
+ * micro-copy. A storage failure while saving additionally sets the store's
+ * user-facing storage message (D21).
+ */
+export async function importDraftAction(json: string): Promise<ImportDraftResult> {
+  let doc: ValidatedResumeDocument
+  try {
+    doc = importResume(json)
+  } catch (error) {
+    if (error instanceof ImportError) return { ok: false, reason: error.reason }
+    // importResume only throws ImportError; anything else is unexpected, and
+    // the safe behavior for the user is the generic validation message.
+    return { ok: false, reason: 'VALIDATION_FAILED' }
+  }
+  try {
+    const record = await saveDraft(doc)
+    notifyTabs('draft_updated', record.id)
+    await refreshDrafts()
+    await loadDraftAction(record.id)
+    return { ok: true, draftId: record.id }
+  } catch (error) {
+    reportStorageFailure(error)
+    return { ok: false, reason: 'STORAGE' }
   }
 }
 

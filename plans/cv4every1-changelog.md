@@ -5,9 +5,9 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Field | Value |
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-20 |
-| Fase terakhir selesai | **Fase 0 — Fondasi Data & Persistensi (termasuk Task 7a closure)** |
-| Fase berikutnya | **Fase 1 — MVP (M1.0 7a–7c ✅ · pra-Task 8 ✅ · Task 8 ✅ · Task 13a ✅ · berikutnya Task 9 — Form UI, butuh persetujuan dependensi dev jsdom/RTL/axe)** |
-| Baseline test | 11 file test · 132 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 9 Form UI Guided Sections** |
+| Fase berikutnya | **Fase 1 lanjutan — Task 13b (Action Verbs Suggestions UI), lalu Task 10 (Renderer ATS)** |
+| Baseline test | 25 file test · 219 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -247,7 +247,7 @@ Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sam
 | :-- | :-- | :-- |
 | 7 | Testing Rig Final + CI Pipeline + Strict TS | ✅ selesai (7a+7b+7c; bukti CI menunggu remote) |
 | 8 | State Management Store (Zustand) | ✅ selesai (2026-09-20) |
-| 9 | Form UI — Guided Sections | ⬜ belum |
+| 9 | Form UI — Guided Sections | ✅ selesai (2026-09-20) |
 | 10 | Renderer ATS (HTML + Print CSS) | ⬜ belum |
 | 11 | Renderer Creative (1 template) | ⬜ belum |
 | 12 | Toggle Mode + Preview Pane | ⬜ belum |
@@ -435,3 +435,78 @@ boundaries OK 86 file / 280 specifier · **9 file / 116 test unit** · build ✓
 boundaries OK 90 file / 286 specifier · **11 file / 132 test unit** · build ✓ · check:budget OK) ·
 `bun run test:e2e` 2 lulus (Chromium + Firefox). Catatan kecil: commit Task 8 memuat perubahan
 `tsconfig.json` dengan format yang belum memenuhi Prettier — diluruskan (format saja, isi sama).
+
+## Milestone 1.3 — Form Terpandu (Task 9)
+
+### Task 9 — Form UI: Guided Sections
+
+**Requirement:** FR-101, FR-102, FR-201 s.d. FR-206, NFR-005, NFR-007, NFR-014
+**Status: ✅ SELESAI (2026-09-20).** Form terpandu seluruh section terpasang di shell minimal
+`App.tsx` (disetujui maintainer: mount sekarang, bukan menunggu shell penuh Task 12).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/features/form/FormLayout.tsx` | Shell form: nav accordion 7 section (satu terbuka, state `openPanel`), progres "Bagian X dari Y", empty state memandu + CTA, peringatan lunak panjang CV, saluran `storageMessage` (role=alert), skip link pratinjau (hanya saat `#cv-preview` ada — mekanisme untuk Task 12, tanpa link mati) |
+| `src/features/form/sections/*.tsx` | 7 section: Basics (+links+foto), Education (status+contoh penulisan, GPA group), Experience & Organizations (editor item bersama — organisasi diperlakukan setara + guidance), Projects, Skills (grup berkategori), Certifications |
+| `src/features/form/fields/*` | `FormField` (buffer + wiring aria), `PartialDateField`, `SelectField`, `StringListEditor`/`HighlightsEditor`, `GpaFieldGroup`, `LinkListEditor` |
+| `src/features/form/photo/{PhotoUpload.tsx,compress.ts}` | Validasi tipe/2 MB, kompresi Canvas (WebP fallback JPEG, sisi terpanjang 800 px, step-down kualitas ≤500 KB), EXIF via `createImageBitmap` `imageOrientation:'from-image'` + fallback `<img>`, simpan Blob via `saveAsset` → `assetRef`, hapus/ganti aset lama, notice ATS F-C3 verbatim |
+| `src/features/form/{AutoSaveIndicator,SectionOrderControls,estimatePageCount,field-validation,useBufferedValue,useMicrocopy}.ts(x)` | Indikator D21 (Menyimpan…/Tersimpan; idle+`lastSavedAt` → Tersimpan), reorder naik/turun D22, heuristik halaman murni, validasi field dari skema Zod core (bukan validator kedua), buffer ketik, hook micro-copy |
+| `src/features/drafts/DraftPanel.tsx` | Panel draft D23 (mobile stack, desktop sidebar): baru, ganti nama (dialog), duplikat, hapus (konfirmasi), ekspor unduhan, impor berkas |
+| `src/App.tsx` | Shell minimal: `initStoreSync` + `refreshDrafts` + pemulihan `cv4every1:lastDraftId` (localStorage, D14 — preferensi UI, bukan konten CV) |
+| `src/content/microcopy/id.ts` | Perluasan aditif bertipe: `sections`, `employmentType`, `fields` (label + placeholder contoh nyata + hint), `actions`, `drafts`, `autosave` (D21), `importErrors` (7 reason), `emptyState`, `photoUpload`, `photoErrors`, `validation`, `progress`, `common`, `skip`, plus ekspor `microcopyStructural` |
+| `src/features/store/actions.ts` + `store.test.ts` | **Baru:** `importDraftAction(json)` — `importResume` validate-first, disimpan sebagai draft BARU lalu dibuka; `ImportError.reason` dikembalikan ke UI (bukan diumumkan store); gagal storage → `storageMessage` D21. `lastSavedAt` saat load ternyata sudah ada sejak Task 8 (`actions.ts:210`) — langkah rencana terpenuhi tanpa perubahan |
+| `vitest.config.ts`, `src/test/setup.dom.ts` | Dua project vitest: `node` (default, `core/` tetap tanpa DOM) + `jsdom` untuk `*.dom.test.tsx` dengan setup (fake-indexeddb **sebelum** rantai import Dexie, jest-dom, cleanup RTL) — sesuai keputusan Task 7b |
+| Test baru (13 berkas) | 7 section + FormLayout + FormField + PhotoUpload + AutoSaveIndicator + BasicsForm + DraftPanel (`.dom.test.tsx`) + 4 murni (field-validation, compress, estimatePageCount, section-keys) |
+
+**Keputusan implementasi:**
+
+- **Buffer ketik per field (krusial):** `applyDocumentUpdate` menolak patch yang gagal Zod, sehingga
+  email setengah-ketik (`budi@`), skala `3.`, dan tanggal `2021-` akan membuat controlled input macet.
+  Pola terpilih: nilai **valid** di-commit per ketikan (autosave tidak pernah tertinggal); nilai
+  invalid intermediate tinggal di state lokal dan errornya baru muncul saat blur (`role=alert` +
+  `aria-describedby`). Penyederhanaan dari rencana: registry flush `visibilitychange` **tidak
+  diperlukan** — semua nilai yang bisa di-commit memang sudah ter-commit per ketikan; nilai invalid
+  memang tidak dapat masuk dokumen.
+- **Adopsi perubahan store lewat render-adjust** (pola resmi React), bukan effect:
+  `useBufferedValue`, `StringListEditor`, dan `LinkListEditor` membandingkan kunci proyeksi
+  ter-commit; baris kosong yang sedang diketik tidak hilang, perubahan dari tab lain tetap diadopsi.
+  Tanpa ref-during-render.
+- **FR-204:** `getMicrocopy('en')` tetap `null` (test Task 13a utuh); UI memakai
+  `microcopyStructural` — label struktural tetap ada (a11y), micro-copy domain Indonesia (IPK, +62,
+  foto, panjang CV, contoh status) di-blank sampai pack EN Fase 3. Teruji: locale `en` menyembunyikan
+  guidance tanpa merusak label.
+- **Heuristik panjang CV (F-C6):** `estimateCvPages` murni dengan ambang terdokumentasi
+  (3000 karakter/halaman + 80 per heading item) — diuji di batas 2 halaman; disempurnakan bila
+  Task 12 memberi paginasi nyata. Bukan skor CV (sweep frasa terlarang otomatis mencakup string baru).
+- **Reorder section:** tombol naik/turun (D22) menulis `sectionOrder`; `normalizeOrder` menghormati
+  urutan tersimpan (bug pertama ditemukan test dan diperbaiki), kunci tak dikenal diabaikan.
+- **Checkbox `current`:** base-ui Checkbox me-render `role=checkbox` pada span (bukan elemen
+  labelable), sehingga nama aksesibel via `aria-label` yang identik dengan teks terlihat
+  (WCAG 2.5.3 Label in Name); `current` aktif menonaktifkan tanggal selesai.
+- **Impor:** gagal validasi tidak pernah menyentuh draft aktif (spec §6); pesan per-`reason` dari
+  micro-copy; unduhan ekspor via Blob + anchor (`URL.createObjectURL` di-stub pada test jsdom).
+- **Konsistensi union Task 13a ditutup** di lapisan features (`section-keys.test.ts`):
+  `CatalogSectionKey` ≡ `SectionKey`, status pendidikan lengkap di micro-copy, pack struktural
+  ter-blank dengan benar.
+- **Re-baseline bundle sadar:** shell Hello World → aplikasi nyata (form + primitif base-ui +
+  `zustand/react` + konten) memompa JS gzip 68,7 → 183,7 KB (+167%); ratchet D24 di-record ulang
+  dengan justifikasi tertulis di `performance-budget.md` §1 (v0.4) — anggaran absolut **tidak**
+  dinaikkan; sisa ruang 16,3 KB dan audit bundle/code-splitting dicatat sebagai keputusan checkpoint
+  gerbang Fase 1.
+- **Sisa warning lint pada kode baru: 1** (`FormLayout` SkipLink `set-state-in-effect`) — disengaja:
+  cek `#cv-preview` pasca-mount untuk integrasi Task 12. Warning lain berasal dari scaffold dan satu
+  temuan pre-existing di `actions.ts` (destructure `renameDraft`) yang tidak disentuh.
+
+**Verifikasi:** `bun run verify` hijau penuh (lint 0 error · format ✓ · typecheck ✓ · boundaries OK ·
+**25 file / 219 test unit** · build ✓ · check:budget OK) · `bun run test:e2e` 2 lulus
+(Chromium + Firefox, shell nyata tanpa console error) · verifikasi browser nyata: 360 px tanpa
+overflow horizontal (0 elemen melewati viewport), teks-zoom 200% tanpa overflow dan tetap berfungsi,
+buat draft → autosave "Tersimpan" → reload → draft dipulihkan (D14) dan indikator tetap "Tersimpan".
+
+**Catatan jujur AC:** audit axe di jsdom melaporkan nol pelanggaran; color-contrast butuh layout
+nyata sehingga tercatat "incomplete" — cakupan kontras penuh menyusul di audit e2e Task 10/12.
+Test kompresi foto memakai stub canvas (jsdom tanpa canvas): batas/dimensi/step-down kualitas
+terbukti oleh test murni, dan jalur simpan → `assets` → `assetRef` terbukti oleh test integrasi;
+Blob yang kembali dari `loadAsset` di jsdom dibatasi structured-clone (integritas Blob round-trip
+sudah dibuktikan test repository di env node). Normalisasi EXIF (decode `from-image` + fallback)
+tidak dapat diuji unit — mengandalkan API browser, terdokumentasi di kode.

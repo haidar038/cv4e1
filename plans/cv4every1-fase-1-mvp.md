@@ -27,7 +27,7 @@ todos:
       - store-layer
   - id: form-sections
     content: Task 9 — Form terpandu seluruh section dengan micro-copy, foto (kompres), validasi inline, indikator autosave, navigasi keyboard
-    status: pending
+    status: completed
     dependencies:
       - content-pillar
   - id: renderer-ats
@@ -461,17 +461,17 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Seluruh field dapat dijangkau dan dioperasikan hanya dengan keyboard (NFR-005).
-- [ ] Audit axe tidak menemukan pelanggaran WCAG 2.2 AA pada form (NFR-007).
-- [ ] Berfungsi pada pembesaran 200% tanpa kehilangan fungsi atau overflow horizontal (NFR-014).
-- [ ] Setiap field punya label programatik + deskripsi bantuan.
-- [ ] Teks panjang wrap tanpa overflow di lebar 360 px.
-- [ ] Validasi muncul saat blur; tidak ada error yang muncul sebelum pengguna berinteraksi.
-- [ ] Indikator autosave bertransisi `Menyimpan…` → `Tersimpan` dan bertahan setelah reload.
-- [ ] Foto 3 MB ditolak dengan pesan ramah yang menyebut batasnya.
-- [ ] Foto 1,5 MB berhasil dikompres dan tersimpan sebagai Blob di store `assets`.
-- [ ] Section kosong tidak menampilkan heading di pratinjau (diverifikasi lewat view model).
-- [ ] Impor berkas rusak menampilkan pesan spesifik dari `ImportError.reason`, tidak pernah menimpa draft aktif.
+- [x] Seluruh field dapat dijangkau dan dioperasikan hanya dengan keyboard (NFR-005).
+- [x] Audit axe tidak menemukan pelanggaran WCAG 2.2 AA pada form (NFR-007).
+- [x] Berfungsi pada pembesaran 200% tanpa kehilangan fungsi atau overflow horizontal (NFR-014).
+- [x] Setiap field punya label programatik + deskripsi bantuan.
+- [x] Teks panjang wrap tanpa overflow di lebar 360 px.
+- [x] Validasi muncul saat blur; tidak ada error yang muncul sebelum pengguna berinteraksi.
+- [x] Indikator autosave bertransisi `Menyimpan…` → `Tersimpan` dan bertahan setelah reload.
+- [x] Foto 3 MB ditolak dengan pesan ramah yang menyebut batasnya.
+- [x] Foto 1,5 MB berhasil dikompres dan tersimpan sebagai Blob di store `assets`.
+- [x] Section kosong tidak menampilkan heading di pratinjau (diverifikasi lewat view model).
+- [x] Impor berkas rusak menampilkan pesan spesifik dari `ImportError.reason`, tidak pernah menimpa draft aktif.
 
 **Edge cases**
 

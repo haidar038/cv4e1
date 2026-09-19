@@ -34,8 +34,8 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 ## Fase 1 — MVP
 
-- [ ] Form terpandu seluruh section
-- [ ] Micro-copy Bahasa Indonesia (IPK, status pendidikan, kontak, organisasi)
+- [x] Form terpandu seluruh section
+- [x] Micro-copy Bahasa Indonesia (IPK, status pendidikan, kontak, organisasi)
 - [ ] Renderer ATS dengan penegakan aturan
 - [ ] Renderer Creative (1–2 template)
 - [ ] Toggle mode + peringatan kontekstual foto

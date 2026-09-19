@@ -8,7 +8,23 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
-    environment: 'node',
+    projects: [
+      {
+        test: {
+          name: 'node',
+          include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+          exclude: ['src/**/*.dom.test.tsx'],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'jsdom',
+          include: ['src/**/*.dom.test.tsx'],
+          environment: 'jsdom',
+          setupFiles: ['src/test/setup.dom.ts'],
+        },
+      },
+    ],
   },
 })
