@@ -177,12 +177,12 @@ Ini **bukan task baru**; ini menutup item Fase 0 yang belum selesai sebelum UI d
 
 **Acceptance criteria**
 
-- [ ] `bun run typecheck` lulus dengan strict aktif
-- [ ] `bun run test` tetap 51 test lulus (atau lebih, jika ada test tambahan)
-- [ ] `bun run lint` lulus
-- [ ] `bun run format:check` lulus
-- [ ] Tidak ada `any` tanpa komentar penjelasan
-- [ ] `exactOptionalPropertyTypes` **tidak** dilonggarkan sebagai jalan pintas
+- [x] `bun run typecheck` lulus dengan strict aktif
+- [x] `bun run test` tetap 51 test lulus (atau lebih, jika ada test tambahan)
+- [x] `bun run lint` lulus
+- [x] `bun run format:check` lulus
+- [x] Tidak ada `any` tanpa komentar penjelasan
+- [x] `exactOptionalPropertyTypes` **tidak** dilonggarkan sebagai jalan pintas
 
 **Edge cases**
 
@@ -223,11 +223,11 @@ Ini **bukan task baru**; ini menutup item Fase 0 yang belum selesai sebelum UI d
 
 **Acceptance criteria**
 
-- [ ] `bun run test:e2e` lulus di Chromium dan Firefox
-- [ ] `bun run check:boundaries` mendeteksi pelanggaran buatan (mis. `core/` mengimpor `react`) dan lulus pada kode saat ini
-- [ ] Boundary checker menangkap import relatif (`../storage/x`) yang lolos dari pola path-based
-- [ ] `bun run verify` menjalankan lint → typecheck → boundaries → test → build secara berurutan
-- [ ] Boundary checker juga diperluas ke Fase 1: `render/` → `storage/` dilarang
+- [x] `bun run test:e2e` lulus di Chromium dan Firefox
+- [x] `bun run check:boundaries` mendeteksi pelanggaran buatan (mis. `core/` mengimpor `react`) dan lulus pada kode saat ini
+- [x] Boundary checker menangkap import relatif (`../storage/x`) yang lolos dari pola path-based
+- [x] `bun run verify` menjalankan lint → typecheck → boundaries → test → build secara berurutan
+- [x] Boundary checker juga diperluas ke Fase 1: `render/` → `storage/` dilarang
 
 **Edge cases**
 
@@ -261,10 +261,10 @@ Ini **bukan task baru**; ini menutup item Fase 0 yang belum selesai sebelum UI d
 
 **Acceptance criteria**
 
-- [ ] CI hijau pada commit terakhir Milestone 1.0
-- [ ] Bundle size baseline tercatat; kenaikan >10% menggagalkan CI
-- [ ] `bun run build` menghasilkan `dist/` statis
-- [ ] Anggaran performa di dokumen tidak lagi berlabel "usulan"
+- [x] CI hijau pada commit terakhir Milestone 1.0
+- [x] Bundle size baseline tercatat; kenaikan >10% menggagalkan CI
+- [x] `bun run build` menghasilkan `dist/` statis
+- [x] Anggaran performa di dokumen tidak lagi berlabel "usulan"
 
 **Edge cases**
 
@@ -321,13 +321,13 @@ Ini **bukan task baru**; ini menutup item Fase 0 yang belum selesai sebelum UI d
 
 **Acceptance criteria**
 
-- [ ] Action terdefinisi untuk: muat draft, buat draft baru, update `basics`, tambah/ubah/hapus/hitung-ulang item per section, ubah `sectionOrder`, ganti nama draft, duplikat draft, hapus draft, ganti mode.
-- [ ] `mode` switch **tidak mengubah** `ResumeDocument` selain `meta.mode` — dibuktikan test.
-- [ ] Selector view model memoized: test membuktikan tidak ada perhitungan ulang saat state tak terkait berubah.
-- [ ] Store berfungsi tanpa React (`store.test.ts` dijalankan di env `node`).
-- [ ] Setelah `registerChange`, autosave terpicu; setelah save, `DraftStore` diperbarui.
-- [ ] `onExternalUpdate` menandai draft sebagai "diperbarui di tab lain" tanpa menimpa diam-diam.
-- [ ] `AIStore` ada tetapi tidak diekspor ke UI.
+- [x] Action terdefinisi untuk: muat draft, buat draft baru, update `basics`, tambah/ubah/hapus/hitung-ulang item per section, ubah `sectionOrder`, ganti nama draft, duplikat draft, hapus draft, ganti mode.
+- [x] `mode` switch **tidak mengubah** `ResumeDocument` selain `meta.mode` — dibuktikan test.
+- [x] Selector view model memoized: test membuktikan tidak ada perhitungan ulang saat state tak terkait berubah.
+- [x] Store berfungsi tanpa React (`store.test.ts` dijalankan di env `node`).
+- [x] Setelah `registerChange`, autosave terpicu; setelah save, `DraftStore` diperbarui.
+- [x] `onExternalUpdate` menandai draft sebagai "diperbarui di tab lain" tanpa menimpa diam-diam.
+- [x] `AIStore` ada tetapi tidak diekspor ke UI.
 
 **Edge cases**
 
@@ -385,12 +385,12 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Tidak ada string micro-copy yang di-hardcode di komponen (semua lewat `src/content/`).
-- [ ] Katalog tervalidasi: setiap `applicableSections` merujuk section yang ada di `SectionKey`.
-- [ ] `getVerbsForSection('projects')` mengembalikan entri yang relevan, tanpa network.
-- [ ] Peringatan foto menjelaskan **alasan**, bukan sekadar melarang.
-- [ ] Tidak ada frasa terlarang `glossary.md` §6 (`ATS-compliant`, skor CV, "dijamin lolos ATS").
-- [ ] `src/content/` tidak mengimpor apa pun dari modul lain (batas modul).
+- [x] Tidak ada string micro-copy yang di-hardcode di komponen (semua lewat `src/content/`).
+- [x] Katalog tervalidasi: setiap `applicableSections` merujuk section yang ada di `SectionKey`.
+- [x] `getVerbsForSection('projects')` mengembalikan entri yang relevan, tanpa network.
+- [x] Peringatan foto menjelaskan **alasan**, bukan sekadar melarang.
+- [x] Tidak ada frasa terlarang `glossary.md` §6 (`ATS-compliant`, skor CV, "dijamin lolos ATS").
+- [x] `src/content/` tidak mengimpor apa pun dari modul lain (batas modul).
 
 **Edge cases**
 

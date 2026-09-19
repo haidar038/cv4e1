@@ -1,0 +1,440 @@
+[
+  {
+    "verb": "Memimpin",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Memimpin [jumlah] [peran] dalam [proyek/acara] hingga [hasil]"
+  },
+  {
+    "verb": "Mengelola",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mengelola [sumber daya/anggaran] senilai [nilai] untuk [tujuan]"
+  },
+  {
+    "verb": "Mengoordinasikan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mengoordinasikan [jumlah] [panitia/pihak] dalam [kegiatan] yang diikuti [jumlah] peserta"
+  },
+  {
+    "verb": "Mengarahkan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengarahkan tim [bidang] beranggotakan [jumlah] orang agar [hasil]"
+  },
+  {
+    "verb": "Mendelegasikan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mendelegasikan [tugas] kepada [jumlah] anggota sesuai keahlian masing-masing"
+  },
+  {
+    "verb": "Memprioritaskan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Memprioritaskan [daftar pekerjaan] agar [target] tercapai tepat waktu"
+  },
+  {
+    "verb": "Mengevaluasi",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mengevaluasi [proses/kinerja] dan menghasilkan [perbaikan]"
+  },
+  {
+    "verb": "Menganggarkan",
+    "category": "Manajerial",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Menganggarkan dana sebesar [jumlah] untuk [kegiatan]"
+  },
+  {
+    "verb": "Mengawasi",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengawasi [tahapan/proses] sehingga [standar] terpenuhi"
+  },
+  {
+    "verb": "Mengambil keputusan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengambil keputusan [tentang apa] berdasarkan [data/kondisi lapangan]"
+  },
+  {
+    "verb": "Merencanakan",
+    "category": "Manajerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Merencanakan [kegiatan] sebanyak [jumlah] tahapan dalam [waktu]"
+  },
+  {
+    "verb": "Menengahi",
+    "category": "Manajerial",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Menengahi [situasi] antara [pihak] hingga tercapai [kesepakatan]"
+  },
+  {
+    "verb": "Mengembangkan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengembangkan [fitur/sistem] menggunakan [teknologi] untuk [kebutuhan]"
+  },
+  {
+    "verb": "Mengimplementasikan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengimplementasikan [solusi] yang mengurangi [masalah] sebesar [dampak]"
+  },
+  {
+    "verb": "Membangun",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Membangun [aplikasi/prototipe] dengan [teknologi] untuk [pengguna]"
+  },
+  {
+    "verb": "Menguji",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Menguji [komponen/sistem] dan menemukan [jumlah] cacat sebelum rilis"
+  },
+  {
+    "verb": "Men-debug",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Men-debug [masalah] pada [komponen] hingga pulih dalam [waktu]"
+  },
+  {
+    "verb": "Mengotomatiskan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengotomatiskan [proses manual] sehingga menghemat [waktu] per minggu"
+  },
+  {
+    "verb": "Mengintegrasikan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengintegrasikan [sistem A] dengan [sistem B] melalui [cara]"
+  },
+  {
+    "verb": "Mengonfigurasi",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengonfigurasi [perangkat/layanan] untuk [kebutuhan]"
+  },
+  {
+    "verb": "Men-deploy",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Men-deploy [aplikasi] ke [lingkungan] dengan [metode]"
+  },
+  {
+    "verb": "Memelihara",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Memelihara [sistem/jaringan] agar [ketersediaan] tetap terjaga"
+  },
+  {
+    "verb": "Memigrasikan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Memigrasikan [data/sistem] dari [lama] ke [baru] tanpa kehilangan data"
+  },
+  {
+    "verb": "Mendokumentasikan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mendokumentasikan [proses/kode] agar [pembaca] dapat [melanjutkan]"
+  },
+  {
+    "verb": "Mengoptimalkan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengoptimalkan [performa/proses] sehingga [metrik] meningkat [angka]"
+  },
+  {
+    "verb": "Mengamankan",
+    "category": "Teknis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengamankan [sistem/data] dengan [langkah keamanan]"
+  },
+  {
+    "verb": "Menganalisis",
+    "category": "Analitis",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Menganalisis [data/masalah] dan menemukan [temuan]"
+  },
+  {
+    "verb": "Meneliti",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Meneliti [topik] menggunakan [metode] sehingga [kesimpulan]"
+  },
+  {
+    "verb": "Mengkaji",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengkaji [literatur/kebijakan] untuk [tujuan]"
+  },
+  {
+    "verb": "Memetakan",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Memetakan [proses/kebutuhan] ke dalam [bentuk hasil]"
+  },
+  {
+    "verb": "Mengukur",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mengukur [metrik] menggunakan [alat] dan melaporkan [hasil]"
+  },
+  {
+    "verb": "Mengaudit",
+    "category": "Analitis",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengaudit [dokumen/proses] dan merekomendasikan [perbaikan]"
+  },
+  {
+    "verb": "Merumuskan",
+    "category": "Analitis",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Merumuskan [solusi/strategi] berdasarkan [data]"
+  },
+  {
+    "verb": "Mengidentifikasi",
+    "category": "Analitis",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mengidentifikasi [penyebab/peluang] dari [sumber]"
+  },
+  {
+    "verb": "Memvalidasi",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Memvalidasi [data/hasil] melalui [metode]"
+  },
+  {
+    "verb": "Menghitung",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Menghitung [besaran] untuk [kebutuhan]"
+  },
+  {
+    "verb": "Mensimulasikan",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mensimulasikan [skenario] untuk [tujuan]"
+  },
+  {
+    "verb": "Mendiagnosis",
+    "category": "Analitis",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mendiagnosis [kerusakan/masalah] hingga [akar penyebab]"
+  },
+  {
+    "verb": "Mendesain",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mendesain [antarmuka/materi] untuk [audiens] dengan [prinsip]"
+  },
+  {
+    "verb": "Merancang",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Merancang [sistem/kegiatan] yang melayani [jumlah] pengguna"
+  },
+  {
+    "verb": "Menggagas",
+    "category": "Kreatif",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Menggagas [ide program] yang berdampak [dampak]"
+  },
+  {
+    "verb": "Menulis",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Menulis [jenis konten] untuk [media/audiens]"
+  },
+  {
+    "verb": "Menyunting",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Menyunting [dokumen/materi] agar [kualitas] meningkat"
+  },
+  {
+    "verb": "Memproduksi",
+    "category": "Kreatif",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Memproduksi [konten/acara] dengan [sumber daya]"
+  },
+  {
+    "verb": "Mengilustrasikan",
+    "category": "Kreatif",
+    "applicableSections": ["projects"],
+    "examplePhrase": "Mengilustrasikan [konsep] menjadi [bentuk visual]"
+  },
+  {
+    "verb": "Mengemas",
+    "category": "Kreatif",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mengemas [pesan/identitas] agar [audiens] mudah mengingat"
+  },
+  {
+    "verb": "Mengkurasi",
+    "category": "Kreatif",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mengkurasi [konten/karya] untuk [acara/publikasi]"
+  },
+  {
+    "verb": "Menciptakan",
+    "category": "Kreatif",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Menciptakan [karya/mekanisme] yang membawa [kebaruan]"
+  },
+  {
+    "verb": "Membuat",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Membuat [produk/materi] untuk [kebutuhan]"
+  },
+  {
+    "verb": "Menyusun",
+    "category": "Kreatif",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Menyusun [dokumen/laporan/rencana] yang [hasil]"
+  },
+  {
+    "verb": "Mempresentasikan",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Mempresentasikan [hasil] di hadapan [audiens] berjumlah [jumlah]"
+  },
+  {
+    "verb": "Mempublikasikan",
+    "category": "Komunikasi",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Mempublikasikan [konten] di [media] dan menjangkau [angka] pembaca"
+  },
+  {
+    "verb": "Memfasilitasi",
+    "category": "Komunikasi",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Memfasilitasi [diskusi/rapat] yang melibatkan [jumlah] peserta"
+  },
+  {
+    "verb": "Bernegosiasi",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Bernegosiasi dengan [pihak] hingga tercapai [kesepakatan]"
+  },
+  {
+    "verb": "Berkolaborasi",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Berkolaborasi dengan [tim/pihak] untuk [hasil]"
+  },
+  {
+    "verb": "Mengadvokasi",
+    "category": "Komunikasi",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mengadvokasi [isu] kepada [pihak] sehingga [perubahan]"
+  },
+  {
+    "verb": "Menjelaskan",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Menjelaskan [topik teknis] kepada [audiens non-teknis]"
+  },
+  {
+    "verb": "Menghubungi",
+    "category": "Komunikasi",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Menghubungi [jumlah] sponsor dan mengamankan [dampak]"
+  },
+  {
+    "verb": "Melaporkan",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Melaporkan [kemajuan] kepada [pemangku kepentingan] secara [frekuensi]"
+  },
+  {
+    "verb": "Berkonsultasi",
+    "category": "Komunikasi",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Berkonsultasi dengan [pihak ahli] untuk [keputusan]"
+  },
+  {
+    "verb": "Mewawancarai",
+    "category": "Komunikasi",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Mewawancarai [jumlah] narasumber untuk [publikasi/riset]"
+  },
+  {
+    "verb": "Mengeksekusi",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengeksekusi [rencana/kegiatan] sesuai [jadwal/anggaran]"
+  },
+  {
+    "verb": "Menjadwalkan",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Menjadwalkan [kegiatan] untuk [jumlah] peserta"
+  },
+  {
+    "verb": "Mengarsipkan",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengarsipkan [dokumen] sehingga [pencarian] lebih cepat"
+  },
+  {
+    "verb": "Merekapitulasi",
+    "category": "Operasional",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Merekapitulasi [data] dari [jumlah] sumber"
+  },
+  {
+    "verb": "Melayani",
+    "category": "Operasional",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Melayani [jumlah] [pengguna/peserta] per [periode]"
+  },
+  {
+    "verb": "Mengadministrasikan",
+    "category": "Operasional",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mengadministrasikan [proses/dokumen] kepanitiaan"
+  },
+  {
+    "verb": "Menyiapkan",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Menyiapkan [kebutuhan/logistik] untuk [kegiatan]"
+  },
+  {
+    "verb": "Mengatur",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Mengatur [alur/pemeriksaan] agar [efisiensi] meningkat"
+  },
+  {
+    "verb": "Memeriksa",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Memeriksa [hasil/kelengkapan] sesuai [standar]"
+  },
+  {
+    "verb": "Menangani",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Menangani [keluhan/proses] dengan [solusi]"
+  },
+  {
+    "verb": "Menjalankan",
+    "category": "Operasional",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Menjalankan [program/sistem] selama [periode]"
+  },
+  {
+    "verb": "Mencatat",
+    "category": "Operasional",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mencatat [transaksi/keputusan] secara [metode]"
+  }
+]

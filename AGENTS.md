@@ -106,6 +106,9 @@ A machine-readable version lives at `docs/context-map.md`.
 - Do not refactor unrelated code in the same change.
 - Do not reformat files you did not otherwise modify.
 - Do not rename things across the codebase without an explicit instruction.
+- When a task or milestone completes, tick its acceptance-criteria checkboxes and update its
+  tracking status (`plans/*.md` todos, `roadmap.md`) **in the same change** — completed work must
+  be visible in the checklists, not only in the changelog.
 
 ### Code
 
@@ -187,6 +190,7 @@ A task is done when all of these hold:
 - [ ] Accessibility checked on changed surfaces
 - [ ] Privacy reviewed — no unintended data egress, nothing logged
 - [ ] Docs updated (schema, spec, requirement, whichever applies)
+- [ ] Tracking checklists updated — plan todos/AC ticked, `roadmap.md` items marked done
 - [ ] ADR added if an architectural decision was made
 - [ ] No secrets, PII, or real personal data anywhere in the diff
 - [ ] Forbidden phrases (glossary §6) absent from any new user-facing copy

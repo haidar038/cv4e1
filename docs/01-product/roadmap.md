@@ -13,7 +13,7 @@
 
 Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-context/assumptions-and-constraints.md` §5.
 
-- [ ] **S1 — Kesetiaan PDF** *(pemblokir)*: render CV statis → ekspor PDF → ekstraksi teks → verifikasi pemulihan di Chrome, Firefox, Safari
+- [x] **S1 — Kesetiaan PDF** *(pemblokir)*: render CV statis → ekspor PDF → ekstraksi teks → verifikasi pemulihan di Chrome, Firefox, Safari
 - [ ] **S2 — Paginasi**: perilaku 1–2 halaman lintas peramban
 - [ ] **S3 — Ketahanan storage**: uji pengusiran IndexedDB di Safari iOS; uji `navigator.storage.persist()`
 - [ ] **S4 — Riset**: ekstraksi teks dari keluaran kompetitor (R1), pemetaan aplikasi CV Indonesia (R2)

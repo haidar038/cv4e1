@@ -6,8 +6,8 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-20 |
 | Fase terakhir selesai | **Fase 0 — Fondasi Data & Persistensi (termasuk Task 7a closure)** |
-| Fase berikutnya | **Fase 1 — MVP (Milestone 1.0 selesai 7a–7c ✅ · pra-Task 8 ✅ · Task 8 ✅ · berikutnya Task 13a — katalog konten)** |
-| Baseline test | 9 file test · 116 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Fase berikutnya | **Fase 1 — MVP (M1.0 7a–7c ✅ · pra-Task 8 ✅ · Task 8 ✅ · Task 13a ✅ · berikutnya Task 9 — Form UI, butuh persetujuan dependensi dev jsdom/RTL/axe)** |
+| Baseline test | 11 file test · 132 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -251,7 +251,7 @@ Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sam
 | 10 | Renderer ATS (HTML + Print CSS) | ⬜ belum |
 | 11 | Renderer Creative (1 template) | ⬜ belum |
 | 12 | Toggle Mode + Preview Pane | ⬜ belum |
-| 13 | Action Verbs Catalog + Suggestions UI | ⬜ belum |
+| 13 | Action Verbs Catalog + Suggestions UI | ◑ 13a ✅ (data, 2026-09-20) · 13b ⬜ (UI) |
 | 14 | PDF Export Flow + PWA Service Worker | ⬜ belum |
 | 15 | Delete All Data + Local Storage Notice | ⬜ belum |
 
@@ -399,3 +399,39 @@ dan inert.
 **Verifikasi:** `bun run verify` hijau penuh (lint 0 error · format ✓ · typecheck ✓ ·
 boundaries OK 86 file / 280 specifier · **9 file / 116 test unit** · build ✓ · check:budget OK) ·
 `bun run test:e2e` 2 lulus (Chromium + Firefox).
+
+## Milestone 1.2 — Content Foundation (Task 13a)
+
+### Task 13a — Micro-copy ID + Action Verbs Catalog (data saja)
+
+**Requirement:** FR-201, FR-202, FR-204, FR-205, FR-206
+**Status: ✅ SELESAI (2026-09-20).** Tanpa UI — konsumen menyusul di Task 9 dan 13b.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/content/microcopy/id.ts` | Pak micro-copy Bahasa Indonesia bertipe (D15): IPK, 4 status pendidikan + contoh penulisan, peringatan foto ATS verbatim + tips pasfoto, kontak (+62/08, email, kota, LinkedIn), organisasi, panjang CV. `getMicrocopy(locale)` mengembalikan `null` untuk `en` (FR-204). |
+| `src/content/microcopy/microcopy.test.ts` | **Di luar daftar file rencana** (dilaporkan): rumah uji frasa terlarang glossary §6 yang menyapu seluruh string modul konten + asersi verbatim/notifikasi foto. |
+| `src/content/action-verbs/id.json` | Katalog statis **72 entri** (rentang rencana 60–100), 6 kategori, tiap entri `{ verb, category, applicableSections[], examplePhrase }` dengan pola `[placeholder]` (J4). |
+| `src/content/action-verbs/index.ts` | Loader bertipe: `getAllVerbs`, `getVerbsForSection`, `getVerbCategories`. |
+| `src/content/action-verbs/action-verbs.test.ts` | 7 test: bentuk entri, tanpa duplikat, cakupan kategori, filter per section, pola kalimat. |
+| `tsconfig.app.json` | +`resolveJsonModule` (prasyarat impor JSON statis D16). |
+
+**Keputusan implementasi:**
+
+- Katalog hanya merujuk `experience`/`organizations`/`projects` — konsisten dengan Task 13b
+  (tanpa saran di Education/Skills); `getVerbsForSection('skills' | 'education')` = `[]` teruji.
+- Kategori **"Operasional"** (rencana Task 13a/D16) menggantikan "layanan" dari localization-guide
+  §4 — deviasi kecil tercatat; rencana menang.
+- Label `discontinued` = **"Berhenti"** (menutup TODO localization-guide §3.2, sesuai daftar
+  rencana Task 13a); contoh penulisannya menonjolkan transparansi (jumlah sks selesai).
+- **Batas modul `content/` → nothing**: union kunci (section, status, locale) dimirror lokal dengan
+  komentar rujukan ke `core/` — secara struktural identik sehingga konsumen `features/` dapat
+  meneruskan nilai `core` langsung; konsistensi antar-union diuji di lapisan features (Task 9/13b).
+  Bentuk katalog divalidasi runtime oleh test (content/ tidak boleh mengimpor zod).
+- Tidak ada frasa terlarang glossary §6 — diuji dengan sapuan seluruh string modul konten.
+- `content/` belum diimpor `App` → anggota bundle tidak berubah.
+
+**Verifikasi:** `bun run verify` hijau penuh (lint 0 error · format ✓ · typecheck ✓ ·
+boundaries OK 90 file / 286 specifier · **11 file / 132 test unit** · build ✓ · check:budget OK) ·
+`bun run test:e2e` 2 lulus (Chromium + Firefox). Catatan kecil: commit Task 8 memuat perubahan
+`tsconfig.json` dengan format yang belum memenuhi Prettier — diluruskan (format saja, isi sama).
