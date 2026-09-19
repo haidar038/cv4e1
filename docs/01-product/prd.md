@@ -65,9 +65,52 @@ Ringkasan; detail di `user-journeys.md`.
 - [ ] Tambahkan yang khusus rilis ini (mis. ekspor DOCX, template komunitas)
 
 ## 10. MVP definition
-- [ ] Definisi satu paragraf: apa yang harus bisa dilakukan seseorang agar MVP disebut selesai
-- [ ] Daftar periksa fitur MVP
-- [ ] Yang sengaja ditunda dari MVP dan alasannya
+
+> **v0.1 — disetujui maintainer (2026-09-20).** Disusun dari `vision.md` §5–§6 (Horizon 1),
+> `roadmap.md` Fase 1, dan `feature-catalog.md` (seluruh fitur P0 Fase 1). Bagian ini menutup
+> gap yang sebelumnya membuat gerbang keluar Fase 1 tidak dapat dinilai (gerbang merujuk ke sini).
+
+### 10.1 Definisi satu paragraf
+
+MVP cv4every1 selesai ketika seseorang yang baru lulus dapat — **dari perangkatnya sendiri,
+tanpa membuat akun, dan tanpa koneksi internet setelah app shell terpasang** — mengisi seluruh
+bagian CV berbahasa Indonesia dengan panduan kontekstual di titik pengisian; melihat hasilnya
+dalam dua mode, **ATS** (satu kolom, tanpa foto, aturan ditegakkan struktural) dan **Creative**
+(boleh dua kolom dan berfoto), dari **satu sumber data yang sama** tanpa kehilangan atau
+perubahan data saat berpindah mode; menerima saran kata kerja aksi statis yang dapat ia
+sesuaikan, tanpa AI; mencetak CV menjadi **PDF yang teksnya dapat diekstraksi** melalui dialog
+cetak peramban; menyimpan draft otomatis dan membukanya kembali; mengekspor dan mengimpor
+berkas `.cv4e.json` sebagai cadangan; serta menghapus seluruh datanya dalam satu alur yang
+menawarkan ekspor terlebih dahulu. Tidak ada skor CV, tidak ada klaim lolos ATS, dan tidak ada
+fitur yang mensyaratkan AI, akun, atau server.
+
+### 10.2 Daftar periksa fitur MVP
+
+Seluruh fitur P0 Fase 1 dari `feature-catalog.md`, ditambah P1 yang dijadwalkan dalam rencana
+Fase 1 (ditandai). Sumber rincian perilaku: `cv4every1-fase-1-mvp.md` Task 8–15.
+
+| Kelompok | Fitur (ID) |
+| :-- | :-- |
+| Manajemen data | Draft: buat, ganti nama, duplikat, hapus (F-A1) · autosave IndexedDB (F-A2) · ekspor `.cv4e.json` (F-A3) · impor tervalidasi (F-A4) · hapus semua data (F-A6) · migrasi schema (F-A7) · peringatan penyimpanan + dorongan ekspor (F-A8) · ekspor cadangan penuh dengan foto base64 (F-A5, P1 — batas akhir Fase 1) |
+| Pengisian konten | Identitas dasar (F-B1) · pendidikan dengan IPK dan status (F-B2) · pengalaman kerja/magang (F-B3) · organisasi/kepanitiaan setara pengalaman (F-B4) · proyek (F-B5) · keahlian (F-B6) · sertifikat (F-B7, P1) · unggah foto untuk mode Creative (F-B8) · susun ulang section dengan tombol (F-B9, P1) |
+| Panduan Bahasa Indonesia | Format IPK (F-C1) · status pendidikan dengan contoh (F-C2) · peringatan foto di mode ATS (F-C3) · format kontak (F-C4, P1) · penulisan pengalaman organisasi (F-C5, P1) · panjang CV (F-C6, P2) |
+| Dual-engine | Toggle ATS ↔ Creative (F-D1) · penegakan aturan mode ATS (F-D2) · satu template Creative (F-D3) · pratinjau langsung (F-D4) |
+| Bantuan penulisan | Action Verbs Catalog statis offline (F-E1) · saran sadar konteks section (F-E2) · pola kalimat berorientasi dampak (F-E3) |
+| Keluaran | Ekspor PDF via dialog cetak + modal instruksi (F-F1) · ekstraksi teks teruji otomatis (F-F3) |
+| Platform | Service worker PWA (F-G1) · dapat dipasang (F-G2, P1) · indikator status offline (F-G3) · permintaan storage persisten (F-G4, P1) |
+
+### 10.3 Yang sengaja ditunda dari MVP (dan alasannya)
+
+- **Fitur AI (F-E4, F-E5, F-H1–F-H4)** — Fase 2. Prinsip P4: fitur inti harus selesai tanpa AI; AI adalah pelengkap.
+- **Pengalih bahasa EN (F-G5)** — Fase 3. Prinsip P9: Bahasa Indonesia dirancang dulu sebagai warga kelas satu; struktur locale disiapkan sejak Task 13a.
+- **Impor CV lama / OCR (F-H5)** — Fase 3. Akurasi OCR berisiko mengecewakan; diposisikan eksperimental dengan tinjauan manusia.
+- **Pembanding mode berdampingan (F-D5) dan pemilihan tema per mode (F-D6)** — P2. Tidak menambah nilai inti dual-engine; menambah kompleksitas template.
+- **Kontrol paginasi lanjutan (F-F2)** — P1, Fase 1/2. Variasi paginasi lintas peramban diterima sebagai trade-off MVP (ADR-0007).
+- **Mode gelap (F-G6)** — P2.
+- **Ekspor DOCX (F-F4)** — P3, tidak dijadwalkan.
+- **Section kustom (F-B10)** — P3.
+- **Undo/redo (keputusan D5)** — pasca-MVP; autosave + ekspor manual sudah menutup risiko kehilangan data.
+- **Academic CV** — `vision.md` §8.9: struktur publikasi/hibah berbeda jauh, tidak untuk MVP.
 
 ## 11. Success metrics
 - [ ] Tarik tabel dari `vision.md` §7

@@ -6,8 +6,8 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-20 |
 | Fase terakhir selesai | **Fase 0 — Fondasi Data & Persistensi (termasuk Task 7a closure)** |
-| Fase berikutnya | **Fase 1 — MVP (Milestone 1.0 selesai: 7a ✅ · 7b ✅ · 7c ✅; bukti CI hijau menunggu repo git/GitHub)** |
-| Baseline test | 8 file test · 95 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Fase berikutnya | **Fase 1 — MVP (Milestone 1.0 selesai 7a–7c ✅ · pra-Task 8 ✅ · Task 8 ✅ · berikutnya Task 13a — katalog konten)** |
+| Baseline test | 9 file test · 116 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -176,6 +176,11 @@ penjelas (mock error path — diizinkan AGENTS.md §5). Tidak ada perubahan runt
 | `oxlint` | ^1.81.0 | dev | Task 1 |
 | `typescript` | ~6.0.2 | dev | Task 1 |
 | `vite` | ^8.3.0 | dev | Task 1 |
+| `@playwright/test` | 1.63.0 | dev | Task 7b |
+| `zustand` | ^5.0.15 | runtime | Pra-Task 8 (D13, disetujui maintainer) |
+
+**Dihapus 2026-09-20 (audit scaffold, lihat entri Pra-Task 8):** `recharts`, `embla-carousel-react`,
+`cmdk`, `input-otp`, `react-day-picker`, `date-fns`, `react-resizable-panels`, `@shadcn/react`.
 
 **Belum dipasang (dibutuhkan Fase 1):** `zustand`, `vite-plugin-pwa`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `axe-core`/`@axe-core/playwright`. (`@playwright/test` 1.63.0 sudah terpasang dan terpakai sejak Task 7b.)
 
@@ -241,7 +246,7 @@ Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sam
 | Task | Judul | Status |
 | :-- | :-- | :-- |
 | 7 | Testing Rig Final + CI Pipeline + Strict TS | ✅ selesai (7a+7b+7c; bukti CI menunggu remote) |
-| 8 | State Management Store (Zustand) | ⬜ belum |
+| 8 | State Management Store (Zustand) | ✅ selesai (2026-09-20) |
 | 9 | Form UI — Guided Sections | ⬜ belum |
 | 10 | Renderer ATS (HTML + Print CSS) | ⬜ belum |
 | 11 | Renderer Creative (1 template) | ⬜ belum |
@@ -323,3 +328,74 @@ CSS 198,13 kB (gzip 30,20 kB) — angka dasar untuk Task 7c.
 **Verifikasi:** `bun run verify` hijau (lint · format:check · typecheck · boundaries ·
 **8 file / 95 test unit** · build · check:budget OK) · `bun run test:e2e` 2 lulus
 (Chromium + Firefox) · `bunx playwright test --project=chromium` (perintah persis CI) lulus.
+
+### Pra-Task 8 — Penutupan gap gerbang + audit dependensi (2026-09-20)
+
+**Status: ✅ SELESAI.** Bukan task dari rencana; rangkaian tindakan persiapan atas keputusan maintainer.
+Repo kini sudah git (`origin: github.com/haidar038/cv4e1`, commit awal ter-push oleh maintainer).
+
+| Aksi | Hasil |
+| :-- | :-- |
+| **Draf `prd.md` §10 (MVP definition)** | Ditulis sebagai **v0.1 — disetujui maintainer (2026-09-20)**: definisi satu paragraf, daftar periksa fitur per ID `feature-catalog.md`, dan daftar yang ditunda beserta alasannya. Gerbang Fase 1 kini punya kriteria yang dapat dinilai. |
+| **ADR-0007 → Accepted** | Status dinaikkan dari Proposed (perubahan satu baris; konten keputusan tidak diubah). Konvensi lisan "Proposed tapi diperlakukan mengikat" berakhir. |
+| **Audit + trimming dependensi scaffold** | **8 paket runtime dihapus**: `recharts`, `embla-carousel-react`, `cmdk`, `input-otp`, `react-day-picker`, `date-fns` (tanpa pemakai sama sekali), `react-resizable-panels`, `@shadcn/react` — beserta 8 komponen `src/components/ui` yang menjadi satu-satunya pemakainya (chart, carousel, command, calendar, resizable, input-otp, message-scroller, questionnaire). Semua dapat dipulihkan lewat git. **Dipertahankan** (dipakai luas atau dirujuk rencana): `@base-ui/react`, `@phosphor-icons/react`, `class-variance-authority`, `cn`, `shadcn` (theme CSS di `index.css`), 2 `@fontsource-variable/*`, stack Tailwind, `react`, `react-dom`, `dexie`, `zod`. |
+| **Efek ke anggaran** | CSS gzip **30,2 → 27,1 KB (−10,4%) — utang CSS LUNAS**; JS tak berubah (komponen scaffold memang tak pernah masuk bundle). Baseline di-record ulang: jsGzip 68 749 B · cssGzip 27 064 B · fontsRaw 393 476 B · transferGzip 493 466 B — ratchet kini melindungi perbaikan. Sisa utang: font raw + transfer (subset font → Task 10). |
+| **`zustand@5.0.15` dipasang** | Persetujuan maintainer untuk Task 8 (D13). Pembenaran per `dependency-policy.md`: state global dengan subscription per-selector (form 40+ field); tidak di-hand-write karena selector-subscription yang benar itu rumit; **MIT, zero runtime dependency**, ~1,5 KB gzip saat terpakai (belum masuk bundle karena belum diimpor); dipelihara pmndrs, sangat aktif; jika ditinggalkan: store ditulis sebagai modul biasa `getState/setState/subscribe` (migrasi mekanis). |
+| **Keputusan metrik lab/field** | LCP/TTI/CLS **ditunda sadar** ke tahap polish/persiapan performance testing (keputusan maintainer, 2026-09-20) — tercatat di `performance-budget.md` §1. |
+| **Rumah subset font + interpretasi gerbang** | Subset font ditambahkan ke Requirements **Task 10** di `cv4every1-fase-1-mvp.md`; aturan interpretasi gerbang Fase 1 untuk anggaran bundle (JS/CSS wajib ✅; font/transfer ✅ atau utang terjadwal) tercatat di `performance-budget.md` §1 — final di checkpoint gerbang. |
+| **Drift dokumen** | `roadmap.md`: Fase 0 semua checkbox dicentang + gerbang ditandai LULUS; `docs/README.md`: "Enam ADR" → "Tujuh ADR". |
+
+**Verifikasi:** `bun run verify` hijau penuh (lint · format:check · typecheck · boundaries ·
+8 file / 95 test · build · check:budget OK, tanpa warning CSS) · `bun run test:e2e` 2 lulus
+(Chromium + Firefox).
+
+## Milestone 1.1 — Store Layer (Task 8)
+
+### Task 8 — State Management Store (Zustand)
+
+**Requirement:** FR-003, FR-102, FR-103, FR-108, NFR-005, NFR-013
+**Status: ✅ SELESAI (2026-09-20).**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/features/store/document-store.ts` | `ResumeDocument` aktif + `draftId` + `dirty` + `lastSavedAt` + `externalNotice` (`zustand/vanilla`) |
+| `src/features/store/draft-store.ts` | `DraftSummary[]` + `selectedId` |
+| `src/features/store/ui-store.ts` | mode (mirror `meta.mode`), locale, panel terbuka, status autosave, pesan storage |
+| `src/features/store/ai-store.ts` | Keranjang inert Fase 2 — kosong, tanpa logika, tidak dikonsumsi UI |
+| `src/features/store/actions.ts` | Satu-satunya lapisan mutasi: lifecycle draft, edit section generik, `setMode`, multi-tab, wiring `AutoSaveManager` |
+| `src/features/store/selectors.ts` | `selectATSViewModel`/`selectCreativeViewModel` memoized berbasis referensi dokumen |
+| `src/features/store/store.test.ts` | 21 test: invariant mode, memoization, persist autosave, kuota penuh, storage diblokir, draft rusak, multi-tab (BroadcastChannel nyata), CRUD draft |
+
+**Keputusan implementasi:**
+
+- `zustand/vanilla` `createStore` — store murni tanpa React (kriteria "dapat diuji tanpa React",
+  state-management §8); komponen nanti mengonsumsi via `useStore(store, selector)`.
+- Semua mutasi dokumen lewat satu gerbang `applyDocumentUpdate`: validasi ulang sebelum commit
+  (store hanya pernah memegang `ValidatedResumeDocument`), no-op terdeteksi dan diabaikan, lalu
+  `autosave.registerChange(doc, draftId)`.
+- `withMaterializedMeta`: default `meta` (locale/mode) dimaterialisasi di batas store supaya
+  invariant "setMode hanya mengubah `meta.mode`" eksak — tanpa efek samping materialisasi
+  `meta.locale` saat toggle pertama pada dokumen tanpa meta.
+- `stableSnapshot`: pembanding konten agnostik terhadap urutan kunci — Zod menyusun ulang urutan
+  kunci saat re-parse, sehingga `JSON.stringify` mentah menghasilkan no-op palsu.
+- Aksi item section generik per `SectionKey` (add/update/remove/move, berbasis index — item skema
+  tidak punya `id`); dua cast terdokumentasi menjembatani keterbatasan korelasi generik TypeScript
+  (bukan `any`, dengan komentar alasan).
+- `AutoSaveManager.onSuccess` → set `draftId`/`lastSavedAt`, `notifyTabs('draft_updated')`,
+  refresh `DraftStore` — menutup titik integrasi sync yang sebelumnya TODO di autosave.
+- Multi-tab: `handleExternalMessage` (diekspor untuk test) + `initStoreSync` — update dari tab lain
+  hanya menaikkan `externalNotice` (tanpa overwrite diam-diam, D4); penghapusan draft yang terbuka
+  memindahkan tab ke kondisi kosong. Teruji lewat **BroadcastChannel kedua dengan nama yang sama**
+  (integrasi nyata, bukan mock).
+- Pesan storage Bahasa Indonesia nada D21: "Gagal menyimpan — ekspor manual disarankan." ·
+  "Mode privat: perubahan tidak tersimpan." · pesan draft rusak menjelaskan dan menenangkan.
+- `zustand` belum masuk bundle (belum diimpor `App`) — anggota bundle tidak berubah.
+
+**Acceptance criteria Task 8:** seluruh terpenuhi — action lifecycle/edit/order/mode terdefinisi;
+invariant mode-switch teruji; selector memoized teruji; store tanpa React (env node); autosave
+terpicu dan `DraftStore` diperbarui setelah save; `onExternalUpdate` non-blocking; `AIStore` ada
+dan inert.
+
+**Verifikasi:** `bun run verify` hijau penuh (lint 0 error · format ✓ · typecheck ✓ ·
+boundaries OK 86 file / 280 specifier · **9 file / 116 test unit** · build ✓ · check:budget OK) ·
+`bun run test:e2e` 2 lulus (Chromium + Firefox).

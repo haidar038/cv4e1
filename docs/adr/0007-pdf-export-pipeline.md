@@ -1,6 +1,6 @@
 # ADR-0007: Pipeline ekspor PDF untuk mode ATS dan Creative
 
-- **Status:** Proposed
+- **Status:** Accepted (diterima 2026-09-20 — diadopsi sebagai arah Fase −1 dan menjadi dasar Fase 1; konten keputusan tidak diubah)
 - **Date:** 2026-09-18
 - **Decision owner:** Maintainer proyek
 - **Related:** ADR-0004 (dua renderer), rendering-architecture.md §5

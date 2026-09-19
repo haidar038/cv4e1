@@ -23,14 +23,14 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 ## Fase 0 — Fondasi
 
-- [ ] `ResumeDocument` + Zod schema + JSON Schema tergenerate
-- [ ] Validasi, normalisasi, view model
-- [ ] Adapter IndexedDB, autosave, manajemen draft
-- [ ] Impor/ekspor JSON + uji round-trip
-- [ ] Kerangka migrasi + fixture
-- [ ] Rig pengujian, CI, anggaran performa
+- [x] `ResumeDocument` + Zod schema + JSON Schema tergenerate
+- [x] Validasi, normalisasi, view model
+- [x] Adapter IndexedDB, autosave, manajemen draft
+- [x] Impor/ekspor JSON + uji round-trip
+- [x] Kerangka migrasi + fixture
+- [x] Rig pengujian, CI, anggaran performa
 
-**Gerbang keluar:** data dapat disimpan, dimuat, diekspor, diimpor, dan dimigrasi, dengan test.
+**Gerbang keluar:** data dapat disimpan, dimuat, diekspor, diimpor, dan dimigrasi, dengan test. — **✅ LULUS (2026-09-20)**
 
 ## Fase 1 — MVP
 

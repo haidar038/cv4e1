@@ -31,7 +31,7 @@ Untuk pertanyaan spesifik, pakai [`context-map.md`](context-map.md).
 | `06-security/` | Threat model, privasi, requirement keamanan, abuse case | 📝 Outline |
 | `07-quality/` | Strategi test, test ATS, aksesibilitas, performa, matriks | 📝 Outline |
 | `08-delivery/` | CI/CD, rilis, deployment, rollback, runbook | 📝 Outline |
-| `adr/` | Architecture decision records | ✅ Enam ADR |
+| `adr/` | Architecture decision records | ✅ Tujuh ADR |
 
 ## Hierarki dokumen
 
