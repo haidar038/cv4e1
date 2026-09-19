@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cv4every1.example/schemas/resume-1.0.0.json",
+  "title": "cv4every1 Resume",
+  "description": "DRAFT v0.1. Skema ini akan digenerate dari definisi Zod di src/core/schema.ts. Jangan edit manual setelah generator tersedia.",
+  "type": "object",
+  "required": ["schemaVersion", "basics", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "meta": { "$ref": "#/$defs/meta" },
+    "basics": { "$ref": "#/$defs/basics" },
+    "sections": { "$ref": "#/$defs/sections" },
+    "sectionOrder": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Urutan tampil section. Section yang tidak tercantum memakai urutan bawaan."
+    }
+  },
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "locale": { "type": "string", "enum": ["id", "en"], "default": "id" },
+        "mode": { "type": "string", "enum": ["ats", "creative"], "default": "ats" },
+        "template": { "type": "string" },
+        "title": { "type": "string", "description": "Label draft milik pengguna, bukan bagian dari isi CV." }
+      }
+    },
+    "basics": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "headline": { "type": "string", "maxLength": 160 },
+        "email": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 40 },
+        "location": { "type": "string", "maxLength": 120 },
+        "summary": { "type": "string", "maxLength": 1200 },
+        "links": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/link" } },
+        "photo": { "$ref": "#/$defs/photo" }
+      }
+    },
+    "link": {
+      "type": "object",
+      "required": ["url"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "maxLength": 60 },
+        "url": { "type": "string", "format": "uri", "maxLength": 500 }
+      }
+    },
+    "photo": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Foto selalu tersimpan. Penyembunyian pada mode ATS adalah urusan render, bukan data.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "assetRef": { "type": "string", "description": "Kunci ke object store aset di IndexedDB. Bukan data URL." }
+      }
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "education": { "type": "array", "items": { "$ref": "#/$defs/education" } },
+        "experience": { "type": "array", "items": { "$ref": "#/$defs/experience" } },
+        "organizations": { "type": "array", "items": { "$ref": "#/$defs/experience" } },
+        "projects": { "type": "array", "items": { "$ref": "#/$defs/project" } },
+        "skills": { "type": "array", "items": { "$ref": "#/$defs/skillGroup" } },
+        "certifications": { "type": "array", "items": { "$ref": "#/$defs/certification" } }
+      }
+    },
+    "education": {
+      "type": "object",
+      "required": ["institution"],
+      "additionalProperties": false,
+      "properties": {
+        "institution": { "type": "string", "maxLength": 200 },
+        "degree": { "type": "string", "maxLength": 200 },
+        "field": { "type": "string", "maxLength": 200 },
+        "location": { "type": "string", "maxLength": 120 },
+        "startDate": { "$ref": "#/$defs/partialDate" },
+        "endDate": { "$ref": "#/$defs/partialDate" },
+        "status": {
+          "type": "string",
+          "enum": ["graduated", "awaiting-ceremony", "in-progress", "discontinued"],
+          "description": "awaiting-ceremony menangani 'lulus, menunggu wisuda' yang lazim di Indonesia."
+        },
+        "gpa": { "$ref": "#/$defs/gpa" },
+        "highlights": { "type": "array", "maxItems": 10, "items": { "type": "string", "maxLength": 400 } }
+      }
+    },
+    "gpa": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Disimpan sebagai objek agar skalanya tidak hilang. IPK tanpa skala kehilangan makna.",
+      "properties": {
+        "value": { "type": "string", "pattern": "^[0-9]+([.,][0-9]{1,2})?$" },
+        "scale": { "type": "string", "pattern": "^[0-9]+([.,][0-9]{1,2})?$", "default": "4.00" },
+        "label": { "type": "string", "default": "IPK" }
+      }
+    },
+    "experience": {
+      "type": "object",
+      "required": ["organization"],
+      "additionalProperties": false,
+      "properties": {
+        "organization": { "type": "string", "maxLength": 200 },
+        "role": { "type": "string", "maxLength": 200 },
+        "employmentType": {
+          "type": "string",
+          "enum": ["full-time", "part-time", "internship", "freelance", "volunteer", "organization"]
+        },
+        "location": { "type": "string", "maxLength": 120 },
+        "startDate": { "$ref": "#/$defs/partialDate" },
+        "endDate": { "$ref": "#/$defs/partialDate" },
+        "current": { "type": "boolean", "default": false },
+        "highlights": { "type": "array", "maxItems": 12, "items": { "type": "string", "maxLength": 400 } }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "maxLength": 200 },
+        "role": { "type": "string", "maxLength": 200 },
+        "context": { "type": "string", "maxLength": 200, "description": "mis. 'Tugas akhir', 'Proyek mata kuliah', 'Personal'" },
+        "startDate": { "$ref": "#/$defs/partialDate" },
+        "endDate": { "$ref": "#/$defs/partialDate" },
+        "url": { "type": "string", "format": "uri", "maxLength": 500 },
+        "highlights": { "type": "array", "maxItems": 10, "items": { "type": "string", "maxLength": 400 } }
+      }
+    },
+    "skillGroup": {
+      "type": "object",
+      "required": ["items"],
+      "additionalProperties": false,
+      "properties": {
+        "category": { "type": "string", "maxLength": 80 },
+        "items": { "type": "array", "maxItems": 40, "items": { "type": "string", "maxLength": 60 } }
+      }
+    },
+    "certification": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "maxLength": 200 },
+        "issuer": { "type": "string", "maxLength": 200 },
+        "issueDate": { "$ref": "#/$defs/partialDate" },
+        "url": { "type": "string", "format": "uri", "maxLength": 500 }
+      }
+    },
+    "partialDate": {
+      "type": "string",
+      "pattern": "^[0-9]{4}(-[0-9]{2})?(-[0-9]{2})?$",
+      "description": "YYYY, YYYY-MM, atau YYYY-MM-DD. Pemformatan tampilan adalah urusan render."
+    }
+  }
+}

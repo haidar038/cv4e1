@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "locale": "id",
+    "mode": "ats",
+    "template": "ats-default",
+    "title": "Fixture Lengkap"
+  },
+  "basics": {
+    "name": "Contoh Nama Fiktif",
+    "headline": "Fresh Graduate Teknik Informatika",
+    "email": "contoh.fiktif@example.com",
+    "phone": "+62 812-0000-0000",
+    "location": "Kota Contoh, Provinsi Contoh",
+    "summary": "Ringkasan profesional fiktif untuk pengujian skema.",
+    "links": [
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/in/contoh-fiktif" }
+    ],
+    "photo": {
+      "enabled": true,
+      "assetRef": "asset_test_001"
+    }
+  },
+  "sections": {
+    "education": [
+      {
+        "institution": "Universitas Contoh Nusantara",
+        "degree": "S1 Teknik Informatika",
+        "field": "Rekayasa Perangkat Lunak",
+        "location": "Kota Contoh",
+        "startDate": "2021-08",
+        "endDate": "2025-07",
+        "status": "graduated",
+        "gpa": { "value": "3.52", "scale": "4.00", "label": "IPK" },
+        "highlights": ["Tugas akhir: sistem informasi pendataan UMKM berbasis web"]
+      }
+    ],
+    "experience": [
+      {
+        "organization": "CV Contoh Digital",
+        "role": "Magang Pengembang Web",
+        "employmentType": "internship",
+        "location": "Kota Contoh",
+        "startDate": "2024-07",
+        "endDate": "2024-12",
+        "current": false,
+        "highlights": [
+          "Membangun tiga halaman antarmuka untuk aplikasi internal",
+          "Menyusun dokumentasi penggunaan aplikasi"
+        ]
+      }
+    ],
+    "organizations": [
+      {
+        "organization": "Himpunan Mahasiswa Teknik Informatika",
+        "role": "Koordinator Divisi Acara",
+        "employmentType": "organization",
+        "startDate": "2023-01",
+        "endDate": "2023-12",
+        "current": false,
+        "highlights": [
+          "Mengkoordinasikan panitia beranggotakan 15 orang",
+          "Menyusun rundown kegiatan seminar teknologi"
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "name": "Sistem Pendataan UMKM",
+        "role": "Pengembang",
+        "context": "Tugas akhir",
+        "startDate": "2024-09",
+        "endDate": "2025-06",
+        "highlights": [
+          "Merancang basis data dan antarmuka pendataan",
+          "Menguji aplikasi bersama pelaku usaha"
+        ]
+      }
+    ],
+    "skills": [
+      { "category": "Teknis", "items": ["JavaScript", "React", "HTML", "CSS", "Git"] },
+      { "category": "Bahasa", "items": ["Bahasa Indonesia", "Bahasa Inggris (pasif)"] }
+    ],
+    "certifications": [
+      {
+        "name": "Belajar Dasar Pemrograman Web",
+        "issuer": "Platform Pelatihan Contoh",
+        "issueDate": "2024-03"
+      }
+    ]
+  },
+  "sectionOrder": ["education", "experience", "organizations", "projects", "skills", "certifications"]
+}

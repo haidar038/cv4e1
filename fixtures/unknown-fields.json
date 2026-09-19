@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "basics": {
+    "name": "Uji Field Tak Dikenal"
+  },
+  "sections": {},
+  "_futureFeatureFlag": true,
+  "customMetadata": {
+    "source": "external-tool",
+    "id": "ext-999"
+  }
+}

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Spike S1 — Candidate A: ATS CV (Print CSS)</title>
+<style>
+  /* Page setup for print */
+  @page {
+    size: A4;
+    margin: 20mm 18mm;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    line-height: 1.45;
+    color: #000;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv { max-width: 100%; }
+
+  h1 {
+    font-size: 18pt;
+    margin: 0 0 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .headline {
+    font-size: 12pt;
+    margin: 0 0 6px;
+    color: #333;
+  }
+
+  .contact {
+    font-size: 10pt;
+    margin-bottom: 10px;
+    color: #222;
+  }
+  .contact span { margin-right: 12px; white-space: nowrap; }
+
+  section { margin-top: 12px; page-break-inside: avoid; }
+
+  h2 {
+    font-size: 12pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2px;
+    margin: 0 0 6px;
+  }
+
+  .item { margin-bottom: 8px; page-break-inside: avoid; }
+
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .item-title { font-weight: bold; }
+  .item-sub { font-style: italic; color: #333; }
+  .item-dates { font-size: 10pt; white-space: nowrap; }
+
+  ul.highlights {
+    margin: 4px 0 0;
+    padding-left: 18px;
+  }
+  ul.highlights li { margin-bottom: 2px; }
+
+  .summary { margin: 6px 0 0; }
+
+  .skills-line { margin: 2px 0; }
+  .skills-label { font-weight: bold; }
+
+  /* ATS rules enforced structurally in this spike:
+     single column, no photo, no icons replacing text, standard headings */
+</style>
+</head>
+<body>
+<div class="cv" id="ats-cv">
+  <header>
+    <h1>Rania Putri Maharani</h1>
+    <p class="headline">Fresh Graduate Teknik Informatika</p>
+    <div class="contact">
+      <span>Ternate, Maluku Utara</span>
+      <span>+62 812-0000-0000</span>
+      <span>rania.contoh@example.com</span>
+      <span>LinkedIn: linkedin.com/in/contoh</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Ringkasan</h2>
+    <p class="summary">Lulusan Teknik Informatika dengan pengalaman organisasi kemahasiswaan dan proyek akhir di bidang pengembangan web. Terbiasa bekerja dalam tim kecil dan mengelola jadwal kegiatan.</p>
+  </section>
+
+  <section>
+    <h2>Pendidikan</h2>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">S1 Teknik Informatika — Universitas Contoh Nusantara</span>
+        <span class="item-dates">Agustus 2021 – Juli 2025</span>
+      </div>
+      <div class="item-sub">Rekayasa Perangkat Lunak · Ternate · IPK 3.52 / 4.00</div>
+      <ul class="highlights">
+        <li>Tugas akhir: sistem informasi pendataan UMKM berbasis web</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pengalaman Kerja</h2>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Magang Pengembang Web — CV Contoh Digital</span>
+        <span class="item-dates">Juli 2024 – Desember 2024</span>
+      </div>
+      <div class="item-sub">Ternate</div>
+      <ul class="highlights">
+        <li>Membangun tiga halaman antarmuka untuk aplikasi pendataan internal</li>
+        <li>Menyusun dokumentasi penggunaan aplikasi untuk staf non-teknis</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Organisasi</h2>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Koordinator Divisi Acara — Himpunan Mahasiswa Teknik Informatika</span>
+        <span class="item-dates">Januari 2023 – Desember 2023</span>
+      </div>
+      <ul class="highlights">
+        <li>Mengkoordinasikan panitia beranggotakan 15 orang untuk seminar teknologi tingkat fakultas</li>
+        <li>Menyusun rundown dan jadwal koordinasi mingguan selama masa persiapan</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Proyek</h2>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Sistem Pendataan UMKM — Tugas akhir</span>
+        <span class="item-dates">September 2024 – Juni 2025</span>
+      </div>
+      <ul class="highlights">
+        <li>Merancang basis data dan antarmuka pendataan untuk 5 kategori usaha</li>
+        <li>Menguji aplikasi bersama 8 pelaku usaha untuk mengumpulkan masukan</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Keahlian</h2>
+    <div class="skills-line"><span class="skills-label">Teknis:</span> JavaScript, React, HTML, CSS, Git, MySQL</div>
+    <div class="skills-line"><span class="skills-label">Bahasa:</span> Bahasa Indonesia, Bahasa Inggris (pasif)</div>
+  </section>
+
+  <section>
+    <h2>Sertifikasi</h2>
+    <div class="item">
+      <div class="item-header">
+        <span class="item-title">Belajar Dasar Pemrograman Web — Platform Pelatihan Contoh</span>
+        <span class="item-dates">Maret 2024</span>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

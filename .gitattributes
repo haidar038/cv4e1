@@ -1,0 +1,11 @@
+# Normalize line endings for every text file stored in this repository.
+# `prettier` is configured with `endOfLine: "lf"`, and CI runs on Linux, so
+# checked-out files must be LF everywhere or `format:check` becomes
+# platform-dependent.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending converted.
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.ico binary

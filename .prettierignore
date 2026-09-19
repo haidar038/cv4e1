@@ -1,0 +1,26 @@
+# Formatting is enforced on authored source, not on prose or generated files.
+
+# Documentation is hand-authored Indonesian prose; reflowing it creates noise
+# and mangles tables. AGENTS.md §12 governs its content, not a formatter.
+docs/
+plans/
+*.md
+
+# Generated artefacts. `schemas/resume.schema.json` is produced by
+# scripts/generate-json-schema.mjs and must stay byte-identical to generator output.
+schemas/
+
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+bun.lock
+
+# Test data: stable, hand-controlled formatting matters more than prettiness.
+fixtures/
+
+# Historical spike artefacts referenced by ADR-0007.
+experiments/
+
+# Static assets
+public/
