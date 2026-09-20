@@ -15,13 +15,13 @@ Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-20 pasca-pipe
 Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 `scripts/bundle-baseline.json`).
 
-| Metrik | Anggaran | Pasca-Task 13b (2026-09-21) | Status |
+| Metrik | Anggaran | Pasca-Task 10 (2026-09-21) | Status |
 | :-- | :-- | :-- | :-- |
-| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **190,5 KB** (190.455 B) | ✅ terpenuhi, sisa ruang 9,5 KB — lihat catatan utang JS di bawah |
-| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **191,6 KB** (termasuk chunk lazy `export-import` 1,2 KB) | ✅ ratchet OK (+3,4%, di bawah gerbang fatal +10%) |
-| CSS awal (gzip) | ≤ 30 KB | **25,7 KB** | ✅ terpenuhi |
+| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **192,2 KB** (192.165 B) | ✅ terpenuhi, sisa ruang 7,8 KB — lihat catatan utang JS di bawah |
+| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **195,7 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB) | ✅ ratchet OK (+5,7%, di bawah gerbang fatal +10%) |
+| CSS awal (gzip) | ≤ 30 KB | **26,2 KB** (termasuk CSS lazy renderer 0,5 KB) | ✅ terpenuhi |
 | Font (raw, woff2) | ≤ 100 KB (di-subset) | **88,8 KB** | ✅ **terpenuhi — utang font lunas** |
-| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **310,0 KB** | ✅ **terpenuhi — utang transfer lunas** |
+| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **314,7 KB** | ✅ **terpenuhi — utang transfer lunas** |
 | LCP ≤ 2.5 s · TTI ≤ 3.5 s · CLS ≤ 0.1 · Muat ulang offline ≤ 1 s | | belum diukur | ⬜ **ditunda sadar** ke tahap polish/persiapan performance testing (keputusan maintainer, 2026-09-20) |
 
 - [x] **Validasi angka bundle lewat pengukuran** (2026-09-20, diperbarui pasca-audit dan pasca-pipeline lazy).
@@ -55,7 +55,11 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   sehingga panel lahir sebagai disclosure inline; baseline JSON **tidak** di-record ulang karena kedua
   ratchet tetap hijau. Sisa ruang anggaran absolut kini 9,5 KB gzip — peringatan utang JS di bawah
   tetap berlaku untuk Task 10–15 (renderer direncanakan lazy, §3).
-- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 9,5 KB gzip.
+- **Task 10 (2026-09-21):** renderer ATS **lahir lazy** sesuai rencana §3 — chunk `ATSRenderer`
+  2,4 KB gzip + CSS 0,5 KB keluar dari JS/CSS awal; yang masuk shell hanya gate pratinjau
+  (`?preview=ats`, dihapus saat Task 12) dan wrapper lazy (+1,7 KB `initialJsGzip`). Baseline JSON
+  **tidak** di-record ulang (semua ratchet hijau). Sisa ruang absolut kini 7,8 KB gzip.
+- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 7,8 KB gzip.
   Sebelum gerbang Fase 1, audit bundle + pemisahan kode (§3: renderer dimuat lazy) perlu dievaluasi
   maintainer agar Task 10–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
   checkpoint gerbang.

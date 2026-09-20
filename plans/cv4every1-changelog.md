@@ -5,10 +5,10 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Field | Value |
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-21 |
-| Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 13b Action Verbs Suggestions UI** (Task 9 sebelumnya) |
-| Fase berikutnya | **Task 10 (Renderer ATS)** |
-| Baseline test | 29 file test · 276 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
-| Wall-clock unit test | ~54 s penuh (node ±13 s · jsdom ±40 s; naik dari 27 s karena 3 berkas `*.dom.test.tsx` baru) |
+| Fase terakhir selesai | **Fase 1 — Milestone 1.4: Task 10 Renderer ATS** (Task 13b sebelumnya) |
+| Fase berikutnya | **Task 11 (Renderer Creative)** |
+| Baseline test | 31 file test · 296 test lulus · e2e 15 lulus + 1 skip kapabilitas · `tsc -b --noEmit` bersih (strict aktif) |
+| Wall-clock unit test | ~55 s penuh (node ±14 s · jsdom ±41 s) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -808,3 +808,47 @@ bullet (Experience, Organizations, Projects); Education dan Skills tetap tanpa s
 **Verifikasi:** `bun run verify` hijau penuh — 29 file / **276 test unit** (node 201 · jsdom 75) ·
 `bun run test:e2e` **10 lulus** (Chromium + Firefox; sebelumnya 8) · `check:budget` ✅ (+3,5% vs
 baseline) · `check:privacy` ✅.
+
+---
+
+## Fase 1 — Milestone 1.4
+
+### Task 10 — Renderer ATS (HTML + Print CSS)
+**Requirement:** FR-002, FR-004, FR-005, FR-006, FR-007, FR-008, FR-301, FR-302, FR-304, NFR-015 —
+ADR-0004/0007, rendering-architecture.md §2/§4, ats-test-plan.md
+**Status: ✅ SELESAI (2026-09-21).** Satu halaman pratinjau sekaligus sumber PDF mode ATS dengan
+teks yang pulih lengkap dan berurutan saat diekstraksi dari PDF.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/render/ats/ATSRenderer.tsx` | Renderer bodoh — satu-satunya prop `vm: ATSViewModel` (tanpa permukaan template/layout, bukti sisi-ATS FR-008); struktur semantik datar tanpa `<div>`; nama kosong tidak pernah menjadi `<h1>` kosong (kontrak rendering). |
+| `src/render/ats/sections/*.tsx` | 5 komponen item (Education, Experience [juga organizations], Project, Skills, Certification); highlights selalu `<ul>`; tanggal/IPK/label sudah jadi dari view model. |
+| `src/render/ats/print.css` | CSS namespaced `.cv-ats`: tampilan kertas di layar, `@page A4`, isolasi `@media print` (hanya dokumen terlihat), `break-inside: avoid` per item; **nol** grid/flex/column-count/float/text-transform — ditegakkan test. |
+| `src/render/ats/structural.ts` + `expectations.ts` | Pure checker pelanggaran struktural + derivasi ekspektasi tampilan dari view model (sumber tunggal test node; metode spike: ekspektasi dari dokumen, bukan hardcode). |
+| `src/render/ats/ATSRenderer.test.tsx` (**node, tanpa DOM**) | 15 test: tanpa img/table/svg/div meski sumber berfoto; urutan heading = view model; kosong = nol heading; D12 mixed-case; en dash/`+62`/`IPK: 3.52 / 4.00`/`Magang`/`Sekarang`; gerbang stylesheet; meta-test checker; **3 snapshot baseline markup dikomit**. |
+| `src/core/normalize-helpers.ts` (+test) | `employmentType` kini diterjemahkan ke label tampilan (`Magang`, bukan `internship`) — melengkapi pola `STATUS_LABELS_ID`; aturan tampilan tetap di layer normalisasi (ADR-0004). |
+| `src/features/preview/PreviewGate.tsx` (+dom test) | Gate `?preview=ats` sementara (Task 12 mengganti dengan PreviewPane): lazy chunk renderer, view model lewat `selectATSViewModel` memoized; SkipLink `#cv-preview` ikut aktif. |
+| `e2e/ats-print.spec.ts` | 3 test: layout cetak + axe halaman pratinjau (2 browser); **ekstraksi PDF** via `page.pdf()` + `pdf-parse` — seluruh baris pratinjau pulih berurutan + sentinel `3.52 / 4.00`/`+62` (Chromium); nol permintaan off-origin sepanjang alur impor→render→cetak. |
+| `scripts/module-boundaries.ts` | `TEST_TOOLING` += `react-dom`, `node:fs`, `node:url` untuk test renderer node-project (produk tetap terjaga: build + ratchet menolak penyalahgunaan). |
+| Docs: plan AC ✓, matrix (FR-002/004/005/006/007/008/302 → ✅), roadmap ✓, ats-test-plan §2 ✓, visual-regression-plan (keputusan baseline), performance-budget | Checklist penutup dalam perubahan yang sama. |
+
+**Keputusan implementasi:**
+- **Renderer lahir lazy** sesuai rencana §3 budget: chunk `ATSRenderer` 2,4 KB gzip + CSS 0,5 KB
+  terpisah; shell hanya bertambah +1,7 KB (`initialJsGzip` 190,5 → **192,2 KB**, sisa 7,8 KB dari
+  200 KB). Baseline JSON tidak di-record ulang — semua ratchet hijau.
+- **Gate `?preview=ats`** (keputusan maintainer): renderer dijangkau e2e lewat region ber-gate
+  query-param + draft terbuka; PreviewPane UX tetap milik Task 12. Task 12 menghapus gate ini.
+- **Regresi visual = snapshot markup deterministik** (keputusan maintainer): baseline screenshot
+  piksel menunggu satu siklus generate baseline Linux di CI (Task 11/12) — rasterisasi font
+  berbeda antar-platform; tercatat di visual-regression-plan.md.
+- **Impor envelope di e2e**: fixture mentah bukan format impor — spec membungkusnya persis
+  seperti `exportResume` (envelope terkunci test FR-104/105/106).
+- **Temuan vs spike:** `page.pdf()` **bekerja** di Chromium Windows lokal (timeout spike tidak
+  terulang) — gerbang ekstraksi berjalan lokal dan CI Linux; Firefox melewatkan test PDF karena
+  kapabilitas browser (bukan flake), layout+egress tetap diuji di Firefox.
+- Tanpa perubahan `ResumeDocument`, tanpa ADR baru, tanpa dependensi baru
+  (`@react-pdf/renderer` tetap devDep spike, tidak menyentuh bundle), tanpa `console.*`.
+
+**Verifikasi:** `bun run verify` hijau penuh — 31 file / **296 test unit** · `check:boundaries`,
+`check:privacy`, `check:budget` ✅ (initialJsGzip +4,4% · jsGzip +5,7% · cssGzip +2,3% ·
+transferGzip +3,7%) · `bun run test:e2e` **15 lulus + 1 skip kapabilitas** (Chromium + Firefox).

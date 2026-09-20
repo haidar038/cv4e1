@@ -40,6 +40,20 @@ const STATUS_LABELS_ID: Record<string, string> = {
   discontinued: 'Berhenti',
 }
 
+/**
+ * Employment types reach the view model as display strings, never as raw
+ * enum tokens — the CV is user-facing text (same rule as STATUS_LABELS_ID;
+ * mirrors the labels the form select shows, glossary-consistent Bahasa).
+ */
+const EMPLOYMENT_TYPE_LABELS_ID: Record<string, string> = {
+  'full-time': 'Penuh waktu',
+  'part-time': 'Paruh waktu',
+  internship: 'Magang',
+  freelance: 'Freelance',
+  volunteer: 'Sukarelawan',
+  organization: 'Organisasi',
+}
+
 export const SECTION_HEADINGS_ID: Record<SectionKey, string> = {
   education: 'PENDIDIKAN',
   experience: 'PENGALAMAN KERJA',
@@ -162,7 +176,9 @@ export function buildExperienceDisplays(
       highlights: item.highlights ?? [],
     }
     if (item.role !== undefined) display.role = item.role
-    if (item.employmentType !== undefined) display.employmentType = item.employmentType
+    if (item.employmentType !== undefined) {
+      display.employmentType = EMPLOYMENT_TYPE_LABELS_ID[item.employmentType] ?? item.employmentType
+    }
     if (item.location !== undefined) display.location = item.location
     return display
   })

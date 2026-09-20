@@ -36,7 +36,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 - [x] Form terpandu seluruh section
 - [x] Micro-copy Bahasa Indonesia (IPK, status pendidikan, kontak, organisasi)
-- [ ] Renderer ATS dengan penegakan aturan
+- [x] Renderer ATS dengan penegakan aturan
 - [ ] Renderer Creative (1–2 template)
 - [ ] Toggle mode + peringatan kontekstual foto
 - [x] Action Verbs Catalog + UI saran

@@ -34,8 +34,21 @@ export interface ModuleRule {
   readonly allowedPackages?: readonly string[]
 }
 
-/** Test-runner tooling is not a product dependency, and is allowed everywhere. */
-const TEST_TOOLING: readonly string[] = ['vitest', 'fake-indexeddb']
+/**
+ * Test-runner tooling is not a product dependency, and is allowed everywhere.
+ * `react-dom` covers the /server subpath: the node-project renderer tests
+ * (render/ats) render to static markup, and read fixtures/stylesheets from
+ * disk via node builtins. None of it can reach the product bundle — a product
+ * file importing any of these fails the build (node builtins) or blows the
+ * bundle ratchet (server renderer), so build + check:budget stay the gates.
+ */
+const TEST_TOOLING: readonly string[] = [
+  'vitest',
+  'fake-indexeddb',
+  'react-dom',
+  'node:fs',
+  'node:url',
+]
 
 export const MODULE_RULES: Readonly<Record<ModuleName, ModuleRule>> = {
   core: { allowedModules: [], allowedPackages: ['zod'] },

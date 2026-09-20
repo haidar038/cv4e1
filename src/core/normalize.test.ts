@@ -72,6 +72,12 @@ describe('Normalization: ATS ViewModel', () => {
     expect(eduItem.status).toBe('Lulus')
   })
 
+  it('should translate employment type to Indonesian (display string, not enum)', () => {
+    const expSection = vm.sections.find((s) => s.key === 'experience')
+    const expItem = expSection?.items[0] as { employmentType?: string }
+    expect(expItem.employmentType).toBe('Magang')
+  })
+
   it('should format dates in Indonesian months', () => {
     const eduSection = vm.sections.find((s) => s.key === 'education')
     const eduItem = eduSection?.items[0] as { dates: { start?: string; end?: string } }

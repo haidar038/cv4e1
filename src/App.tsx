@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useStore } from 'zustand'
 import { DraftPanel } from './features/drafts/DraftPanel'
 import { FormLayout } from './features/form/FormLayout'
+import { PreviewGate } from './features/preview/PreviewGate'
 import { initStoreSync, loadDraftAction, refreshDrafts } from './features/store/actions'
 import { documentStore } from './features/store/document-store'
 
@@ -36,6 +37,8 @@ function App() {
       <main id="cv-form" className="flex min-w-0 flex-1">
         <FormLayout />
       </main>
+      {/* Task 10 print/extraction surface; Task 12 replaces it with the PreviewPane. */}
+      <PreviewGate />
     </div>
   )
 }

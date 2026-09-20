@@ -125,6 +125,10 @@ export interface MicrocopyPack {
     hint: string
     emptyState: string
   }
+  preview: {
+    /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
+    regionLabel: string
+  }
   drafts: {
     title: string
     empty: string
@@ -405,6 +409,9 @@ export const microcopyId: MicrocopyPack = {
     toggleLabel: 'Saran kata kerja',
     hint: 'Pilih kata kerja untuk menyisipkannya di posisi kursor, lalu sesuaikan dengan pengalaman Anda.',
     emptyState: 'Belum ada saran kata kerja untuk bagian ini.',
+  },
+  preview: {
+    regionLabel: 'Pratinjau CV',
   },
   drafts: {
     title: 'CV saya',

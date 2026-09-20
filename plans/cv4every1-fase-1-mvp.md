@@ -580,16 +580,16 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Output render **tidak mengandung** `<img>` meski `photo.enabled: true` di dokumen sumber.
-- [ ] Urutan section persis sama dengan `sectionOrder`.
-- [ ] Section kosong menghasilkan **nol heading** (FR-006).
-- [ ] Tidak ada `<table>` di struktur inti (FR-005).
-- [ ] Nama tampil mixed-case, bukan uppercase.
-- [ ] Struktur HTML rata/sederhana — tidak ada nesting dekoratif berlebihan.
-- [ ] `renderToStaticMarkup` dapat dipakai untuk snapshot test **tanpa DOM** (JSON-LD/string test).
-- [ ] Regresi visual baseline tersimpan untuk semua fixture valid.
-- [ ] **Uji ekstraksi teks**: cetak ke PDF di CI (Chromium Linux) lalu ekstrak — nama, kontak, heading, tanggal, `3.52 / 4.00`, dan seluruh highlights pulih lengkap dan berurutan (`ats-test-plan.md`).
-- [ ] Mode ATS *tidak* bisa menampilkan foto meski template dimodifikasi — dibuktikan test yang gagal jika `<img>` muncul.
+- [x] Output render **tidak mengandung** `<img>` meski `photo.enabled: true` di dokumen sumber.
+- [x] Urutan section persis sama dengan `sectionOrder`.
+- [x] Section kosong menghasilkan **nol heading** (FR-006).
+- [x] Tidak ada `<table>` di struktur inti (FR-005).
+- [x] Nama tampil mixed-case, bukan uppercase.
+- [x] Struktur HTML rata/sederhana — tidak ada nesting dekoratif berlebihan.
+- [x] `renderToStaticMarkup` dapat dipakai untuk snapshot test **tanpa DOM** (JSON-LD/string test).
+- [x] Regresi visual baseline tersimpan untuk semua fixture valid. *(baseline = snapshot markup deterministik per fixture; baseline screenshot piksel menyusul di Task 11/12 — keputusan tercatat di visual-regression-plan.md §3)*
+- [x] **Uji ekstraksi teks**: cetak ke PDF di CI (Chromium Linux) lalu ekstrak — nama, kontak, heading, tanggal, `3.52 / 4.00`, dan seluruh highlights pulih lengkap dan berurutan (`ats-test-plan.md`). *(ternyata `page.pdf()` juga bekerja di Chromium Windows lokal — gerbang berlaku di keduanya; Firefox skip karena kapabilitas browser)*
+- [x] Mode ATS *tidak* bisa menampilkan foto meski template dimodifikasi — dibuktikan test yang gagal jika `<img>` muncul.
 
 **Edge cases**
 

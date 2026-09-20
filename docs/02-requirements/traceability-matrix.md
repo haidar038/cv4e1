@@ -18,9 +18,10 @@
 | 🟡 | Sebagian: jalur data/view model terbukti, tetapi bagian renderer/UI-nya belum ada atau belum diuji |
 | ⬜ | Belum ada test — fitur belum dibangun, atau jalurnya belum diuji |
 
-**Baseline bukti:** 29 file / 276 test unit (`bun run test:unit`) + 10 test e2e
-(`bun run test:e2e`, Chromium & Firefox, terhadap build produksi yang disajikan `vite preview`)
-+ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
+**Baseline bukti:** 31 file / 296 test unit (`bun run test:unit`) + 15 test e2e lulus,
+1 skip kapabilitas (`page.pdf()` bukan kapabilitas Firefox; test PDF berjalan di Chromium lokal
+dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privacy` dan
+`check:budget` di `bun run verify`/CI.
 
 ---
 
@@ -43,6 +44,13 @@
 | **FR-204** | AC-204-a,b | Micro-copy Indonesia nonaktif saat locale bukan `id` | `microcopy.test.ts` (pack `en` = null) · `EducationForm.dom.test.tsx` (guidance disembunyikan) · `src/features/form/section-keys.test.ts` (pack struktural mengosongkan string domain, label tetap ada) |
 | **FR-205** | AC-205-a | Saran kata kerja sadar section: katalog terfilter (`src/content/action-verbs/action-verbs.test.ts`, `src/features/form/section-keys.test.ts`); UI saran per bullet dengan penyisipan pada posisi kursor tanpa menimpa teks (`src/features/form/ActionVerbSuggestions.dom.test.tsx`, `src/features/form/fields/insertAtCursor.test.ts`, `src/features/form/fields/StringListEditor.dom.test.tsx`) |
 | **FR-206** | AC-206-a | Saran bekerja offline: `e2e/no-egress.spec.ts` membuka panel saran dan menyisipkan kata kerja pada build produksi dengan **nol** permintaan di luar origin |
+| **FR-002** | AC-002-a | `ATSViewModel` tanpa field foto (`normalize.test.ts`) **dan** keluaran render ATS tanpa `<img>` meski sumber `photo.enabled: true` (`src/render/ats/ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
+| **FR-004** | AC-004-a,b | Renderer ATS satu kolom: markup block-flow tanpa `<div>`; stylesheet bebas grid/flex/column-count/float — ditegakkan test (`ATSRenderer.test.tsx` gerbang CSS + struktur; `e2e/ats-print.spec.ts`) |
+| **FR-005** | AC-005-a | Tidak ada `<table>` pada struktur inti — checker struktural pada markup nyata (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
+| **FR-006** | AC-006-a,b | Section kosong → nol heading pada render (`ATSRenderer.test.tsx`; view model: `normalize.test.ts`) |
+| **FR-007** | AC-007-a | Urutan heading render persis mengikuti `vm.sections`/`sectionOrder` (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
+| **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` (tanpa permukaan template/layout) + gerbang stylesheet — test gagal bila aturan dilanggar (`ATSRenderer.test.tsx`) |
+| **FR-302** | AC-302-a | Sisi ATS: PDF hasil cetak halaman pratinjau diekstraksi `pdf-parse` — seluruh konten halaman pulih lengkap dan berurutan (`e2e/ats-print.spec.ts`, Chromium) |
 | **NFR-005** | AC-NFR-005-a | Dapat dioperasikan sepenuhnya dengan keyboard | `src/features/form/FormLayout.dom.test.tsx` (walkthrough keyboard-only, tanpa jebakan fokus, reorder via tombol) · test section memakai `user-event` di seluruh `*.dom.test.tsx` |
 | **NFR-006** | AC-NFR-006-a,b | Build produksi tanpa API key rahasia | `scripts/privacy-rules.test.ts` (13 test: pola kredensial, kutipan disensor, allowlist tertutup) · gerbang `bun run check:privacy` memindai `dist/` nyata di `verify` + CI |
 | **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px) |
@@ -57,9 +65,6 @@
 | Requirement | AC | Sudah terbukti | Belum terbukti — pemilik |
 | :-- | :-- | :-- | :-- |
 | **FR-001** | AC-001-a,b | Satu model kanonik (`src/core/schema.test.ts`) diturunkan ke dua view model (`src/core/normalize.test.ts`) | Kedua renderer benar-benar merender model yang sama — Task 10/11 |
-| **FR-002** | AC-002-a | `ATSViewModel` **tidak punya** field foto sama sekali (`normalize.test.ts`, penegakan struktural) | Renderer ATS benar-benar tidak mengeluarkan `<img>` — Task 10 |
-| **FR-006** | AC-006-a,b | Section kosong tidak pernah masuk view model (`normalize.test.ts`; `FormLayout.dom.test.tsx`: section yang dikosongkan hilang dari view model) | Nol heading kosong pada keluaran renderer — Task 10/11 |
-| **FR-007** | AC-007-a | Urutan section mengikuti `sectionOrder` di view model (`normalize.test.ts`, `store.test.ts`, `FormLayout.dom.test.tsx`) | Urutan yang sama pada keluaran renderer — Task 10/11 |
 | **FR-108** | AC-108-a | Penghapusan penyimpanan teruji di lapisan storage (`repository.test.ts`: `wipeAllData` mengosongkan drafts + assets) | Alur UI hapus-semua + `localStorage` + Cache Storage — Task 15 |
 | **NFR-002** | AC-NFR-002-a | Tidak ada kode jaringan di `core/`/`storage/`/`render/` (ditegakkan `check:boundaries`); alur inti memicu nol permintaan keluar-origin (`e2e/no-egress.spec.ts`) | Aturan egress untuk AI (persetujuan per operasi, AC-NFR-002-b) — Fase 2 |
 | **NFR-010** | AC-NFR-010-a | e2e lulus di **Chromium + Firefox** | Matriks peramban penuh (Safari/mobile) — `browser-device-matrix.md`, Fase 4 |
@@ -70,8 +75,8 @@
 
 | Requirement | AC | Alasan | Pemilik |
 | :-- | :-- | :-- | :-- |
-| FR-004 (satu kolom ATS), FR-005 (tanpa tabel), FR-008 (template tidak menimpa aturan mode) | AC-004-a,b · AC-005-a · AC-008-a | Renderer ATS belum dibangun | Task 10 |
-| FR-301 s.d. FR-304 (ekspor PDF, ekstraksi teks kedua mode, tanpa API eksternal) | AC-301-a,b · AC-302-a · AC-303-a · AC-304-a | Alur cetak & renderer belum ada | Task 10/11/14 |
+| FR-008 (sisi Creative — template tidak menimpa aturan mode) | AC-008-a | Sisi ATS sudah terbukti di Task 10; sisi Creative menunggu renderer | Task 11 |
+| FR-301, FR-303, FR-304 (PDF mengikuti mode, teks PDF Creative, tombol/UX ekspor) | AC-301-a,b · AC-303-a · AC-304-a | Sisi ATS FR-302 sudah terbukti (Task 10); sisa menunggu toggle mode (Task 12), renderer Creative (Task 11), tombol ekspor (Task 14) | Task 11/12/14 |
 | FR-109 (pemberitahuan penyimpanan lokal) | AC-109-a | Belum dibangun | Task 15 |
 | FR-110 (tanpa API key di ekspor) | AC-110-a,b | Belum ada API key sama sekali; AC-110-a (kondisi kini) terbukti secara vak — ditegakkan `check:privacy` di `dist/`, tetapi test eksplisit pada envelope menyusul | Fase 2 (saat key pertama ada), dengan test |
 | NFR-001 (fitur inti offline setelah app shell terpasang) | AC-NFR-001-a | Service worker belum ada | Task 14 |

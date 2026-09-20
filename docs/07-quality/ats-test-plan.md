@@ -32,9 +32,15 @@ Untuk setiap fixture:
   pastikan: nama ada, kontak ada, setiap heading ada,
             setiap teks bullet ada, urutan sesuai sumber
 ```
-- [ ] Ini adalah test paling penting dalam proyek
-- [ ] Harus berjalan di CI
-- [ ] Gagal berarti memblokir rilis
+- [x] Ini adalah test paling penting dalam proyek
+- [x] Harus berjalan di CI
+- [x] Gagal berarti memblokir rilis
+
+> Terlaksana di Task 10 (2026-09-21): `e2e/ats-print.spec.ts` — cetak via `page.pdf()`
+> lalu ekstraksi `pdf-parse`, ekspektasi turunan dari konten halaman pratinjau
+> (single codepath), urutan diverifikasi sebagai subsequence. CI menjalankannya
+> di job e2e Chromium/Linux (ADR-0007); Firefox melewatkan test PDF karena
+> `page.pdf()` bukan kapabilitasnya (layout & egress tetap diuji di Firefox).
 
 ## 3. Verifikasi eksternal
 - [ ] Jalankan PDF hasil ekspor melalui parser publik gratis untuk pemeriksaan silang

@@ -1,0 +1,135 @@
+/*
+ * ATS document styles — one column, block flow only (Task 10, ADR-0007).
+ *
+ * Structural gates asserted by ATSRenderer.test.tsx: this stylesheet must
+ * never contain `display: grid`, `display: flex`, `column-count`, `float`,
+ * or any `text-transform` (D12 — the name stays mixed-case). Colours are
+ * plain black on white: the ATS mode has no theme (plan non-goal).
+ *
+ * Paper: `@page` is A4. Letter users pick Letter in the browser dialog,
+ * which scales the layout — the browser print dialog stays the paper-size
+ * control (ADR-0007 accepted consequence).
+ */
+
+.cv-ats {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 210mm;
+  padding: 18mm 16mm;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-sans, Arial, sans-serif);
+  font-size: 10.5pt;
+  line-height: 1.5;
+}
+
+.cv-ats * {
+  box-sizing: border-box;
+}
+
+.cv-ats-header {
+  margin: 0 0 4pt;
+}
+
+.cv-ats-name {
+  margin: 0;
+  font-family: var(--font-heading, Arial, sans-serif);
+  font-size: 20pt;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.cv-ats-headline {
+  margin: 2pt 0 0;
+  font-size: 12pt;
+}
+
+.cv-ats-contacts,
+.cv-ats-links {
+  margin: 3pt 0 0;
+  font-size: 10pt;
+}
+
+.cv-ats-summary {
+  margin: 8pt 0 0;
+}
+
+.cv-ats a {
+  color: #000;
+}
+
+.cv-ats-section {
+  margin: 14pt 0 0;
+}
+
+.cv-ats-heading {
+  margin: 0 0 6pt;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #000;
+  font-family: var(--font-heading, Arial, sans-serif);
+  font-size: 13pt;
+  font-weight: 700;
+  line-height: 1.3;
+  /* Keep the heading on the same page as its first item when printing. */
+  break-after: avoid;
+}
+
+.cv-ats-item {
+  margin: 0 0 10pt;
+  /* Never split one experience item across pages (plan edge case). */
+  break-inside: avoid;
+}
+
+.cv-ats-item-title {
+  margin: 0;
+  font-size: 11pt;
+  font-weight: 400;
+}
+
+.cv-ats-item-title strong {
+  font-weight: 700;
+}
+
+.cv-ats-item-meta {
+  margin: 1pt 0 0;
+  font-size: 10pt;
+}
+
+.cv-ats-item ul {
+  margin: 3pt 0 0;
+  padding-left: 14pt;
+}
+
+.cv-ats-item li {
+  margin: 0 0 2pt;
+}
+
+/*
+ * Print isolation: wherever the document is mounted (preview gate now,
+ * PreviewPane in Task 12), printing shows only the document itself — all
+ * app controls disappear (plan requirement: `@media print` hides the UI).
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .cv-ats,
+  .cv-ats * {
+    visibility: visible;
+  }
+
+  .cv-ats {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 14mm 15mm;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
