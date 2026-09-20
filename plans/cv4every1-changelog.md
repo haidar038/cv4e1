@@ -700,3 +700,26 @@ pelanggaran.
 **Catatan Task 9 yang kini tertutup:** peringatan jujur "color-contrast butuh layout nyata, lengkap
 di e2e Task 10/12" sudah **selesai lebih awal**; yang masih tersisa dari catatan itu hanyalah piksel
 foto nyata dan normalisasi EXIF (tetap urusan peramban, didokumentasikan).
+
+### Traceability matrix diisi dari bukti nyata (2026-09-20)
+
+**Temuan:** `docs/02-requirements/traceability-matrix.md` masih outline v0.1 — 19 baris, semuanya ⬜,
+dan nama test-nya (`dual-renderer.spec.ts`, `ats-photo-hidden.spec.ts`, …) belum ada di repository.
+Dokumen itu justru membuat proyek tampak lebih kosong daripada kenyataannya, dan sebaliknya bisa
+memancing tanda ✅ yang tidak berdasar.
+
+| Berkas | Perubahan |
+| :-- | :-- |
+| `docs/02-requirements/traceability-matrix.md` | v0.2: **19 requirement ✅** (FR-003/101–107/111/201–204 · NFR-005/007/008/009/012/015), **11 🟡** (terbukti di lapisan data/view model, renderer/UI belum), sisanya ⬜ dengan pemilik task yang eksplisit. Setiap baris ✅ menyebut **path test yang benar-benar ada**, plus celah yang harus ditutup dan cara memperbaruinya |
+
+**Keputusan yang disadari:** kolom Acceptance Criteria **tidak** dicantumkan — `acceptance-criteria.md`
+masih outline sehingga ID `AC-xxx-a` belum ditulis untuk hampir semua requirement. Menuliskannya
+sekarang berarti mengarang kriteria yang belum disepakati (`AGENTS.md` §4); kolom itu masuk begitu
+AC-nya ditulis.
+
+**Yang sengaja tidak diklaim:** NFR-006 (tidak ada secret di build) dan NFR-011 (data CV tidak masuk
+log) tetap ⬜ karena belum ada pemeriksaan otomatis — bukan ditandai ✅ karena "kelihatannya begitu".
+NFR-014 (zoom 200%) tetap 🟡: verifikasi manual di peramban sudah tercatat, test otomatisnya belum ada.
+
+**Verifikasi:** matrix hanya memuat requirement yang test-nya dijalankan `bun run verify`
+(25 file / 230 test unit) atau `bun run test:e2e` (8 test, Chromium + Firefox) per 2026-09-20.
