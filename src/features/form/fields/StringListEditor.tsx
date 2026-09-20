@@ -1,11 +1,21 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PlusIcon, XIcon } from '@phosphor-icons/react'
+import { insertAtCursor } from './insertAtCursor'
 
 function keyOf(rows: readonly string[]): string {
   return rows.filter((row) => row !== '').join('\u0000')
+}
+
+/** Everything a per-row slot needs in order to offer row-level extras. */
+export interface StringListRowSlotArgs {
+  /** 1-based row position, matching the row input's accessible name suffix. */
+  position: number
+  /** Inserts `text` at this row input's caret; never overwrites user text. */
+  insertAtCursor: (text: string) => void
 }
 
 export interface StringListEditorProps {
@@ -19,6 +29,12 @@ export interface StringListEditorProps {
   /** Current values; undefined behaves like an empty list. */
   values: string[] | undefined
   onCommit: (values: string[]) => void
+  /**
+   * Optional per-row slot rendered between the input and the remove button
+   * (e.g. verb suggestions). Omit for lists without row-level extras —
+   * Education and Skills stay slot-free.
+   */
+  renderRowSlot?: ((args: StringListRowSlotArgs) => ReactNode) | undefined
 }
 
 /**
@@ -35,9 +51,11 @@ export function StringListEditor({
   placeholder,
   values,
   onCommit,
+  renderRowSlot,
 }: StringListEditorProps) {
   const [rows, setRows] = useState<string[]>(() => values ?? [])
   const [lastCommittedKey, setLastCommittedKey] = useState(() => keyOf(values ?? []))
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   // Adopt external store changes (draft loaded, other tab) during render, but
   // only when they differ from what this editor last committed — otherwise
@@ -54,6 +72,30 @@ export function StringListEditor({
     onCommit(committed)
   }
 
+  // Suggestion insertion goes through the same commit path as typing. The
+  // selection is read off the input element (it survives the blur a click
+  // causes); focus and caret are restored a frame later so the popover's own
+  // close-focus handling cannot win the race.
+  const insertIntoRow = (index: number, text: string) => {
+    const input = inputRefs.current[index]
+    const current = rows[index] ?? ''
+    const result = insertAtCursor({
+      value: current,
+      selectionStart: input?.selectionStart ?? current.length,
+      insert: text,
+    })
+    const next = [...rows]
+    next[index] = result.value
+    setRows(next)
+    commit(next)
+    requestAnimationFrame(() => {
+      const target = inputRefs.current[index]
+      if (!target) return
+      target.focus()
+      target.setSelectionRange(result.caret, result.caret)
+    })
+  }
+
   return (
     <Field>
       <FieldLabel>{label}</FieldLabel>
@@ -62,8 +104,14 @@ export function StringListEditor({
         {rows.map((row, index) => {
           const rowLabel = `${label} ${index + 1}`
           return (
-            <div key={index} className="flex items-center gap-2">
+            // flex-wrap: a row slot's full-width panel (e.g. verb suggestions)
+            // unfolds on its own line below the input.
+            <div key={index} className="flex flex-wrap items-center gap-2">
               <Input
+                ref={(element) => {
+                  inputRefs.current[index] = element
+                }}
+                className="min-w-0 flex-1"
                 aria-label={rowLabel}
                 value={row}
                 maxLength={maxLength}
@@ -75,6 +123,10 @@ export function StringListEditor({
                   commit(next)
                 }}
               />
+              {renderRowSlot?.({
+                position: index + 1,
+                insertAtCursor: (text) => insertIntoRow(index, text),
+              })}
               <Button
                 type="button"
                 variant="ghost"

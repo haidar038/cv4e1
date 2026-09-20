@@ -118,6 +118,13 @@ export interface MicrocopyPack {
     moveDown: string
     remove: string
   }
+  actionVerbs: {
+    /** Icon-only trigger prefix; components compose it with section + row labels. */
+    toggleLabel: string
+    /** Panel guidance — generic writing help, kept in the structural pack. */
+    hint: string
+    emptyState: string
+  }
   drafts: {
     title: string
     empty: string
@@ -393,6 +400,11 @@ export const microcopyId: MicrocopyPack = {
     moveUp: 'Naikkan',
     moveDown: 'Turunkan',
     remove: 'Hapus',
+  },
+  actionVerbs: {
+    toggleLabel: 'Saran kata kerja',
+    hint: 'Pilih kata kerja untuk menyisipkannya di posisi kursor, lalu sesuaikan dengan pengalaman Anda.',
+    emptyState: 'Belum ada saran kata kerja untuk bagian ini.',
   },
   drafts: {
     title: 'CV saya',

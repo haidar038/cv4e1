@@ -4,11 +4,11 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 
 | Field | Value |
 | :-- | :-- |
-| Terakhir diperbarui | 2026-09-20 |
-| Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 9 Form UI Guided Sections** |
-| Fase berikutnya | **Fase 1 lanjutan — Task 13b (Action Verbs Suggestions UI), lalu Task 10 (Renderer ATS)** |
-| Baseline test | 26 file test · 249 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
-| Wall-clock unit test | ~27 s penuh (node ±3 s · jsdom ±26 s setelah optimasi `deps.optimizer` 2026-09-20) |
+| Terakhir diperbarui | 2026-09-21 |
+| Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 13b Action Verbs Suggestions UI** (Task 9 sebelumnya) |
+| Fase berikutnya | **Task 10 (Renderer ATS)** |
+| Baseline test | 29 file test · 276 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Wall-clock unit test | ~54 s penuh (node ±13 s · jsdom ±40 s; naik dari 27 s karena 3 berkas `*.dom.test.tsx` baru) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -763,3 +763,48 @@ tetap terbuka dengan jujur.
   dengan pesan actionable; baseline baru: `initialJsGzip` **184,1 KB / 200 KB** (sisa 15,9 KB),
   `jsGzip` 185,2 KB, `transferGzip` 303,6 KB (+0,9 KB karena chunk lazy ikut dihitung).
 - Test anggaran bertambah: `entryJsFiles`, chunk lazy vs eager, baseline legacy ditolak.
+
+---
+
+## Fase 1 — Milestone 1.3
+
+### Task 13b — Action Verbs Suggestions UI
+**Requirement:** FR-205 (AC-205-a), FR-206 (AC-206-a), J4 — feature-catalog F-E1 s.d. F-E3
+**Status: ✅ SELESAI (2026-09-21).** Panel saran kata kerja per section di samping setiap baris
+bullet (Experience, Organizations, Projects); Education dan Skills tetap tanpa saran.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/features/form/fields/insertAtCursor.ts` + `.test.ts` | Pure function penyisipan posisi kursor (pola seam `compress.ts`, tanpa DOM, 11 test node): sisip di `selectionStart`, tak pernah menimpa/menghapus, spasi adaptif tanpa spasi menggantung, clamp posisi. |
+| `src/features/form/fields/StringListEditor.tsx` (+ `.dom.test.tsx` baru) | Slot opsional `renderRowSlot` per baris (di antara input dan tombol hapus), ref input, glue sisip + restorasi fokus/karet via `requestAnimationFrame`; baris kini `flex-wrap` agar panel terbuka di baris sendiri. |
+| `src/features/form/ActionVerbSuggestions.tsx` | Shell disclosure per baris: trigger ikon dengan nama aksesibel komposit (section + label + posisi — tak ambigu antar baris/section), Escape menutup dan mengembalikan fokus ke trigger. |
+| `src/features/form/ActionVerbSuggestionsPanel.tsx` | Daftar `getVerbsForSection` dikelompokkan kategori statis (`getVerbCategories`, heading dari katalog — bukan hardcode); tiap verb = tombol (nama aksesibel = verb) dengan `examplePhrase` sebagai pola tampilan (J4 — bracket `[placeholder]` tidak pernah disisipkan); empty-state defensif bila katalog kosong. |
+| `src/features/form/fields/HighlightsEditor.tsx` + `sections/{ExperienceForm,ProjectsForm}.tsx` | Pass-through slot; ExperienceItemEditor (experience + organizations) dan ProjectsForm mengisi slot; Education/Skills tidak. |
+| `src/content/microcopy/id.ts` | Grup additif `actionVerbs` (`toggleLabel`, `hint`, `emptyState`) — tersapu test frasa terlarang otomatis. |
+| `e2e/no-egress.spec.ts` (diperluas, tanpa spec duplikat) | Alur inti kini mencakup buka panel + sisip kata kerja; tetap **nol** permintaan di luar origin (AC-206-a). |
+| `e2e/a11y.spec.ts` (+1 test mobile) | Audit axe panel terbuka di 360 px pada build produksi (color-contrast dievaluasi nyata) + panel tak keluar viewport. |
+| Docs: plan AC ✓, `traceability-matrix.md` (FR-205/FR-206 → ✅), `roadmap.md` ✓, `performance-budget.md` | Checklist penutup dalam perubahan yang sama (AGENTS.md §5/§8). |
+
+**Keputusan implementasi:**
+- **Popover → disclosure inline (revisi poin keputusan 1, berbasis angka):** varian popover
+  (`components/ui/popover.tsx`, base-ui) terukur **+25,4 KB gzip** pada chunk awal — graf modul
+  positioning/portal — dan membuat `check:budget` **RATCHET FAIL** (+13,8% > gerbang fatal +10%).
+  Fallback lazy saja tidak menyelamatkan gerbang `jsGzip` (tetap > batas), dan re-baseline +25 KB
+  bertentangan dengan peringatan utang JS. Panel kini disclosure inline (base-ui collapsible,
+  tanpa portal/floating-ui): kedua gerbang hijau tanpa re-baseline, plus lebih aman di 360 px.
+- **Anggaran JS (before/after):** `initialJsGzip` **184.078 → 190.455 B** (+6,4 KB: katalog 72 entri
+  ±4 KB, graf collapsible, shell) — sisa ruang 9,5 KB dari 200 KB; `jsGzip` 185.228 → 191.608 B
+  (+3,4%); `transferGzip` 303,6 → 310,0 KB. Baseline `scripts/bundle-baseline.json` **tidak** diubah
+  (ratchet tetap hijau). Katalog dimuat eager — kelompok lazy berikutnya tetap renderer (Task 10/11).
+- **Klik = aksi eksplisit (J4):** penyisipan lewat buffer baris `StringListEditor` yang sudah ada +
+  `updateSectionItem`; string kata kerja selalu valid. `examplePhrase` hanya tampil sebagai pola.
+- **Infra test:** `testTimeout` proyek jsdom dinaikkan 5 s → 15 s (`vitest.config.ts`). Test
+  pengetikan panjang (~3 s dalam isolasi) melampaui 5 s saat kontensi fork worker Windows sejak
+  suite bertambah 3 berkas; test yang timeout meninggalkan operasi `user-event` yang memicu
+  kaskade "multiple elements" pada test berikutnya. Tanpa perubahan assertion.
+- Tanpa perubahan `ResumeDocument`, tanpa migrasi, tanpa ADR, tanpa dependensi baru, tanpa `console.*`
+  (gerbang `check:privacy` lolos).
+
+**Verifikasi:** `bun run verify` hijau penuh — 29 file / **276 test unit** (node 201 · jsdom 75) ·
+`bun run test:e2e` **10 lulus** (Chromium + Firefox; sebelumnya 8) · `check:budget` ✅ (+3,5% vs
+baseline) · `check:privacy` ✅.

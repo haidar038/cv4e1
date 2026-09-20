@@ -527,11 +527,11 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Saran tampil tanpa permintaan jaringan (diverifikasi dengan network dimatikan di e2e).
-- [ ] Klik menyisipkan pada posisi kursor, menyisipkan **hanya** kata kerja/pola, tidak menghapus teks.
-- [ ] Daftar berbeda antara section Experience dan Skills (filter bekerja).
-- [ ] Dapat dioperasikan keyboard penuh; fokus kembali ke textarea setelah menyisipkan.
-- [ ] Tidak ada saran di section yang tidak relevan (mis. Education).
+- [x] Saran tampil tanpa permintaan jaringan (diverifikasi dengan network dimatikan di e2e).
+- [x] Klik menyisipkan pada posisi kursor, menyisipkan **hanya** kata kerja/pola, tidak menghapus teks.
+- [x] Daftar berbeda antara section Experience dan Skills (filter bekerja).
+- [x] Dapat dioperasikan keyboard penuh; fokus kembali ke textarea setelah menyisipkan.
+- [x] Tidak ada saran di section yang tidak relevan (mis. Education).
 
 **Edge cases**
 

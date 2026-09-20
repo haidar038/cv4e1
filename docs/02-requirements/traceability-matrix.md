@@ -18,7 +18,7 @@
 | 🟡 | Sebagian: jalur data/view model terbukti, tetapi bagian renderer/UI-nya belum ada atau belum diuji |
 | ⬜ | Belum ada test — fitur belum dibangun, atau jalurnya belum diuji |
 
-**Baseline bukti:** 26 file / 243 test unit (`bun run test:unit`) + 8 test e2e
+**Baseline bukti:** 29 file / 276 test unit (`bun run test:unit`) + 10 test e2e
 (`bun run test:e2e`, Chromium & Firefox, terhadap build produksi yang disajikan `vite preview`)
 + gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 
@@ -41,6 +41,8 @@
 | **FR-202** | AC-202-a | Pilihan status pendidikan sesuai konteks Indonesia | `microcopy.test.ts` (empat label + contoh penulisan) · `EducationForm.dom.test.tsx` |
 | **FR-203** | AC-203-a | Menjelaskan **alasan** foto disembunyikan di mode ATS | `microcopy.test.ts` (teks verbatim) · `src/features/form/photo/PhotoUpload.dom.test.tsx` (muncul di ATS, tidak di Creative) |
 | **FR-204** | AC-204-a,b | Micro-copy Indonesia nonaktif saat locale bukan `id` | `microcopy.test.ts` (pack `en` = null) · `EducationForm.dom.test.tsx` (guidance disembunyikan) · `src/features/form/section-keys.test.ts` (pack struktural mengosongkan string domain, label tetap ada) |
+| **FR-205** | AC-205-a | Saran kata kerja sadar section: katalog terfilter (`src/content/action-verbs/action-verbs.test.ts`, `src/features/form/section-keys.test.ts`); UI saran per bullet dengan penyisipan pada posisi kursor tanpa menimpa teks (`src/features/form/ActionVerbSuggestions.dom.test.tsx`, `src/features/form/fields/insertAtCursor.test.ts`, `src/features/form/fields/StringListEditor.dom.test.tsx`) |
+| **FR-206** | AC-206-a | Saran bekerja offline: `e2e/no-egress.spec.ts` membuka panel saran dan menyisipkan kata kerja pada build produksi dengan **nol** permintaan di luar origin |
 | **NFR-005** | AC-NFR-005-a | Dapat dioperasikan sepenuhnya dengan keyboard | `src/features/form/FormLayout.dom.test.tsx` (walkthrough keyboard-only, tanpa jebakan fokus, reorder via tombol) · test section memakai `user-event` di seluruh `*.dom.test.tsx` |
 | **NFR-006** | AC-NFR-006-a,b | Build produksi tanpa API key rahasia | `scripts/privacy-rules.test.ts` (13 test: pola kredensial, kutipan disensor, allowlist tertutup) · gerbang `bun run check:privacy` memindai `dist/` nyata di `verify` + CI |
 | **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px) |
@@ -59,8 +61,6 @@
 | **FR-006** | AC-006-a,b | Section kosong tidak pernah masuk view model (`normalize.test.ts`; `FormLayout.dom.test.tsx`: section yang dikosongkan hilang dari view model) | Nol heading kosong pada keluaran renderer — Task 10/11 |
 | **FR-007** | AC-007-a | Urutan section mengikuti `sectionOrder` di view model (`normalize.test.ts`, `store.test.ts`, `FormLayout.dom.test.tsx`) | Urutan yang sama pada keluaran renderer — Task 10/11 |
 | **FR-108** | AC-108-a | Penghapusan penyimpanan teruji di lapisan storage (`repository.test.ts`: `wipeAllData` mengosongkan drafts + assets) | Alur UI hapus-semua + `localStorage` + Cache Storage — Task 15 |
-| **FR-205** | AC-205-a | Katalog + pencarian per section teruji (`src/content/action-verbs/action-verbs.test.ts`, `section-keys.test.ts`) | UI saran kata kerja — Task 13b |
-| **FR-206** | AC-206-a | Katalog adalah JSON statis tanpa jalur jaringan; `content/` dilarang mengimpor apa pun oleh boundary checker | Bukti e2e "saran tampil tanpa permintaan jaringan" — Task 13b/14 |
 | **NFR-002** | AC-NFR-002-a | Tidak ada kode jaringan di `core/`/`storage/`/`render/` (ditegakkan `check:boundaries`); alur inti memicu nol permintaan keluar-origin (`e2e/no-egress.spec.ts`) | Aturan egress untuk AI (persetujuan per operasi, AC-NFR-002-b) — Fase 2 |
 | **NFR-010** | AC-NFR-010-a | e2e lulus di **Chromium + Firefox** | Matriks peramban penuh (Safari/mobile) — `browser-device-matrix.md`, Fase 4 |
 | **NFR-013** | AC-NFR-013-a | Autosave terpicu per perubahan dan tahan kegagalan kuota (`store.test.ts`, `repository.test.ts`) | Uji pemulihan setelah crash/reload paksa — belum dijadwalkan |

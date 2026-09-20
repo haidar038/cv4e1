@@ -80,5 +80,32 @@ test.describe('full-page WCAG 2.2 AA audit', () => {
 
       await expectNoViolations(page)
     })
+
+    test('action verb suggestions panel at 360 px', async ({ page }) => {
+      await page.goto('/')
+      await page.getByRole('button', { name: 'Buat CV pertama' }).click()
+      await page.getByRole('button', { name: 'Pengalaman', exact: true }).click()
+      await page.getByRole('button', { name: 'Tambah Pengalaman', exact: true }).click()
+      await page.getByRole('button', { name: 'Tambah Poin pencapaian', exact: true }).click()
+      const trigger = page.getByRole('button', {
+        name: 'Saran kata kerja Pengalaman Poin pencapaian 1',
+      })
+      await trigger.click()
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      const panel = page.getByRole('group', { name: 'Saran kata kerja' })
+      await expect(panel).toBeVisible()
+
+      // The unfolded panel is part of the audited tree — its muted pattern
+      // text is exactly what needs real layout to judge color-contrast.
+      await expectNoViolations(page)
+
+      // And the open panel must stay inside the narrow viewport.
+      const box = await panel.boundingBox()
+      expect(box, 'panel should be rendered').toBeTruthy()
+      if (box) {
+        expect(box.x).toBeGreaterThanOrEqual(0)
+        expect(box.x + box.width).toBeLessThanOrEqual(360)
+      }
+    })
   })
 })

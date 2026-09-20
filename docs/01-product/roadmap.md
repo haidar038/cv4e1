@@ -39,7 +39,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 - [ ] Renderer ATS dengan penegakan aturan
 - [ ] Renderer Creative (1–2 template)
 - [ ] Toggle mode + peringatan kontekstual foto
-- [ ] Action Verbs Catalog + UI saran
+- [x] Action Verbs Catalog + UI saran
 - [ ] Ekspor PDF
 - [ ] Service worker PWA + offline penuh
 - [ ] Hapus semua data

@@ -23,6 +23,11 @@ export default defineConfig({
           include: ['src/**/*.dom.test.tsx'],
           environment: 'jsdom',
           setupFiles: ['src/test/setup.dom.ts'],
+          // Long user-event typing flows take ~3 s in isolation; under
+          // parallel forks on Windows they tip over the 5 s default, and a
+          // timed-out test leaves pending user-event work that pollutes the
+          // next test in the file (duplicate-element cascades).
+          testTimeout: 15_000,
           // Measured: ~60% of this project's wall-clock is module import, and
           // every file re-imports the same heavy client packages (React, base-ui,
           // axe-core, Dexie, ...). Pre-bundling them once per run keeps the test

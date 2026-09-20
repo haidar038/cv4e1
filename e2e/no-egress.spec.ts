@@ -30,5 +30,16 @@ test('the core flow makes no off-origin request', async ({ page }) => {
   // Exact name: the reorder buttons read "Turunkan Pendidikan" etc.
   await page.getByRole('button', { name: 'Pendidikan', exact: true }).click()
 
+  // Task 13b (FR-206, AC-206-a): the verb-suggestion flow is part of the core
+  // offline surface — opening the panel and picking a verb must also produce
+  // zero off-origin requests. The catalog is a bundled static JSON, so there
+  // is nothing to fetch.
+  await page.getByRole('button', { name: 'Pengalaman', exact: true }).click()
+  await page.getByRole('button', { name: 'Tambah Pengalaman', exact: true }).click()
+  await page.getByRole('button', { name: 'Tambah Poin pencapaian', exact: true }).click()
+  await page.getByRole('button', { name: 'Saran kata kerja Pengalaman Poin pencapaian 1' }).click()
+  await page.getByRole('button', { name: 'Memimpin', exact: true }).click()
+  await expect(page.getByRole('textbox', { name: 'Poin pencapaian 1' })).toHaveValue('Memimpin')
+
   expect(offOrigin).toEqual([])
 })

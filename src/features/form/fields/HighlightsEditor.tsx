@@ -1,13 +1,19 @@
+import type { ReactNode } from 'react'
 import { useMicrocopy } from '../useMicrocopy'
-import { StringListEditor } from './StringListEditor'
+import { StringListEditor, type StringListRowSlotArgs } from './StringListEditor'
 
 export interface HighlightsEditorProps {
   highlights: string[] | undefined
   onCommit: (highlights: string[]) => void
+  /**
+   * Optional per-row slot (e.g. verb suggestions); omitted where suggestions
+   * do not apply (Education, Skills).
+   */
+  renderRowSlot?: ((args: StringListRowSlotArgs) => ReactNode) | undefined
 }
 
 /** Bullet editor for an item's `highlights` (max 400 chars each, schema). */
-export function HighlightsEditor({ highlights, onCommit }: HighlightsEditorProps) {
+export function HighlightsEditor({ highlights, onCommit, renderRowSlot }: HighlightsEditorProps) {
   const pack = useMicrocopy()
   return (
     <StringListEditor
@@ -20,6 +26,7 @@ export function HighlightsEditor({ highlights, onCommit }: HighlightsEditorProps
       maxLength={400}
       values={highlights}
       onCommit={onCommit}
+      renderRowSlot={renderRowSlot}
     />
   )
 }

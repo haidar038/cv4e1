@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { addSectionItem, removeSectionItem, updateSectionItem } from '../../store/actions'
 import { useMicrocopy } from '../useMicrocopy'
+import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
 import { FormField } from '../fields/FormField'
 import { HighlightsEditor } from '../fields/HighlightsEditor'
 import { PartialDateField } from '../fields/PartialDateField'
@@ -119,6 +120,14 @@ export function ExperienceItemEditor({
       <HighlightsEditor
         highlights={item.highlights}
         onCommit={(highlights) => commit({ highlights })}
+        renderRowSlot={({ position, insertAtCursor: insertVerb }) => (
+          <ActionVerbSuggestions
+            section={section}
+            sectionLabel={sectionLabel}
+            rowLabel={`${pack.fields.highlights.label} ${position}`}
+            onPick={insertVerb}
+          />
+        )}
       />
     </fieldset>
   )

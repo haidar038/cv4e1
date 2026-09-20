@@ -3,6 +3,7 @@ import type { ProjectItem } from '../../../core/schema'
 import { Button } from '@/components/ui/button'
 import { addSectionItem, removeSectionItem, updateSectionItem } from '../../store/actions'
 import { useMicrocopy } from '../useMicrocopy'
+import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
 import { FormField } from '../fields/FormField'
 import { HighlightsEditor } from '../fields/HighlightsEditor'
 import { PartialDateField } from '../fields/PartialDateField'
@@ -100,6 +101,14 @@ function ProjectItemEditor({ index, item }: { index: number; item: ProjectItem }
       <HighlightsEditor
         highlights={item.highlights}
         onCommit={(highlights) => commit({ highlights })}
+        renderRowSlot={({ position, insertAtCursor: insertVerb }) => (
+          <ActionVerbSuggestions
+            section="projects"
+            sectionLabel={pack.sections.projects}
+            rowLabel={`${pack.fields.highlights.label} ${position}`}
+            onPick={insertVerb}
+          />
+        )}
       />
     </fieldset>
   )
