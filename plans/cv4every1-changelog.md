@@ -655,3 +655,48 @@ dokumen anggaran — bukan ditambahkan diam-diam.
 
 **Verifikasi:** `bun run build` + `bun run check:budget` (ratchet hijau) · `bun run verify` penuh
 hijau · `e2e/no-egress.spec.ts` membuktikan font tetap dilayani dari origin sendiri.
+
+### Harness audit aksesibilitas halaman penuh (2026-09-20)
+
+**Temuan yang ditutup:** audit axe di jsdom hanya bisa melaporkan `color-contrast` sebagai
+"incomplete" (tanpa layout) dan tidak bisa menilai aturan tingkat halaman (`title`, `lang`, satu
+`main`). `index.html` juga masih membawa sisa scaffold: `lang="en"` dan judul `cv4e1`.
+
+| Berkas | Perubahan |
+| :-- | :-- |
+| `e2e/a11y.spec.ts` | **Baru.** Audit axe pada **build produksi**: (1) empty state, (2) form terpandu dengan draft terbuka pada viewport 360 px. Tag WCAG 2.0/2.1/2.2 A+AA. `title`, `lang="id"`, dan tepat satu `main` diasersi eksplisit; laporan pelanggaran diformat agar terbaca di log CI |
+| `e2e/no-egress.spec.ts` | **Baru (bonus).** Mengamati jaringan browser selama alur inti (buat draft → buka section): **nol** permintaan ke luar origin — bukti nyata untuk NFR-002/009/015, sesuatu yang tidak bisa diamati unit test |
+| `index.html` | `lang="en"` → `lang="id"` (antarmuka berbahasa Indonesia) dan `<title>cv4e1</title>` → `cv4every1` |
+| `e2e/smoke.spec.ts` | Asersi judul diperbarui — kewajiban "Task 14 wajib memperbarui" dari Task 7b kini terpenuhi lebih awal |
+| `docs/07-quality/accessibility-plan.md` | v0.2: §3 kontras dan §5 pengujian otomatis ditutup dengan bukti; catatan struktur dokumen ditambahkan |
+| `package.json`, `bun.lock` | devDependency `@axe-core/playwright@4.13.0` |
+
+**Pengaman anti-lulus-semuu:** `expectNoViolations()` tidak hanya memeriksa `violations`, tetapi juga
+memastikan axe benar-benar menjalankan rule dan bahwa `color-contrast` **dievaluasi** (bukan
+`incomplete`). Tanpa itu, spec ini bisa hijau tanpa membuktikan apa pun — persis kegagalan yang
+sedang diperbaiki.
+
+**Pembenaran dependensi `@axe-core/playwright` (per `dependency-policy.md`):**
+
+- **Fungsi:** menyuntikkan axe-core ke halaman Playwright dan menjalankan analisis pada layout nyata.
+- **Kenapa bukan ditulis sendiri:** secara teknis bisa (~15 baris: `addScriptTag` sumber axe-core +
+  `page.evaluate`). Yang dibeli dari wrapper ini adalah kebenaran pemeliharaan: penanganan iframe,
+  aliran `run`/`finishRun`, dan keselarasan versi dengan axe-core — dipelihara Deque, penulis axe
+  sendiri. Untuk alat audit yang hasilnya menentukan klaim WCAG produk, memakai jalur resminya lebih
+  murah dipelihara daripada memelihara varian sendiri.
+- **Bundle:** dev-only — **nol byte** di `dist/` (jsGzip tidak berubah: 184,4 KB).
+- **Lisensi:** **MPL-2.0** (weak copyleft per-berkas). Ini **bukan kelas lisensi baru** di graf
+  dependensi: `axe-core` sudah devDependency sejak Task 9 dan berlisensi sama. Karena tidak ada
+  dependensi runtime baru dan tidak ada kelas lisensi baru, ADR tidak diperlukan (`AGENTS.md` §9) —
+  bila maintainer menilai sebaliknya, keputusan ini dapat dinaikkan menjadi ADR tanpa mengubah kode.
+- **Maintenance:** aktif, dipelihara Deque; versi dipatok 4.13.0 agar sejalan dengan `axe-core@4.13.0`.
+- **Rencana jika ditinggalkan:** suntikkan sumber `axe-core` (tetap devDependency langsung) lewat
+  `addScriptTag` + `page.evaluate`; spec tetap berjalan tanpa paket ini.
+
+**Verifikasi:** `bun run test:e2e` **8 lulus** (Chromium + Firefox; sebelumnya 2) · `bun run verify`
+hijau · audit kontras kini benar-benar dievaluasi di peramban nyata pada desktop **dan** 360 px tanpa
+pelanggaran.
+
+**Catatan Task 9 yang kini tertutup:** peringatan jujur "color-contrast butuh layout nyata, lengkap
+di e2e Task 10/12" sudah **selesai lebih awal**; yang masih tersisa dari catatan itu hanyalah piksel
+foto nyata dan normalisasi EXIF (tetap urusan peramban, didokumentasikan).

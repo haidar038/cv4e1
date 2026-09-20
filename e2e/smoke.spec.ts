@@ -24,8 +24,9 @@ test('app shell loads cleanly', async ({ page }) => {
 
   await expect(page.locator('#root')).not.toBeEmpty()
 
-  // Scaffold title; Task 14 renames it to `cv4every1` — update this assertion there.
-  await expect(page).toHaveTitle('cv4e1')
+  // Product title (index.html); the full-page audit in a11y.spec.ts also asserts
+  // it together with `html lang="id"`.
+  await expect(page).toHaveTitle('cv4every1')
 
   expect(consoleErrors).toEqual([])
   expect(pageErrors).toEqual([])

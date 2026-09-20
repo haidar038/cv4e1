@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **Outline v0.1** |
-| Terakhir diperbarui | 2026-09-15 |
+| Status | **v0.2 — outline + audit halaman penuh sudah berjalan (2026-09-20)** |
+| Terakhir diperbarui | 2026-09-20 |
 
 > Nama produk mengandung janji. Aksesibilitas adalah requirement, bukan peningkatan, dan tidak ditunda ke fase akhir.
 
@@ -28,7 +28,9 @@
 | Panel saran AI | Dapat dinavigasi keyboard |
 
 ## 3. Kontras dan visual
-- [ ] Kontras teks minimal 4.5:1
+- [x] Kontras teks minimal 4.5:1 — diuji `e2e/a11y.spec.ts` pada build produksi (axe rule
+      `color-contrast`, desktop + 360 px). jsdom hanya bisa melaporkan "incomplete", jadi bukti
+      otomatisnya harus dari peramban nyata; spec menolak lulus bila rule kontras tidak dievaluasi.
 - [ ] Indikator fokus terlihat jelas di mana-mana
 - [ ] Jangan andalkan warna saja untuk menyampaikan makna
 - [ ] Hormati `prefers-reduced-motion`
@@ -40,7 +42,12 @@
 - [ ] Zoom tidak dinonaktifkan
 
 ## 5. Pengujian
-- [ ] Otomatis: axe di CI pada setiap halaman
+- [x] Otomatis: axe di CI pada setiap halaman — dua lapis: per komponen di jsdom
+      (`src/features/form/test-utils.tsx` → `runAxe()`, dipakai 9 berkas `*.dom.test.tsx`) dan
+      **halaman penuh** di `e2e/a11y.spec.ts` (tag WCAG 2.0/2.1/2.2 A+AA; `title`, `lang`,
+      satu `main`, dan kontras warna).
+- [x] Struktur dokumen: `index.html` memakai `lang="id"` (antarmuka berbahasa Indonesia) dan judul
+      `cv4every1`; diuji eksplisit di `e2e/a11y.spec.ts` dan `e2e/smoke.spec.ts`.
 - [ ] Manual: walkthrough hanya keyboard per rilis
 - [ ] Manual: uji pembaca layar (NVDA, VoiceOver) per rilis mayor
 - [ ] Daftar periksa per PR untuk permukaan yang berubah
