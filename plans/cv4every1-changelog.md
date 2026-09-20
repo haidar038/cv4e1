@@ -7,7 +7,8 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Terakhir diperbarui | 2026-09-20 |
 | Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 9 Form UI Guided Sections** |
 | Fase berikutnya | **Fase 1 lanjutan — Task 13b (Action Verbs Suggestions UI), lalu Task 10 (Renderer ATS)** |
-| Baseline test | 25 file test · 219 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Baseline test | 25 file test · 230 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Wall-clock unit test | ~27 s penuh (node ±3 s · jsdom ±26 s setelah optimasi `deps.optimizer` 2026-09-20) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -166,7 +167,7 @@ penjelas (mock error path — diizinkan AGENTS.md §5). Tidak ada perubahan runt
 
 | Paket | Versi | Jenis | Ditambahkan pada |
 | :-- | :-- | :-- | :-- |
-| `zod` | ^4.6.5 | runtime | Task 3 |
+| `zod` | ^3.25.76 **dideklarasikan 2026-09-20** (sebelumnya dipakai tanpa deklarasi) | runtime | Task 3 |
 | `dexie` | ^4.4.6 | runtime | Task 5 |
 | `zod-to-json-schema` | ^3.25.2 | dev | Task 3 |
 | `fake-indexeddb` | ^6.2.5 | dev | Task 5 |
@@ -177,12 +178,17 @@ penjelas (mock error path — diizinkan AGENTS.md §5). Tidak ada perubahan runt
 | `typescript` | ~6.0.2 | dev | Task 1 |
 | `vite` | ^8.3.0 | dev | Task 1 |
 | `@playwright/test` | 1.63.0 | dev | Task 7b |
+| `jsdom` | ^30.1.0 | dev | Task 9 |
+| `@testing-library/react` | ^16.3.3 | dev | Task 9 |
+| `@testing-library/jest-dom` | ^7.0.1 | dev | Task 9 |
+| `@testing-library/user-event` | ^14.6.7 | dev | Task 9 |
+| `axe-core` | ^4.13.0 | dev | Task 9 |
 | `zustand` | ^5.0.15 | runtime | Pra-Task 8 (D13, disetujui maintainer) |
 
 **Dihapus 2026-09-20 (audit scaffold, lihat entri Pra-Task 8):** `recharts`, `embla-carousel-react`,
 `cmdk`, `input-otp`, `react-day-picker`, `date-fns`, `react-resizable-panels`, `@shadcn/react`.
 
-**Belum dipasang (dibutuhkan Fase 1):** `zustand`, `vite-plugin-pwa`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `axe-core`/`@axe-core/playwright`. (`@playwright/test` 1.63.0 sudah terpasang dan terpakai sejak Task 7b.)
+**Belum dipasang (dibutuhkan Fase 1):** `vite-plugin-pwa` (Task 14). `@axe-core/playwright` juga belum dipasang — audit aksesibilitas halaman penuh (kontras + `lang` + `title`, yang tidak dapat dinilai jsdom) dijadwalkan di Task 10/12. Seluruh dependensi test env jsdom sudah terpasang sejak Task 9.
 
 ### Skrip `package.json` saat ini
 
@@ -195,7 +201,9 @@ format:check      prettier --check .
 typecheck         tsc -b --noEmit
 check:boundaries  bun scripts/check-boundaries.ts
 check:budget      bun scripts/check-bundle-size.ts   (ratchet +10%, D24)
-test / test:unit  vitest run
+test / test:unit  vitest run                       (kedua project)
+test:unit:node    vitest run --project node        (jalur cepat lokal, ±3 s)
+test:unit:jsdom   vitest run --project jsdom
 test:e2e          playwright test
 verify            lint → format:check → typecheck → check:boundaries → test:unit → build
 gen:schema        bun scripts/generate-json-schema.mjs
@@ -211,15 +219,16 @@ preview           vite preview
 src/
 ├── core/          ✅ TERISI — schema, view-models, normalize, migration + 4 test
 ├── storage/       ✅ TERISI — db, repository, autosave, sync, export-import + 2 test
-├── render/        ⬜ kosong (README saja)     ← Fase 1
-├── ai/            ⬜ kosong (README saja)     ← Fase 2
-├── content/       ⬜ kosong (README saja)     ← Fase 1
-├── features/      ⬜ kosong (README saja)     ← Fase 1
-├── components/ui/ ✅ shadcn primitives (~70 berkas, dari scaffold)
+├── render/        ⬜ kosong (README saja)          ← Task 10, 11
+├── ai/            ⬜ kosong (README saja)          ← Fase 2
+├── content/       ✅ TERISI — microcopy id + katalog 72 action verbs (Task 13a)
+├── features/      ✅ TERISI — store (Task 8), form + photo + drafts (Task 9)
+├── test/          ✅ setup jsdom + canvas double (Task 9)
+├── components/ui/ ✅ shadcn primitives (~62 berkas, dari scaffold — sudah diaudit)
 ├── ui/            ⬜ README + button.tsx
 ├── hooks/         use-mobile.ts
 ├── lib/utils.ts   cn()
-├── App.tsx        ⬜ masih "Hello World"      ← Fase 1
+├── App.tsx        ✅ shell minimal: DraftPanel + FormLayout (Task 9)
 └── index.css      ✅ token Tailwind v4 + fontsource
 ```
 
@@ -237,7 +246,7 @@ src/
 
 ## Fase 1 — MVP
 
-**Status: BELUM DIMULAI.** Rencana lengkap: `cv4every1-fase-1-mvp.md`.
+**Status: SEDANG BERJALAN.** Milestone 1.0 (Task 7a/7b/7c), 1.1 (Task 8), 1.2 (Task 13a), dan 1.3 (Task 9) selesai — lihat tabel progres di bawah. Rencana lengkap: `cv4every1-fase-1-mvp.md`.
 
 Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sama dengan Fase 0 di atas (Requirement, tabel berkas, keputusan implementasi, bukti test).
 
@@ -509,4 +518,99 @@ Test kompresi foto memakai stub canvas (jsdom tanpa canvas): batas/dimensi/step-
 terbukti oleh test murni, dan jalur simpan → `assets` → `assetRef` terbukti oleh test integrasi;
 Blob yang kembali dari `loadAsset` di jsdom dibatasi structured-clone (integritas Blob round-trip
 sudah dibuktikan test repository di env node). Normalisasi EXIF (decode `from-image` + fallback)
-tidak dapat diuji unit — mengandalkan API browser, terdokumentasi di kode.
+tidak dapat diuji unit — mengandalkan API browser, terdokumentasi di kode. **Catatan ini ditutup sebagian di entri berikutnya (2026-09-20).**
+
+---
+
+## Penutupan Temuan Review Sebelum Task 13b (2026-09-20)
+
+Bukan task rencana Fase 1: rangkaian tindak lanjut temuan review codebase, disetujui maintainer
+sebagai prasyarat Task 13b. **Tanpa perubahan `ResumeDocument`, tanpa migrasi, tanpa ADR** — item
+dependensi hanya *mendeklarasikan* paket yang sudah dipakai sejak Task 3 (preseden Zustand: cukup
+pembenaran `dependency-policy.md` + catatan changelog).
+
+### A — Deklarasi dependensi `zod` + `zod-to-json-schema`
+
+**Temuan:** `src/core/schema.ts` dan `schema-parts.ts` mengimpor `zod`, `scripts/generate-json-schema.mjs`
+mengimpor `zod-to-json-schema`, tetapi **keduanya tidak ada** di `package.json` maupun blok workspace
+`bun.lock`. Zod yang benar-benar terpakai adalah **3.25.76**, ter-hoist dari devDependency `shadcn`
+— sedangkan tabel dependensi di dokumen ini mengklaim `zod@^4.6.5`. Risikonya nyata: memangkas satu
+paket scaffold (yang memang sudah dilakukan untuk 8 paket lain) akan mematahkan build, dan perilaku
+build bergantung pada graf dependensi dev.
+
+| Berkas | Perubahan |
+| :-- | :-- |
+| `package.json` | `zod ^3.25.76` (runtime) · `zod-to-json-schema ^3.25.2` (dev) |
+| `bun.lock` | 2 baris pada blok workspace — dipastikan **nol** pergerakan versi paket lain |
+
+**Verifikasi:** `bun install` → diff lock tepat 2 baris (guardrail dipenuhi) · `bun install --frozen-lockfile`
+lulus (paritas CI) · `bun pm ls zod` → satu versi (`zod@3.25.76`) · `bun run gen:schema` →
+`git diff schemas/` **kosong** (versi yang dideklarasikan menghasilkan JSON Schema identik) ·
+`bun run verify` hijau.
+
+### B — Penutupan catatan jujur Task 9 (pipeline foto)
+
+**Temuan 1 — sumber pesan jsdom.** Pesan `Not implemented: HTMLCanvasElement's getContext()`
+(±1× per berkas jsdom) dilacak dengan stack probe: berasal dari **axe-core**
+(`_isIconLigature`, rule `color-contrast`), bukan dari kode produk. Penyebab identik dengan laporan
+"color-contrast incomplete" — satu akar masalah.
+
+**Temuan 2 — loop kompresi tidak teruji.** `compressPhoto` menyentuh canvas langsung, sehingga loop
+step-down kualitas, keputusan WebP→JPEG, dan jalur `PhotoCompressError` tidak punya test sama sekali.
+
+| Berkas | Perubahan |
+| :-- | :-- |
+| `src/test/canvas-double.ts` | **Baru.** Context 2D deterministik untuk jsdom: `measureText` proporsional panjang teks dan `getImageData` berpola non-nol — sengaja, agar axe tidak mengklasifikasi setiap label sebagai "icon ligature" lalu melewatinya |
+| `src/test/setup.dom.ts` | Memasang double (menggantikan probe) + reset per test |
+| `src/features/form/photo/compress.ts` | Dipisah: `encodeWithinBudget()` murni tanpa DOM + adapter `compressPhoto(blob, deps?)` dengan seam `decode`/`createCanvas`/`encode`/`supportsWebP` (default = implementasi peramban). Tanda tangan `compressPhoto(file)` di `PhotoUpload.tsx` **tidak berubah** |
+| `src/features/form/photo/compress.test.ts` | +11 test (env `node`): urutan kualitas 0,9→0,5, hasil pertama yang cocok anggaran, target-vs-jaminan, WebP/JPEG, keberhasilan tidak dibuang saat percobaan berikutnya gagal, `PhotoCompressError` hanya saat semua gagal, dimensi canvas & `drawImage`, `getContext` null, kegagalan decode |
+| `src/features/form/photo/PhotoUpload.dom.test.tsx` | Stub canvas lokal dihapus (memakai double terpusat) + asersi nyata: `drawImage` menerima `(0,0,800,600)` dari sumber 1200×900 dan encoder dipanggil `('image/webp', 0.9)` |
+
+**Perbaikan perilaku kecil yang disadari:** sebelumnya `compressPhoto` dapat membuang hasil encode
+yang sudah berhasil bila percobaan berikutnya mengembalikan `null` (loop menimpa `output`). Sekarang
+hasil terbaik dipertahankan dan error hanya dilempar bila **semua** percobaan gagal — sesuai maksud
+yang sudah didokumentasikan di kode ("never drop the user's photo").
+
+**Sisa keterbatasan (jujur, tidak diklaim selesai):** piksel nyata hasil kompresi tetap tidak
+diverifikasi di jsdom — itu tetap milik verifikasi peramban nyata; normalisasi EXIF
+(`createImageBitmap` + `imageOrientation: 'from-image'`) tetap hanya bisa diuji di peramban.
+Axe `color-contrast` dan audit halaman penuh (`lang`, `title`) **tetap** ditunda ke Task 10/12.
+
+### C — Rekonsiliasi tracking
+
+- `plans/cv4every1-fase-1-mvp.md` frontmatter: `confirm-and-reconcile`, `harden-strict-and-tooling`,
+  `ci-and-test-rig`, `store-layer`, `content-pillar` → `completed` (sebelumnya `pending` padahal
+  Task 7a/7b/7c/8/13a sudah selesai). Sisa `pending` = Task 10–15 + gerbang.
+- Dokumen ini: klaim `zod@^4.6.5` dikoreksi; blok "Belum dipasang" disusutkan (sisa `vite-plugin-pwa`
+  dan `@axe-core/playwright`); tabel dependensi diisi paket dev Task 9; kontradiksi "Fase 1 — BELUM
+  DIMULAI" dihapus; blok struktur `src/` dan tabel skrip diperbarui.
+- **Belum dikerjakan (keputusan maintainer):** `docs/02-requirements/traceability-matrix.md` masih
+  outline (diisi saat gerbang Fase 1), dan drift kecil lain (peta repo `AGENTS.md` §15 yang menyebut
+  `CHANGELOG.md` di root, path `fixtures/resumes/` di glossary, `index.html` masih `lang="en"` dengan
+  title `cv4e1`) sengaja dibiarkan — `index.html` sudah tercatat sebagai kewajiban Task 14.
+
+### D — Wall-clock suite unit test
+
+Terukur di mesin pengembangan Windows 4 core (Bun 1.3.14, Vitest 5.0.1): project `jsdom` turun
+**55,7–59,1 s → 25,5–29,3 s** dan `bun run test:unit` **±91 s → ±27 s**, dengan jumlah test lulus
+identik (59 jsdom · 230 total). Penawarnya `test.deps.optimizer.client` di `vitest.config.ts`:
+dependensi klien berat dibundel sekali per run, sehingga porsi waktu "import" turun 61% → 16%.
+Skrip `test:unit:node` (±3 s) ditambahkan sebagai jalur cepat lokal; `test:unit` tetap menjalankan
+kedua project dan tetap menjadi bagian `verify`/CI (**tidak ada test yang di-skip**). Angka, cara
+mengukur ulang, batas yang diketahui, dan alasan menolak `isolate: false` dicatat di
+`docs/07-quality/test-strategy.md` §7 (status naik ke v0.2).
+
+### E — README
+
+Root `README.md` yang masih template scaffold Vite diganti dokumentasi nyata (Inggris + bagian
+Bahasa Indonesia sesuai `AGENTS.md` §12): apa/kenapa, daftar "yang bukan", status fase jujur
+(renderer/PDF/PWA ditulis **direncanakan**, bukan selesai), batasan yang tidak bisa dinegosiasikan,
+stack, quickstart Bun, tabel skrip, struktur repo, pintu masuk dokumen, alur kontribusi, dan
+**lisensi belum ditentukan (Q1) + belum ada berkas `LICENSE`**.
+
+### Verifikasi penutupan temuan
+
+`bun run verify` hijau penuh — lint 0 error · format ✓ · typecheck ✓ · boundaries OK ·
+**25 file / 230 test unit** (±27 s) · build ✓ · `check:budget` OK (jsGzip 184,4 KB / +0,4%; cssGzip
+27,3 KB; ratchet +10% tetap aman, baseline tidak di-record ulang) · `bun run test:e2e` 2 lulus
+(Chromium + Firefox) · pesan "Not implemented" pada output jsdom: **0**.

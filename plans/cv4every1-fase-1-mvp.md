@@ -4,25 +4,25 @@ overview: Implementasi Fase 1 MVP cv4every1 — menutup utang teknis Fase 0 (str
 todos:
   - id: confirm-and-reconcile
     content: Baca AGENTS.md §3 + dokumen wajib, konfirmasi keputusan D13–D24, laporkan gap Task 7 yang belum selesai, tunggu persetujuan
-    status: pending
+    status: completed
   - id: harden-strict-and-tooling
     content: Aktifkan TypeScript strict + flag turunannya, tambah Prettier, dan perbaiki seluruh error yang muncul di core/ dan storage/
-    status: pending
+    status: completed
     dependencies:
       - confirm-and-reconcile
   - id: ci-and-test-rig
     content: Playwright config + smoke e2e + boundary checker + GitHub Actions + skrip agregat, isi angka anggaran performa dari build pertama
-    status: pending
+    status: completed
     dependencies:
       - harden-strict-and-tooling
   - id: store-layer
     content: Task 8 — DocumentStore/DraftStore/UIStore dengan Zustand, integrasi AutoSaveManager dan BroadcastChannel, selector view model ter-memoize
-    status: pending
+    status: completed
     dependencies:
       - ci-and-test-rig
   - id: content-pillar
-    content: Task 13 — Action Verbs Catalog (JSON statis) + micro-copy ID sebagai data bertipe di src/content/
-    status: pending
+    content: Task 13 — Action Verbs Catalog (JSON statis) + micro-copy ID sebagai data bertipe di src/content/ (13a data selesai; UI saran = 13b)
+    status: completed
     dependencies:
       - store-layer
   - id: form-sections
