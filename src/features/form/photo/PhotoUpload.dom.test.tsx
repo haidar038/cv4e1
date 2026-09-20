@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { loadAsset } from '../../../storage'
@@ -7,6 +7,7 @@ import { uiStore } from '../../store/ui-store'
 import * as storageApi from '../../../storage'
 import { PhotoUpload } from './PhotoUpload'
 import { openTestDocument, resetFormStores, runAxe, teardownFormStores } from '../test-utils'
+import { lastCanvasContext } from '../../../test/canvas-double'
 import { StorageFullError } from '../../../storage'
 
 beforeEach(async () => {
@@ -28,16 +29,20 @@ function renderUpload() {
   )
 }
 
-function stubCanvasPipeline(): void {
+/**
+ * Stubs the platform seams a browser would provide: decoding (EXIF-aware
+ * `createImageBitmap`, reporting 1200×900) and the WebP encoder. The 2D context
+ * itself comes from the central double in `src/test/canvas-double.ts`, so this
+ * test asserts against a real, inspectable `drawImage` instead of duplicating a
+ * local stub. Returns the encoder spy so a test can prove the encode step ran.
+ */
+function stubCanvasEncoder(): Mock {
   vi.stubGlobal(
     'createImageBitmap',
     vi.fn(async () => ({ width: 1200, height: 900 }) as ImageBitmap),
   )
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
-    drawImage: vi.fn(),
-  } as unknown as CanvasRenderingContext2D)
   vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/webp;base64,xxxx')
-  vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => {
+  return vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback) => {
     callback(new Blob(['compressed-bytes'], { type: 'image/webp' }))
   })
 }
@@ -73,7 +78,7 @@ describe('PhotoUpload input validation (D18)', () => {
 describe('PhotoUpload compression + storage (D18 pipeline)', () => {
   it('compresses a 1.5 MB photo and stores the Blob in the assets store (AC)', async () => {
     const user = userEvent.setup()
-    stubCanvasPipeline()
+    const toBlob = stubCanvasEncoder()
     renderUpload()
 
     const file = new File([new ArrayBuffer(1_500_000)], 'pasfoto.jpg', { type: 'image/jpeg' })
@@ -82,6 +87,10 @@ describe('PhotoUpload compression + storage (D18 pipeline)', () => {
     await waitFor(() => {
       expect(documentStore.getState().document?.basics.photo?.assetRef).toMatch(/^photo_/)
     })
+    // The pipeline really ran: the 1200×900 source was drawn scaled to the D18
+    // longest-edge budget and encoded as WebP at the starting quality.
+    expect(lastCanvasContext().drawImage).toHaveBeenCalledWith(expect.anything(), 0, 0, 800, 600)
+    expect(toBlob).toHaveBeenCalledWith(expect.any(Function), 'image/webp', 0.9)
     const ref = documentStore.getState().document?.basics.photo?.assetRef
     if (ref === undefined) throw new Error('unreachable')
     const stored = await loadAsset(ref)
@@ -93,7 +102,7 @@ describe('PhotoUpload compression + storage (D18 pipeline)', () => {
 
   it('keeps the text draft intact and shows a clear message when the quota is full', async () => {
     const user = userEvent.setup()
-    stubCanvasPipeline()
+    stubCanvasEncoder()
     vi.spyOn(storageApi, 'saveAsset').mockRejectedValue(new StorageFullError())
     updateName('Budi Santoso')
     renderUpload()
