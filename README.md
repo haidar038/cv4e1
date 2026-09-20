@@ -1,35 +1,183 @@
-# React + TypeScript + Vite
+# cv4every1
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A free, open-source, local-first CV builder that produces an **ATS-oriented** version and a
+**Creative** version of the same CV from **one source of data** — no account, no backend, no
+watermark.
 
-Currently, two official plugins are available:
+Built for Indonesian fresh graduates first: GPA written as `3.52 / 4.00`, campus organizations and
+internships treated as real experience, guidance written in Bahasa Indonesia at the point of
+filling, and an offline action-verb catalog so writing help is never locked behind a paid API key.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Product vision and principles:** [`docs/00-project-context/vision.md`](docs/00-project-context/vision.md)
+- **Working rules for contributors and AI agents:** [`AGENTS.md`](AGENTS.md)
+- **Full documentation index (Bahasa Indonesia):** [`docs/README.md`](docs/README.md)
 
-## React Compiler
+## What it is not
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+cv4every1 does **not** guarantee that a CV passes an ATS, **does not** produce a CV score, **does
+not** invent facts about the user (no numbers, employers, titles or skills the user did not
+provide), and **does not** require an account, a subscription, or a server. It is not a general
+design tool: layout choices are deliberately constrained so the output stays machine-readable.
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+## Status
 
-## Expanding the Oxlint configuration
+Work follows phases in [`docs/01-product/roadmap.md`](docs/01-product/roadmap.md). Phases are used
+instead of dates on purpose.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+| Phase | State |
+| :-- | :-- |
+| Phase −1 — risk spike | ✅ done — PDF pipeline decided in [ADR-0007](docs/adr/0007-pdf-export-pipeline.md): HTML + print CSS, no runtime PDF generator |
+| Phase 0 — data foundation | ✅ done — `ResumeDocument` schema, validation, normalization, IndexedDB storage, autosave, import/export, migrations, with tests |
+| Phase 1 — MVP | 🚧 in progress |
+| Phase 2 — optional AI | ⬜ not started (must not start before the Phase 1 gate) |
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+**Phase 1 progress:** testing rig + CI + strict TypeScript (Task 7) ✅ · state store (Task 8) ✅ ·
+micro-copy and action-verb catalog data (Task 13a) ✅ · guided multi-section form (Task 9) ✅.
+Still ahead: action-verb suggestion UI (13b), ATS renderer (10), Creative renderer (11), mode toggle
+and live preview (12), print-to-PDF flow and PWA service worker (14), delete-all-data flow (15).
+
+**Honest note on the current build:** the form, autosave, draft management and JSON import/export
+work today. The ATS/Creative renderers, PDF export and offline service worker are **planned, not
+shipped** — the app is not yet useful end-to-end.
+
+## Non-negotiable constraints
+
+These are hard rules, not preferences. Details: [`AGENTS.md`](AGENTS.md) §2 and
+[`docs/00-project-context/assumptions-and-constraints.md`](docs/00-project-context/assumptions-and-constraints.md).
+
+- No backend, no server database, no required login for any feature.
+- Core flows must work offline once the app shell is installed.
+- Static assets only — if it needs a running server, it is out of scope.
+- One canonical model (`ResumeDocument`); both renderers read it through view models.
+- CV data lives in **IndexedDB**; `localStorage` is only for small UI preferences.
+- Nothing is sent over the network unless the user explicitly enables AI for that specific action.
+- ATS mode enforces rules (no photo, single column, restricted decoration); a template can never
+  override a mode rule, and switching modes never alters source data.
+- No third-party runtime scripts, no analytics, no telemetry, no CDN fonts or scripts.
+- Export and full wipe must always work.
+
+## Stack
+
+| Layer | Choice |
+| :-- | :-- |
+| Build | Vite 8 + Bun (package manager) |
+| UI | React 19 + TypeScript (strict) + Tailwind CSS 4 + shadcn/base-ui primitives |
+| State | Zustand (`vanilla` stores, testable without React) |
+| Data | Zod schemas in `src/core/`, Dexie over IndexedDB in `src/storage/` |
+| Output | HTML + print CSS (browser print dialog) |
+| Tests | Vitest (two projects: `node` and `jsdom`) + Playwright |
+
+## Getting started
+
+Requires [Bun](https://bun.sh) 1.3.14 (the version CI pins).
+
+```bash
+bun install
+bun run dev          # development server
+bun run test:unit:node   # fast unit run (~3 s, no DOM)
+bun run verify       # the full gate: lint, format, types, boundaries, tests, build, budget
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Scripts
+
+| Script | Purpose |
+| :-- | :-- |
+| `dev` | Vite dev server |
+| `build` | `tsc -b && vite build` — static output in `dist/` |
+| `preview` | Serve the production build locally |
+| `lint` | Oxlint |
+| `format` / `format:check` | Prettier write / check |
+| `typecheck` | `tsc -b --noEmit` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`) |
+| `check:boundaries` | Enforces the module dependency table (`docs/03-architecture/architecture-overview.md` §5) |
+| `check:budget` | Bundle-size ratchet (+10% vs `scripts/bundle-baseline.json`) |
+| `test` / `test:unit` | Vitest, both projects |
+| `test:unit:node` / `test:unit:jsdom` | One project only (fast local iteration) |
+| `test:e2e` | Playwright |
+| `verify` | lint → format:check → typecheck → boundaries → unit tests → build → budget |
+| `gen:schema` | Regenerate `schemas/resume.schema.json` from the Zod schema |
+
+## Repository layout
+
+```text
+src/
+├── core/          ResumeDocument schema, validation, migration, normalization → view models
+├── storage/       IndexedDB adapter, autosave, cross-tab sync, import/export
+├── content/       Bahasa Indonesia micro-copy and the offline action-verb catalog
+├── features/      UI grouped by feature (store, form, drafts, …)
+├── components/ui/ shadcn/base-ui primitives
+└── test/          jsdom setup and test doubles
+docs/              Project documentation (Bahasa Indonesia)
+plans/             Development plans and the phase changelog
+fixtures/          Test ResumeDocuments (fictional data only)
+schemas/           Generated JSON Schema — do not edit by hand
+scripts/           Build, boundary, and budget tooling
+e2e/               Playwright specs
+```
+
+Layer rules are enforced mechanically, not by convention: `core/` may not import React, the DOM,
+storage or the network; `render/` may not import `storage/`; `content/` may not import anything.
+Run `bun run check:boundaries` after moving files.
+
+## Testing
+
+Every change ships with tests appropriate to what changed (see `AGENTS.md` §6). Current baseline:
+**230 unit tests** across 25 files plus Playwright smoke coverage. Measured wall-clock and the
+jsdom optimization are documented in
+[`docs/07-quality/test-strategy.md`](docs/07-quality/test-strategy.md) §7.
+
+## Contributing
+
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md) first. External contributions
+are opened after the MVP ships. Anything touching the data schema, a new dependency, offline
+behavior, or AI boundaries needs a discussion before code.
+
+**Test data:** fictional only. Never commit real names, contact details, or resumes.
+
+## License
+
+**Not decided yet** (open question Q1 in `vision.md` §12: MIT for maximum adoption vs AGPL-3.0 to
+prevent closed SaaS reuse). There is no `LICENSE` file in this repository yet, so no license is
+granted while the decision is pending.
+
+---
+
+## Bahasa Indonesia
+
+**cv4every1** adalah pembuat CV gratis, open-source, **local-first**, dan **tanpa akun** yang
+menghasilkan dua versi CV — **ATS-oriented** dan **Creative** — dari **satu sumber data** yang sama.
+Tanpa backend, tanpa watermark, dan tanpa paywall di langkah terakhir.
+
+Dibuat untuk fresh graduate Indonesia lebih dulu: IPK ditulis `3.52 / 4.00`, organisasi kampus dan
+magang diperlakukan sebagai pengalaman yang sah, panduan berbahasa Indonesia muncul di titik
+pengisian, dan katalog kata kerja aksi tersedia offline sehingga bantuan penulisan tidak bergantung
+pada API berbayar.
+
+**Yang tidak dijanjikan:** tidak ada jaminan lolos ATS, tidak ada skor CV, dan sistem tidak pernah
+mengarang angka, nama perusahaan, jabatan, atau keahlian yang tidak Anda berikan.
+
+**Status jujur saat ini:** form terpandu, autosave, manajemen draft, dan impor/ekspor JSON sudah
+berfungsi. Renderer ATS/Creative, ekspor PDF, dan mode offline (service worker) masih **dalam
+rencana** — jadi aplikasi belum bisa dipakai dari awal sampai PDF.
+
+### Aturan yang tidak bisa dinegosiasikan
+
+Tidak ada server, tidak ada login, fitur inti harus berjalan offline setelah app shell terpasang,
+data CV hanya disimpan di IndexedDB perangkat Anda, aturan mode ATS tidak boleh dilanggar template,
+dan berpindah mode tidak pernah mengubah data sumber. Tidak ada analytics, telemetri, atau skrip
+pihak ketiga saat runtime. Ekspor dan hapus semua data harus selalu berfungsi.
+
+### Menjalankan
+
+```bash
+bun install            # sekali saja
+bun run dev            # server pengembangan
+bun run test:unit:node # unit cepat (±3 detik)
+bun run verify         # gerbang lengkap sebelum PR
+```
+
+Dokumentasi lengkap berbahasa Indonesia ada di [`docs/README.md`](docs/README.md), dengan peta
+konteks per topik di [`docs/context-map.md`](docs/context-map.md). Aturan operasional (termasuk
+untuk agen AI) ada di [`AGENTS.md`](AGENTS.md).
+
+**Lisensi belum ditentukan** (Q1: MIT vs AGPL-3.0), sehingga belum ada berkas `LICENSE` di repositori
+ini dan belum ada lisensi yang diberikan.
