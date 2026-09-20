@@ -35,6 +35,8 @@ jobs:
         run: bun run test:unit
       - name: Production build
         run: bun run build
+      - name: Privacy check (NFR-006 secrets in dist, NFR-011 console allowlist)
+        run: bun run check:privacy
       - name: Bundle budget (ratchet +10%, D24)
         run: bun run check:budget
 
