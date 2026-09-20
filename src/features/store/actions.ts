@@ -18,7 +18,7 @@ import {
   StorageBlockedError,
   type SyncMessage,
 } from '../../storage'
-import { importResume } from '../../storage/export-import'
+import { importResumeLazy } from '../../storage/export-import-lazy'
 import { ImportError, type ImportErrorReason } from '../../storage/export-import-types'
 import { documentStore } from './document-store'
 import { draftStore } from './draft-store'
@@ -331,10 +331,10 @@ export type ImportDraftResult =
 export async function importDraftAction(json: string): Promise<ImportDraftResult> {
   let doc: ValidatedResumeDocument
   try {
-    doc = importResume(json)
+    doc = await importResumeLazy(json)
   } catch (error) {
     if (error instanceof ImportError) return { ok: false, reason: error.reason }
-    // importResume only throws ImportError; anything else is unexpected, and
+    // importResumeLazy only throws ImportError; anything else is unexpected, and
     // the safe behavior for the user is the generic validation message.
     return { ok: false, reason: 'VALIDATION_FAILED' }
   }

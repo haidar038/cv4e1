@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { exportResume } from '../../storage/export-import'
+import { exportResumeLazy } from '../../storage/export-import-lazy'
 import type { DraftSummary } from '../../storage'
 import {
   createDraft,
@@ -69,7 +69,7 @@ export function DraftPanel() {
   const handleExport = () => {
     if (document === null) return
     const title = document.meta?.title ?? document.basics.name ?? ''
-    downloadJson(exportResume(document), title)
+    void exportResumeLazy(document).then((json) => downloadJson(json, title))
   }
 
   const handleImportFile = async (file: File | undefined) => {

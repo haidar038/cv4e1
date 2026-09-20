@@ -1,6 +1,7 @@
 import { gzipSync } from 'node:zlib'
 import { describe, expect, test } from 'vitest'
 import {
+  entryJsFiles,
   ABSOLUTE_BUDGETS,
   BUDGET_METRICS,
   classifyFile,
@@ -12,6 +13,7 @@ import {
 } from './bundle-budget.ts'
 
 const stats = (over: Partial<BundleStats>): BundleStats => ({
+  initialJsGzip: 0,
   jsGzip: 0,
   cssGzip: 0,
   fontsRaw: 0,
@@ -33,11 +35,35 @@ describe('classifyFile', () => {
   })
 })
 
+describe('entryJsFiles', () => {
+  test('extracts every module script src from index.html', () => {
+    const html = [
+      '<!doctype html>',
+      '<html lang="id">',
+      '  <head><script type="module" crossorigin src="/assets/index-abc123.js"></script></head>',
+      '  <body><div id="root"></div></body>',
+      '</html>',
+    ].join('\n')
+    expect(entryJsFiles(html)).toEqual(['assets/index-abc123.js'])
+  })
+
+  test('ignores inline scripts, non-js srcs, and modulepreload links', () => {
+    const html = [
+      '<script>window.x = 1</script>',
+      '<link rel="modulepreload" href="/assets/preload-abc.js">',
+      '<script type="module">import "./x"</script>',
+    ].join('\n')
+    expect(entryJsFiles(html)).toEqual([])
+  })
+})
+
 describe('computeStats', () => {
   const jsBytes = Buffer.from('console.log("hello world")\n')
   const cssBytes = Buffer.from('body{margin:0}\n')
   const fontBytes = Buffer.from([0x77, 0x4f, 0x46, 0x32, 0, 1, 2, 3])
-  const htmlBytes = Buffer.from('<!doctype html><div id="root"></div>')
+  const htmlBytes = Buffer.from(
+    '<!doctype html><script type="module" src="assets/index-a1b2.js"></script><div id="root"></div>',
+  )
 
   test('aggregates per kind and estimates transfer as the sum of all gzips', () => {
     const files = [
@@ -48,6 +74,7 @@ describe('computeStats', () => {
     ]
 
     expect(computeStats(files)).toEqual({
+      initialJsGzip: gzipSync(jsBytes).length,
       jsGzip: gzipSync(jsBytes).length,
       cssGzip: gzipSync(cssBytes).length,
       fontsRaw: fontBytes.length,
@@ -57,6 +84,26 @@ describe('computeStats', () => {
         gzipSync(fontBytes).length +
         gzipSync(htmlBytes).length,
     })
+  })
+
+  test('a lazy chunk counts toward jsGzip but not initialJsGzip', () => {
+    const htmlBytes = Buffer.from('<script type="module" src="assets/index-entry.js"></script>')
+    const files = [
+      { path: 'assets/index-entry.js', bytes: jsBytes },
+      { path: 'assets/export-import-chunk.js', bytes: jsBytes },
+      { path: 'index.html', bytes: htmlBytes },
+    ]
+    const result = computeStats(files)
+    expect(result.jsGzip).toBe(2 * gzipSync(jsBytes).length)
+    expect(result.initialJsGzip).toBe(gzipSync(jsBytes).length)
+    expect(result.transferGzip).toBe(2 * gzipSync(jsBytes).length + gzipSync(htmlBytes).length)
+  })
+
+  test('JS with no index.html present is counted entirely as lazy', () => {
+    const files = [{ path: 'assets/orphan.js', bytes: jsBytes }]
+    const result = computeStats(files)
+    expect(result.jsGzip).toBe(gzipSync(jsBytes).length)
+    expect(result.initialJsGzip).toBe(0)
   })
 
   test('counts each file once even when kinds repeat', () => {
@@ -73,18 +120,24 @@ describe('computeStats', () => {
 })
 
 describe('evaluateBudget', () => {
-  const BASE = stats({ jsGzip: 1000, cssGzip: 2000, fontsRaw: 5000, transferGzip: 10000 })
+  const BASE = stats({
+    initialJsGzip: 800,
+    jsGzip: 1000,
+    cssGzip: 2000,
+    fontsRaw: 5000,
+    transferGzip: 10000,
+  })
 
   test('passes when nothing grew', () => {
     expect(evaluateBudget(BASE, BASE)).toEqual([])
   })
 
   test('passes when metrics shrank', () => {
-    expect(evaluateBudget(stats({ jsGzip: 1 }), BASE)).toEqual([])
+    expect(evaluateBudget(stats({ initialJsGzip: 1, jsGzip: 1 }), BASE)).toEqual([])
   })
 
   test('passes at exactly the +10% ratchet edge', () => {
-    expect(evaluateBudget(stats({ jsGzip: 1100 }), BASE)).toEqual([])
+    expect(evaluateBudget(stats({ initialJsGzip: 880, jsGzip: 1100 }), BASE)).toEqual([])
   })
 
   test('fails just past the ratchet and reports the overshoot', () => {
@@ -102,6 +155,15 @@ describe('evaluateBudget', () => {
     expect(violations.map((violation) => violation.metric)).toEqual(['cssGzip', 'transferGzip'])
   })
 
+  test('initial chunk growth is judged independently of lazy chunk growth', () => {
+    // Lazy chunk doubled — jsGzip over the ratchet, initialJsGzip untouched.
+    const lazyGrowth = evaluateBudget(stats({ jsGzip: 2000, initialJsGzip: 800 }), BASE)
+    expect(lazyGrowth.map((violation) => violation.metric)).toEqual(['jsGzip'])
+    // Initial chunk grew — initialJsGzip over, jsGzip within.
+    const initialGrowth = evaluateBudget(stats({ jsGzip: 1050, initialJsGzip: 900 }), BASE)
+    expect(initialGrowth.map((violation) => violation.metric)).toEqual(['initialJsGzip'])
+  })
+
   test('tolerance is overridable', () => {
     expect(evaluateBudget(stats({ jsGzip: 1100 }), BASE, 0)).toHaveLength(1)
     expect(evaluateBudget(stats({ jsGzip: 1199 }), BASE, 0.2)).toEqual([])
@@ -117,9 +179,9 @@ describe('evaluateBudget', () => {
 
 describe('parseBaselineJson', () => {
   test('accepts a valid baseline', () => {
-    expect(parseBaselineJson({ jsGzip: 1, cssGzip: 2, fontsRaw: 3, transferGzip: 4 })).toEqual(
-      stats({ jsGzip: 1, cssGzip: 2, fontsRaw: 3, transferGzip: 4 }),
-    )
+    expect(
+      parseBaselineJson({ initialJsGzip: 1, jsGzip: 2, cssGzip: 3, fontsRaw: 4, transferGzip: 5 }),
+    ).toEqual(stats({ initialJsGzip: 1, jsGzip: 2, cssGzip: 3, fontsRaw: 4, transferGzip: 5 }))
   })
 
   test.each([undefined, null, 42, 'x', [], { jsGzip: 1 }])(
@@ -130,10 +192,16 @@ describe('parseBaselineJson', () => {
   )
 
   test('rejects negative and non-finite metric values', () => {
-    const negative = { jsGzip: -1, cssGzip: 2, fontsRaw: 3, transferGzip: 4 }
-    const nan = { jsGzip: Number.NaN, cssGzip: 2, fontsRaw: 3, transferGzip: 4 }
-    expect(() => parseBaselineJson(negative)).toThrow(/jsGzip/)
-    expect(() => parseBaselineJson(nan)).toThrow(/jsGzip/)
+    const negative = { initialJsGzip: -1, jsGzip: 2, cssGzip: 3, fontsRaw: 4, transferGzip: 5 }
+    const nan = { initialJsGzip: Number.NaN, jsGzip: 2, cssGzip: 3, fontsRaw: 4, transferGzip: 5 }
+    expect(() => parseBaselineJson(negative)).toThrow(/initialJsGzip/)
+    expect(() => parseBaselineJson(nan)).toThrow(/initialJsGzip/)
+  })
+
+  test('rejects a legacy baseline that predates initialJsGzip', () => {
+    expect(() =>
+      parseBaselineJson({ jsGzip: 1, cssGzip: 2, fontsRaw: 3, transferGzip: 4 }),
+    ).toThrow(/initialJsGzip/)
   })
 })
 

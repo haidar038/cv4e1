@@ -19,10 +19,19 @@
 
 import { gzipSync } from 'node:zlib'
 
-/** Metrics tracked in `scripts/bundle-baseline.json` and enforced by the ratchet. */
-export type MetricName = 'jsGzip' | 'cssGzip' | 'fontsRaw' | 'transferGzip'
+/**
+ * Metrics tracked in `scripts/bundle-baseline.json` and enforced by the ratchet.
+ *
+ * `jsGzip` is the gzip of *every* JS file in dist/ — all chunks, eager and lazy
+ * — and therefore cannot express the cost of the first visit. `initialJsGzip`
+ * is the JS referenced by dist/index.html: what the first visit actually
+ * downloads and executes. The §1 200 KB target is a budget for the initial
+ * chunk, so it is judged against `initialJsGzip`.
+ */
+export type MetricName = 'initialJsGzip' | 'jsGzip' | 'cssGzip' | 'fontsRaw' | 'transferGzip'
 
 export interface BundleStats {
+  readonly initialJsGzip: number
   readonly jsGzip: number
   readonly cssGzip: number
   readonly fontsRaw: number
@@ -30,6 +39,7 @@ export interface BundleStats {
 }
 
 export const BUDGET_METRICS: readonly MetricName[] = [
+  'initialJsGzip',
   'jsGzip',
   'cssGzip',
   'fontsRaw',
@@ -38,6 +48,7 @@ export const BUDGET_METRICS: readonly MetricName[] = [
 
 /** Absolute targets from performance-budget.md §1, in bytes. */
 export const ABSOLUTE_BUDGETS: Readonly<Record<MetricName, number>> = {
+  initialJsGzip: 200 * 1000,
   jsGzip: 200 * 1000,
   cssGzip: 30 * 1000,
   fontsRaw: 100 * 1000,
@@ -64,12 +75,31 @@ export interface DistFileInput {
 }
 
 /**
+ * Extracts the JS asset names referenced by dist/index.html. These are the
+ * chunks a first visit downloads eagerly; everything else in dist/ is lazy.
+ * Returns dist-relative POSIX paths like `assets/index-abc123.js`, with any
+ * leading slash from absolute srcs stripped so they match the dist walk.
+ */
+export function entryJsFiles(html: string): string[] {
+  return [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+\.js)["']/g)]
+    .map((match) => match[1]?.replace(/^\//, ''))
+    .filter((src): src is string => src !== undefined && src !== '')
+}
+
+/**
  * Aggregates raw dist/ files into the tracked metrics. Text assets (JS, CSS)
  * are measured gzipped because that is what the wire carries; fonts are
  * measured raw because woff2 is already compressed. `transferGzip` estimates
  * first-visit transfer: the gzip of every file in dist/.
  */
 export function computeStats(files: readonly DistFileInput[]): BundleStats {
+  const html = files.find((file) => file.path === 'index.html')
+  const eagerJs =
+    html === undefined
+      ? new Set<string>()
+      : new Set(entryJsFiles(new TextDecoder().decode(html.bytes)))
+
+  let initialJsGzip = 0
   let jsGzip = 0
   let cssGzip = 0
   let fontsRaw = 0
@@ -78,13 +108,18 @@ export function computeStats(files: readonly DistFileInput[]): BundleStats {
   for (const file of files) {
     const gzipped = gzipSync(file.bytes).length
     const kind = classifyFile(file.path)
-    if (kind === 'js') jsGzip += gzipped
+    if (kind === 'js') {
+      jsGzip += gzipped
+      // index.html references like `assets/index-abc.js`; normalize the same
+      // way the walk does (OS separators → POSIX) before comparing.
+      if (eagerJs.has(file.path.replaceAll('\\', '/'))) initialJsGzip += gzipped
+    }
     if (kind === 'css') cssGzip += gzipped
     if (kind === 'font') fontsRaw += file.bytes.length
     transferGzip += gzipped
   }
 
-  return { jsGzip, cssGzip, fontsRaw, transferGzip }
+  return { initialJsGzip, jsGzip, cssGzip, fontsRaw, transferGzip }
 }
 
 export interface BudgetViolation {
@@ -128,7 +163,13 @@ export function parseBaselineJson(input: unknown): BundleStats {
   }
 
   const record = input as Record<string, unknown>
-  const parsed: Record<MetricName, number> = { jsGzip: 0, cssGzip: 0, fontsRaw: 0, transferGzip: 0 }
+  const parsed: Record<MetricName, number> = {
+    initialJsGzip: 0,
+    jsGzip: 0,
+    cssGzip: 0,
+    fontsRaw: 0,
+    transferGzip: 0,
+  }
 
   for (const metric of BUDGET_METRICS) {
     const value = record[metric]

@@ -1,6 +1,7 @@
 {
-  "jsGzip": 184373,
+  "initialJsGzip": 184078,
+  "jsGzip": 185228,
   "cssGzip": 25670,
   "fontsRaw": 88848,
-  "transferGzip": 302715
+  "transferGzip": 303568
 }
