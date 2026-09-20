@@ -7,7 +7,7 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Terakhir diperbarui | 2026-09-20 |
 | Fase terakhir selesai | **Fase 1 — Milestone 1.3: Task 9 Form UI Guided Sections** |
 | Fase berikutnya | **Fase 1 lanjutan — Task 13b (Action Verbs Suggestions UI), lalu Task 10 (Renderer ATS)** |
-| Baseline test | 25 file test · 230 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
+| Baseline test | 26 file test · 249 test lulus · `tsc -b --noEmit` bersih (strict aktif) |
 | Wall-clock unit test | ~27 s penuh (node ±3 s · jsdom ±26 s setelah optimasi `deps.optimizer` 2026-09-20) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
@@ -719,7 +719,47 @@ AC-nya ditulis.
 
 **Yang sengaja tidak diklaim:** NFR-006 (tidak ada secret di build) dan NFR-011 (data CV tidak masuk
 log) tetap ⬜ karena belum ada pemeriksaan otomatis — bukan ditandai ✅ karena "kelihatannya begitu".
-NFR-014 (zoom 200%) tetap 🟡: verifikasi manual di peramban sudah tercatat, test otomatisnya belum ada.
-
-**Verifikasi:** matrix hanya memuat requirement yang test-nya dijalankan `bun run verify`
+NFR-014 (zoom 200%) tetap 🟡: verifikasi manual di peramban sudah tercatat, test otomatisnya belum ada.**Verifikasi:** matrix hanya memuat requirement yang test-nya dijalankan `bun run verify`
 (25 file / 230 test unit) atau `bun run test:e2e` (8 test, Chromium + Firefox) per 2026-09-20.
+
+### Gerbang privasi otomatis, AC penuh, dan pipeline lazy (2026-09-20)
+
+Tiga item susulan dari temuan review, satu commit per item. `bun run verify` hijau (26 file / 249 test
+unit) · `bun run test:e2e` **8 lulus** · baseline bundle di-record ulang secara sadar.
+
+**1 — Gerbang privasi otomatis NFR-006 + NFR-011 (`48de3ec`).** `scripts/privacy-rules.ts` (aturan murni,
+13 test unit) + `scripts/check-privacy.ts` (CLI), masuk `verify` dan CI **setelah** build:
+
+- **NFR-006:** seluruh `dist/` (.js/.mjs/.css/.html) dipindai pola kredensial (sk-, sk-ant-, AIza, ghp_,
+  xox, AKIA, bearer, JWT, blok kunci privat, assignment ke kunci bernama secret). Kutipan pelanggaran
+  **disensor** — laporan tidak boleh menjadi kebocoran yang dicegahnya. `dist/` kosong/hilang = gagal,
+  supaya scan yang terlewat tidak lulus semu.
+- **NFR-011:** setiap `console.*` di `src/` harus argumen pertamanya string literal yang persis ada di
+  allowlist tertutup (3 pesan diagnostik infrastruktur yang memang ada hari ini). Interpolasi —
+  variabel, template literal, penggabungan — selalu ditolak karena itulah saluran data resume menuju
+  konsol. Berkas test dikecualikan (tidak pernah ikut bundle).
+- Dokumen: `docs/06-security/privacy-and-data-handling.md` §5a baru.
+
+**2 — AC Given/When/Then untuk seluruh FR/NFR (`a24df52`).** `acceptance-criteria.md` naik ke v0.2:
+**66 AC** untuk FR-001…FR-502 dan NFR-001…NFR-015, termasuk jalur gagal (storage diblokir, kuota,
+import malformed, timeout AI) dan invariant AI (grounding dites terhadap invariant, bukan string persis).
+`traceability-matrix.md` naik ke v0.3: **kolom AC dikembalikan** sesuai janji di v0.2, dan NFR-006/
+NFR-011 naik ⬜ → ✅ dengan gerbang `check:privacy` sebagai bukti — janji privasi kini dijaga mesin,
+bukan hanya disiplin. Dua celah checklist tertutup; sisanya (script CI matrix, pemetaan ADR, abuse case)
+tetap terbuka dengan jujur.
+
+**3 — Pipeline impor/ekspor lazy + metrik `initialJsGzip` (`ab61d2e`).**
+
+- `src/storage/export-import-lazy.ts`: parsing envelope, rantai migrasi, dan satu salinan skema Zod
+  kini dimuat lewat `import()` dinamis hanya saat aksi ekspor/impor diklik (`DraftPanel`,
+  `importDraftAction`). Chunk `export-import` = **1,15 KB gzip** keluar dari JS awal. Kontrak sync
+  lama tidak berubah; error `ImportError` tetap sama.
+- **Yang jujur TIDAK keluar:** skema Zod utama + validator tetap di chunk awal karena autosave
+  memvalidasi pada setiap ketikan — tumpukan inti memang selalu dibutuhkan. Renderer ATS/Creative
+  (Task 10/11) adalah kelompok lazy berikutnya.
+- **Metrik baru `initialJsGzip`:** anggaran 200 KB adalah anggaran *JS awal*, tetapi `jsGzip` lama
+  menjumlahkan semua berkas JS di dist/. Metrik baru mengukur hanya JS yang direferensikan
+  `dist/index.html`; ratchet kini menjaga keduanya secara independen. Baseline lama (4 metrik) ditolak
+  dengan pesan actionable; baseline baru: `initialJsGzip` **184,1 KB / 200 KB** (sisa 15,9 KB),
+  `jsGzip` 185,2 KB, `transferGzip` 303,6 KB (+0,9 KB karena chunk lazy ikut dihitung).
+- Test anggaran bertambah: `entryJsFiles`, chunk lazy vs eager, baseline legacy ditolak.
