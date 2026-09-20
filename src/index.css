@@ -1,8 +1,39 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/roboto';
-@import '@fontsource-variable/ibm-plex-sans';
+/*
+ * Fonts are self-hosted from the bundled @fontsource-variable packages (NFR-015:
+ * never a CDN) and restricted to the Latin subset the product actually writes.
+ * Importing the package entry pulls cyrillic, greek and vietnamese files as well
+ * (fontsRaw 393.5 KB); the two Latin faces below total 88.8 KB, under the
+ * performance-budget.md §1 target of 100 KB. Latin covers Indonesian text; a name
+ * containing a character outside U+0000-00FF falls back to the system font, which
+ * is why latin-ext (a further 30.9 KB for Plex alone) is deliberately not bundled
+ * yet — the budget allows roughly 11 KB of headroom, not 42 KB.
+ */
+@font-face {
+  font-family: 'Roboto Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../node_modules/@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 700;
+  src: url('../node_modules/@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 @custom-variant dark (&:is(.dark *));
 

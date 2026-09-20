@@ -567,7 +567,7 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
   - Nama dalam **mixed-case** (keputusan **D12** dari Fase 0) — hindari `text-transform: uppercase` pada nama.
 - `print.css` dengan `@page` A4 (+ Letter), margin, `break-inside: avoid` per item pengalaman, dan `@media print` yang menyembunyikan seluruh kontrol UI.
 - Font dari `@fontsource-variable/*` yang sudah dibundel (NFR-015) — **tanpa CDN**.
-- **Subset font Latin** pada langkah bundling font (penutup utang `performance-budget.md` §1: target font raw ≤ 100 KB; transfer ikut turun). Angka sebelum/sesudah dicatat di changelog dan baseline `check:budget` di-update.
+- **Subset font Latin** pada langkah bundling font (penutup utang `performance-budget.md` §1: target font raw ≤ 100 KB; transfer ikut turun). Angka sebelum/sesudah dicatat di changelog dan baseline `check:budget` di-update. — **✅ SELESAI LEBIH AWAL (2026-09-20): fontsRaw 393,5 → 88,8 KB, transfer 608,6 → 302,7 KB; Task 10 tidak perlu mengerjakan ini lagi.**
 - Ukuran halaman dan paginasi mengikuti `rendering-architecture.md` §4.
 - Urutan section persis mengikuti `viewModel.sections` (FR-007).
 

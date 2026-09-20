@@ -612,5 +612,46 @@ stack, quickstart Bun, tabel skrip, struktur repo, pintu masuk dokumen, alur kon
 
 `bun run verify` hijau penuh — lint 0 error · format ✓ · typecheck ✓ · boundaries OK ·
 **25 file / 230 test unit** (±27 s) · build ✓ · `check:budget` OK (jsGzip 184,4 KB / +0,4%; cssGzip
-27,3 KB; ratchet +10% tetap aman, baseline tidak di-record ulang) · `bun run test:e2e` 2 lulus
-(Chromium + Firefox) · pesan "Not implemented" pada output jsdom: **0**.
+27,3 KB; ratchet +10% tetap aman — baseline di-record ulang kemudian saat subset font, lihat bagian
+berikutnya) · `bun run test:e2e` 2 lulus (Chromium + Firefox) · pesan "Not implemented" pada output
+jsdom: **0**.
+
+---
+
+## Tiga Item Lanjutan Sebelum Task 13b (2026-09-20)
+
+Bukan task rencana Fase 1: tiga item lanjutan atas permintaan maintainer setelah review. Urutan
+pengerjaan di dokumen ini: utang font → harness a11y → traceability matrix. **Tanpa perubahan
+`ResumeDocument`, tanpa migrasi, tanpa ADR** (alasan tidak butuh ADR dicatat di tiap bagian).
+
+### Utang anggaran font + transfer LUNAS (2026-09-20)
+
+**Temuan:** `src/index.css` mengimpor entri paket `@fontsource-variable/roboto` dan
+`@fontsource-variable/ibm-plex-sans`. Entri paket itu mendeklarasikan **semua** subset — cyrillic,
+cyrillic-ext, greek, greek-ext, vietnamese, latin, latin-ext — sehingga build menyalin 12 berkas
+woff2 (393,5 KB) padahal produk hanya menulis teks Latin. Target `performance-budget.md` §1 (≤ 100 KB)
+terlampaui hampir 4×.
+
+| Berkas | Perubahan |
+| :-- | :-- |
+| `src/index.css` | Impor paket diganti `@font-face` yang dideklarasikan sendiri untuk subset **Latin** saja (dari `files/*-latin-wght-normal.woff2` milik paket yang sama) — tetap dibundel lokal, **tanpa** CDN (NFR-015), `font-display: swap`, rentang bobot dipertahankan (Roboto `100 900`, IBM Plex `100 700`), `unicode-range` Latin disalin dari paket |
+| `scripts/bundle-baseline.json` | Baseline di-record ulang agar ratchet +10% (D24) **melindungi** perbaikan, bukan melindungi ukuran lama |
+| `docs/07-quality/performance-budget.md` | §1 angka baru + status ✅ · §3 checkbox subsetting/CDN/third-party ditutup dengan bukti · v0.5 |
+| `plans/cv4every1-fase-1-mvp.md` | Requirement subset font pada Task 10 ditandai selesai lebih awal agar tidak dikerjakan dua kali |
+
+**Hasil (build produksi, `bun run check:budget`):**
+
+| Metrik | Sebelum | Sesudah | Perubahan | Anggaran |
+| :-- | :-- | :-- | :-- | :-- |
+| `fontsRaw` | 393,5 KB (12 berkas) | **88,8 KB** (2 berkas) | −77,4% | ≤ 100 KB ✅ |
+| `transferGzip` | 608,6 KB | **302,7 KB** | −50,3% | ≤ 400 KB ✅ |
+| `cssGzip` | 27,3 KB | **25,7 KB** | −6,0% | ≤ 30 KB ✅ |
+| `jsGzip` | 183,7 KB | 184,4 KB | +0,4% | ≤ 200 KB ✅ (sisa 15,6 KB) |
+
+**Trade-off yang diterima dan dicatat:** karakter di luar `U+0000-00FF` (mis. `é` pada nama)
+jatuh ke font sistem. `latin-ext` sengaja **tidak** dibundel: +30,9 KB untuk Plex sendiri, sementara
+ruang anggaran tersisa ±11 KB. Menambahkan subset berarti menaikkan anggaran lewat keputusan di
+dokumen anggaran — bukan ditambahkan diam-diam.
+
+**Verifikasi:** `bun run build` + `bun run check:budget` (ratchet hijau) · `bun run verify` penuh
+hijau · `e2e/no-egress.spec.ts` membuktikan font tetap dilayani dari origin sendiri.
