@@ -14,6 +14,8 @@
     "check:budget": "bun scripts/check-bundle-size.ts",
     "test": "vitest run",
     "test:unit": "vitest run",
+    "test:unit:node": "vitest run --project node",
+    "test:unit:jsdom": "vitest run --project jsdom",
     "test:e2e": "playwright test",
     "verify": "bun run lint && bun run format:check && bun run typecheck && bun run check:boundaries && bun run test:unit && bun run build && bun run check:budget",
     "gen:schema": "bun scripts/generate-json-schema.mjs",
