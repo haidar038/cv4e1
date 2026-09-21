@@ -32,12 +32,12 @@ todos:
       - content-pillar
   - id: renderer-ats
     content: Task 10 — ATSRenderer dari ATSViewModel, single column, heading standar, print CSS, tanpa foto secara struktural
-    status: pending
+    status: completed
     dependencies:
       - form-sections
   - id: renderer-creative
     content: Task 11 — CreativeRenderer satu template, dua kolom, foto, aksen warna, teks tetap dapat diseleksi
-    status: pending
+    status: completed
     dependencies:
       - renderer-ats
   - id: dual-engine-ux
@@ -636,13 +636,13 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Foto dirender bila `photo` ada di view model; tidak dirender bila tidak ada.
-- [ ] Tanpa foto, layout tetap seimbang (tidak ada kolom kosong ganjil).
-- [ ] Setiap ikon memiliki label teks yang setara.
-- [ ] Teks terekstraksi lengkap saat dicetak (uji yang sama seperti ATS).
-- [ ] Baseline regresi visual tersimpan.
-- [ ] Tidak ada warna di luar token tema.
-- [ ] `render/` lulus pemeriksaan batas modul (tidak mengimpor `storage/`).
+- [x] Foto dirender bila `photo` ada di view model; tidak dirender bila tidak ada. *(test node: resolver → img+alt; resolver undefined → placeholder; tanpa photo → tanpa slot; jalur blob nyata di e2e via seed IndexedDB)*
+- [x] Tanpa foto, layout tetap seimbang (tidak ada kolom kosong ganjil). *(sidebar tidak dirender bila kosong; foto gagal muat → placeholder menjaga keseimbangan)*
+- [x] Setiap ikon memiliki label teks yang setara. *(keputusan: template default TANPA ikon — AC terpenuhi vacuously; `<svg` masuk daftar terlarang checker sehingga ikon masa depan butuh keputusan sadar)*
+- [x] Teks terekstraksi lengkap saat dicetak (uji yang sama seperti ATS). *(e2e `creative-print.spec.ts`: semua baris pratinjau pulih berurutan dari PDF, Chromium)*
+- [x] Baseline regresi visual tersimpan. *(3 snapshot markup per fixture — keputusan yang sama dengan Task 10; screenshot piksel menyusul satu siklus baseline Linux di CI)*
+- [x] Tidak ada warna di luar token tema. *(gate stylesheet: tolak hex/rgb/hsl/oklch literal, wajib var(--token))*
+- [x] `render/` lulus pemeriksaan batas modul (tidak mengimpor `storage/`). *(resolver foto disuntikkan di PreviewGate; `check:boundaries` hijau)*
 
 **Edge cases**
 

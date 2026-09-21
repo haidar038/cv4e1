@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.3 — AC lengkap, diisi dari bukti nyata per 2026-09-20** |
-| Terakhir diperbarui | 2026-09-20 |
+| Status | **v0.4 — dua renderer lengkap; FR-001/FR-008/FR-303 sisi Creative terbukti (2026-09-21)** |
+| Terakhir diperbarui | 2026-09-21 |
 
 > Memetakan Requirement → Acceptance Criteria (`acceptance-criteria.md`, v0.2) → bukti test yang
 > benar-benar ada di repository → Status.
@@ -18,10 +18,10 @@
 | 🟡 | Sebagian: jalur data/view model terbukti, tetapi bagian renderer/UI-nya belum ada atau belum diuji |
 | ⬜ | Belum ada test — fitur belum dibangun, atau jalurnya belum diuji |
 
-**Baseline bukti:** 31 file / 296 test unit (`bun run test:unit`) + 15 test e2e lulus,
-1 skip kapabilitas (`page.pdf()` bukan kapabilitas Firefox; test PDF berjalan di Chromium lokal
-dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privacy` dan
-`check:budget` di `bun run verify`/CI.
+**Baseline bukti:** 32 file / 319 test unit (`bun run test:unit`) + 20 test e2e lulus,
+2 skip kapabilitas (`page.pdf()` bukan kapabilitas Firefox — test PDF ATS **dan** Creative
+berjalan di Chromium lokal dan CI Linux) terhadap build produksi via `vite preview` +
+gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 
 ---
 
@@ -29,6 +29,7 @@ dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privac
 
 | Requirement | AC | Pernyataan (ringkas) | Bukti test nyata |
 | :-- | :-- | :-- | :-- |
+| **FR-001** | AC-001-a,b | Satu model kanonik untuk dua mode | `src/core/normalize.test.ts` (dua view model dari satu dokumen) · **test divergensi AC-001-a**: setiap string tampilan ATS hadir di markup Creative dan sebaliknya, dari dokumen sumber yang sama (`src/render/creative/CreativeRenderer.test.tsx`) · **AC-001-b**: ubah dokumen → render ulang menampilkan nilai baru pada kedua mode (`ATSRenderer.test.tsx` + `CreativeRenderer.test.tsx` kasus `current: true`; `store.test.ts` untuk commit perubahan) |
 | **FR-003** | AC-003-a,b | Berpindah mode tidak mengubah/menghapus data sumber | `src/features/store/store.test.ts` — *mode switching invariant*: `setMode` hanya mengubah `meta.mode`; mode tersimpan per draft |
 | **FR-101** | AC-101-a | Draft tersimpan lokal tanpa akun | `src/storage/repository.test.ts` (save/load/list) · `src/features/drafts/DraftPanel.dom.test.tsx` (buat + daftar) |
 | **FR-102** | AC-102-a,b | Autosave tanpa tindakan eksplisit pengguna | `src/features/store/store.test.ts` (perubahan menandai dirty + autosave menyimpan) · `src/features/form/AutoSaveIndicator.dom.test.tsx` (`Menyimpan…` → `Tersimpan`, bertahan setelah reload) |
@@ -49,11 +50,12 @@ dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privac
 | **FR-005** | AC-005-a | Tidak ada `<table>` pada struktur inti — checker struktural pada markup nyata (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
 | **FR-006** | AC-006-a,b | Section kosong → nol heading pada render (`ATSRenderer.test.tsx`; view model: `normalize.test.ts`) |
 | **FR-007** | AC-007-a | Urutan heading render persis mengikuti `vm.sections`/`sectionOrder` (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
-| **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` (tanpa permukaan template/layout) + gerbang stylesheet — test gagal bila aturan dilanggar (`ATSRenderer.test.tsx`) |
+| **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` + gerbang stylesheet (`ATSRenderer.test.tsx`) · **sisi Creative**: resolver foto disuntikkan dari `features/` (render/ bebas storage), checker struktural + gerbang stylesheet kreatif — `CreativeRenderer.test.tsx` |
+| **FR-303** | AC-303-a | Sisi Creative: PDF hasil cetak halaman pratinjau Creative diekstraksi `pdf-parse` — seluruh baris pratinjau pulih lengkap dan berurutan (`e2e/creative-print.spec.ts`, Chromium) |
 | **FR-302** | AC-302-a | Sisi ATS: PDF hasil cetak halaman pratinjau diekstraksi `pdf-parse` — seluruh konten halaman pulih lengkap dan berurutan (`e2e/ats-print.spec.ts`, Chromium) |
 | **NFR-005** | AC-NFR-005-a | Dapat dioperasikan sepenuhnya dengan keyboard | `src/features/form/FormLayout.dom.test.tsx` (walkthrough keyboard-only, tanpa jebakan fokus, reorder via tombol) · test section memakai `user-event` di seluruh `*.dom.test.tsx` |
 | **NFR-006** | AC-NFR-006-a,b | Build produksi tanpa API key rahasia | `scripts/privacy-rules.test.ts` (13 test: pola kredensial, kutipan disensor, allowlist tertutup) · gerbang `bun run check:privacy` memindai `dist/` nyata di `verify` + CI |
-| **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px) |
+| **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px) · **region pratinjau ATS & Creative**: axe pada `#cv-preview` (`e2e/ats-print.spec.ts`, `e2e/creative-print.spec.ts`) |
 | **NFR-008** | AC-NFR-008-a | Anggaran performa app shell | `scripts/bundle-budget.test.ts` (batas ratchet, agregasi, baseline malformed) · gerbang `check:budget` di `verify` + CI · angka di `docs/07-quality/performance-budget.md` |
 | **NFR-009** | AC-NFR-009-a | Tidak ada skrip pihak ketiga saat runtime | `e2e/no-egress.spec.ts` (alur inti memicu **nol** permintaan ke luar origin) |
 | **NFR-011** | AC-NFR-011-a | Data resume tidak pernah masuk log | `scripts/privacy-rules.test.ts` (interpolasi/variabel selalu ditolak; hanya pesan tetap allowlist) · audit `console.*` di `src/` oleh `check:privacy` di `verify` + CI |
@@ -64,7 +66,6 @@ dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privac
 
 | Requirement | AC | Sudah terbukti | Belum terbukti — pemilik |
 | :-- | :-- | :-- | :-- |
-| **FR-001** | AC-001-a,b | Satu model kanonik (`src/core/schema.test.ts`) diturunkan ke dua view model (`src/core/normalize.test.ts`) | Kedua renderer benar-benar merender model yang sama — Task 10/11 |
 | **FR-108** | AC-108-a | Penghapusan penyimpanan teruji di lapisan storage (`repository.test.ts`: `wipeAllData` mengosongkan drafts + assets) | Alur UI hapus-semua + `localStorage` + Cache Storage — Task 15 |
 | **NFR-002** | AC-NFR-002-a | Tidak ada kode jaringan di `core/`/`storage/`/`render/` (ditegakkan `check:boundaries`); alur inti memicu nol permintaan keluar-origin (`e2e/no-egress.spec.ts`) | Aturan egress untuk AI (persetujuan per operasi, AC-NFR-002-b) — Fase 2 |
 | **NFR-010** | AC-NFR-010-a | e2e lulus di **Chromium + Firefox** | Matriks peramban penuh (Safari/mobile) — `browser-device-matrix.md`, Fase 4 |
@@ -75,8 +76,7 @@ dan CI Linux) terhadap build produksi via `vite preview` + gerbang `check:privac
 
 | Requirement | AC | Alasan | Pemilik |
 | :-- | :-- | :-- | :-- |
-| FR-008 (sisi Creative — template tidak menimpa aturan mode) | AC-008-a | Sisi ATS sudah terbukti di Task 10; sisi Creative menunggu renderer | Task 11 |
-| FR-301, FR-303, FR-304 (PDF mengikuti mode, teks PDF Creative, tombol/UX ekspor) | AC-301-a,b · AC-303-a · AC-304-a | Sisi ATS FR-302 sudah terbukti (Task 10); sisa menunggu toggle mode (Task 12), renderer Creative (Task 11), tombol ekspor (Task 14) | Task 11/12/14 |
+| FR-301, FR-304 (PDF mengikuti mode aktif, tombol/UX ekspor) | AC-301-a,b · AC-304-a | Ekstraksi teks kedua mode sudah terbukti (Task 10: FR-302; Task 11: FR-303); ekspor mengikuti toggle mode dan tombolnya menunggu UI ekspor | Task 12/14 |
 | FR-109 (pemberitahuan penyimpanan lokal) | AC-109-a | Belum dibangun | Task 15 |
 | FR-110 (tanpa API key di ekspor) | AC-110-a,b | Belum ada API key sama sekali; AC-110-a (kondisi kini) terbukti secara vak — ditegakkan `check:privacy` di `dist/`, tetapi test eksplisit pada envelope menyusul | Fase 2 (saat key pertama ada), dengan test |
 | NFR-001 (fitur inti offline setelah app shell terpasang) | AC-NFR-001-a | Service worker belum ada | Task 14 |

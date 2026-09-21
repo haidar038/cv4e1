@@ -5,10 +5,10 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Field | Value |
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-21 |
-| Fase terakhir selesai | **Fase 1 — Milestone 1.4: Task 10 Renderer ATS** (Task 13b sebelumnya) |
-| Fase berikutnya | **Task 11 (Renderer Creative)** |
-| Baseline test | 31 file test · 296 test lulus · e2e 15 lulus + 1 skip kapabilitas · `tsc -b --noEmit` bersih (strict aktif) |
-| Wall-clock unit test | ~55 s penuh (node ±14 s · jsdom ±41 s) |
+| Fase terakhir selesai | **Fase 1 — Milestone 1.4: Task 11 Renderer Creative** (Task 10 sebelumnya) |
+| Fase berikutnya | **Task 12 (Toggle Mode + Preview Pane)** |
+| Baseline test | 32 file test · 319 test lulus · e2e 20 lulus + 2 skip kapabilitas · `tsc -b --noEmit` bersih (strict aktif) |
+| Wall-clock unit test | ~60 s penuh (node ±6 s · jsdom ±50 s) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
 > Konvensi penomoran task mengikuti `cv4every1-bootstrap-dan-spike-pdf.md` dan planning Fase 0. **Nomor task tidak pernah didaur ulang** (AGENTS.md §5).
@@ -257,8 +257,8 @@ Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sam
 | 7 | Testing Rig Final + CI Pipeline + Strict TS | ✅ selesai (7a+7b+7c; bukti CI menunggu remote) |
 | 8 | State Management Store (Zustand) | ✅ selesai (2026-09-20) |
 | 9 | Form UI — Guided Sections | ✅ selesai (2026-09-20) |
-| 10 | Renderer ATS (HTML + Print CSS) | ⬜ belum |
-| 11 | Renderer Creative (1 template) | ⬜ belum |
+| 10 | Renderer ATS (HTML + Print CSS) | ✅ selesai (2026-09-21) |
+| 11 | Renderer Creative (1 template) | ✅ selesai (2026-09-21) |
 | 12 | Toggle Mode + Preview Pane | ⬜ belum |
 | 13 | Action Verbs Catalog + Suggestions UI | ◑ 13a ✅ (data, 2026-09-20) · 13b ⬜ (UI) |
 | 14 | PDF Export Flow + PWA Service Worker | ⬜ belum |
@@ -852,3 +852,51 @@ teks yang pulih lengkap dan berurutan saat diekstraksi dari PDF.
 **Verifikasi:** `bun run verify` hijau penuh — 31 file / **296 test unit** · `check:boundaries`,
 `check:privacy`, `check:budget` ✅ (initialJsGzip +4,4% · jsGzip +5,7% · cssGzip +2,3% ·
 transferGzip +3,7%) · `bun run test:e2e` **15 lulus + 1 skip kapabilitas** (Chromium + Firefox).
+
+### Task 11 — Renderer Creative (1 template)
+**Requirement:** FR-001 (AC-001-a,b), FR-303 (AC-303-a), FR-008 sisi Creative, NFR-007 —
+ADR-0004/0007, rendering-architecture.md §2
+**Status: ✅ SELESAI (2026-09-21).** Versi visual dua kolom dari data yang sama — berfoto dan
+beraksen warna token — dengan teks yang tetap terekstraksi penuh dari PDF, ditutup test
+divergensi lintas mode (AC-001-a).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/render/creative/CreativeRenderer.tsx` | Renderer bodoh — hanya `vm: CreativeViewModel` + `resolvePhotoUrl` yang disuntikkan (render/ bebas storage). |
+| `src/render/creative/templates/default/TemplateDefault.tsx` + `styles.module.css` | Template `default`: flex dua kolom (sidebar foto/kontak/links/keahlian; utama nama/ringkasan/sisa section urut vm), CSS module ber-token OKLCH, DOM order = visual order, isolasi cetak `:global(body *)`, hook kelas stabil `cv-creative`. |
+| `src/render/creative/sections/*.tsx` | 4 komponen item — komposisi string tampilan **identik dengan ATS** (`joinMeta`/`dateRangeText` dipakai ulang dari `../ats/sections/display`), hanya presentasinya berbeda. |
+| `src/render/creative/structural.ts` + `expectations.ts` | Checker kreatif (aturan BERBEDA dari ATS: `<img>` boleh — maks 1 dengan alt; terlarang canvas/svg/table/iframe/object/embed) + derivasi ekspektasi urutan baca creative; helper murni diimpor dari ats/. |
+| `src/render/creative/CreativeRenderer.test.tsx` (**node**) | 19 test: gate struktural 3 fixture; perilaku foto (resolver → img+alt; undefined → placeholder aria-hidden; tanpa photo → tanpa slot; sidebar kosong tak dirender); heading tepat 1× dengan KEAHLIAN di sidebar; urutan ekspektasi; **test divergensi AC-001-a** (set ATS ⊆ markup Creative dan sebaliknya); sentinel ID; gate stylesheet (token-only, tanpa background-image/text-transform, @page A4, break-inside, object-fit: cover, isolasi cetak); 3 snapshot baseline dikomit. |
+| `src/features/preview/usePhotoResolver.ts` (+gate) | Seam foto: `loadAsset` → `URL.createObjectURL` (revoke on cleanup); pasangan `{ref, url}` agar resolver menjawab undefined untuk ref yang tak dimuat. Gate `?preview=creative` lazy chunk kedua; resolver disuntikkan DI SINI (features/ boleh impor storage). |
+| `e2e/creative-print.spec.ts` | 3 test: layout + struktur + axe `#cv-preview` + foto nyata via **seed PNG 1×1 ke IndexedDB dari spec** (jalur penuh storage→object URL→img→PDF); ekstraksi PDF Chromium — semua baris pulih berurutan (pencocokan whitespace-insensitive karena URL panjang ter-wrap di sidebar sempit); jalur gagal-muat → placeholder + nol egress. |
+
+**Keputusan implementasi:**
+- **Foto e2e dua jalur jujur:** seed via `kind:'backup'` gugur (penyematan aset F-A5 belum
+  diimplementasikan); yang dipilih: seed raw IndexedDB (tanpa impor kode produk, gagal keras bila
+  skema berubah) untuk jalur foto penuh, dan impor tanpa seed untuk edge case placeholder.
+- **Tanpa ikon di template default:** nol perubahan boundaries (`render/` tetap hanya `react`),
+  nol byte bundle; `<svg` masuk daftar terlarang checker sehingga ikon masa depan butuh keputusan
+  sadar. AC "ikon berlabel teks" terpenuhi vacuously.
+- **Aksen warna lewat permukaan, bukan teks berwarna:** token primary/muted berada di bawah
+  ambang kontras AA pada ukuran teks CV, jadi warna dipakai di border/background (sidebar,
+  garis heading) sementara teks tetap foreground — audit axe kontras lulus di peramban nyata.
+- **Audit axe di-scope ke `#cv-preview`:** halaman gate sementara menyempitkan form sehingga
+  tombol reorder form di luar dokumen terkena rule `target-size` — artefak gate yang digantikan
+  PreviewPane Task 12; audit shell tetap milik `a11y.spec.ts`.
+- **Keterbatasan jujur paginasi:** fragmentasi flex item saat print masih parsial di Chromium/
+  Firefox — gate PDF membuktikan fixture ±1 halaman pulih utuh; CV >1 halaman terdokumentasi
+  di komentar template + visual-regression-plan sebagai keterbatasan MVP (fallback print-block
+  ditolak: melanggar satu-codepath ADR-0007).
+- **React 19 preload hoisting:** `renderToStaticMarkup` memunculkan `<link rel="preload">` untuk
+  img — masuk `<head>`, di luar `#cv-preview`, URL `blob:` diabaikan test egress.
+- Tanpa perubahan `ResumeDocument`, tanpa migrasi, tanpa ADR, tanpa dependensi baru, tanpa
+  `console.*` (check:privacy lolos), tanpa perubahan `scripts/module-boundaries.ts`.
+- Deviasi kecil diakui: aturan checker dipilih "alt wajib ada" (nilai = nama pemilik; draft tanpa
+  nama → foto dekoratif `alt=""`), bukan "alt non-kosong" di rencana — menghindari salinan
+  hardcoded di render/ tanpa mengubah view model.
+
+**Verifikasi:** `bun run verify` hijau penuh — 32 file / **319 test unit** · `check:boundaries`,
+`check:privacy`, `check:budget` ✅ (initialJsGzip 192,7 KB · jsGzip 199,3/203,7 KB ratchet ·
+cssGzip 27,0/28,2 KB ratchet · transferGzip 319,0 KB) · `bun run test:e2e` **20 lulus + 2 skip
+kapabilitas** (Chromium + Firefox). Ruang ratchet JS/CSS kini tipis — keputusan re-baseline
+dicatat sebagai item checkpoint gerbang di `performance-budget.md` §1.

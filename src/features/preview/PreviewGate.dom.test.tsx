@@ -73,3 +73,68 @@ describe('PreviewGate', () => {
     expect(summary, summary).toBe('')
   })
 })
+
+/**
+ * Task 11 creative gate: same contract, second mode. The photo in these
+ * tests has no blob in the fake IndexedDB, so the gate's injected resolver
+ * yields no URL and the renderer shows its neutral placeholder — the
+ * jsdom-honest path (URL.createObjectURL does not exist here; the resolved
+ * path is proven by the node renderer tests and the real-browser e2e).
+ */
+describe('PreviewGate creative mode', () => {
+  it('renders nothing with ?preview=creative but no open draft', () => {
+    setUrl('?preview=creative')
+    render(<PreviewGate />)
+    expect(document.getElementById('cv-preview')).toBeNull()
+  })
+
+  it('mounts the lazy creative renderer when the gate is active and a draft is open', async () => {
+    setUrl('?preview=creative')
+    openNamedDocument()
+    render(<PreviewGate />)
+
+    // The creative sidebar leads the reading order; the name is the main h1.
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Budi Santoso')
+    expect(document.getElementById('cv-preview')).not.toBeNull()
+    expect(screen.getByRole('region', { name: 'Pratinjau CV' })).toBeInTheDocument()
+  })
+
+  it('shows the photo placeholder when the assetRef has no blob, with no img', async () => {
+    setUrl('?preview=creative')
+    openTestDocument()
+    documentStore.setState((state) => {
+      if (state.document === null) return state
+      return {
+        ...state,
+        document: {
+          ...state.document,
+          basics: {
+            ...state.document.basics,
+            name: 'Budi Santoso',
+            photo: { enabled: true, assetRef: 'asset_missing_blob' },
+          },
+        },
+      }
+    })
+    render(<PreviewGate />)
+    await screen.findByRole('heading', { level: 1 })
+
+    expect(document.querySelector('#cv-preview img')).toBeNull()
+    expect(document.querySelector('#cv-preview [aria-hidden="true"]')).not.toBeNull()
+  })
+
+  it('passes the axe audit with the creative renderer mounted', async () => {
+    setUrl('?preview=creative')
+    openNamedDocument()
+    render(<PreviewGate />)
+    await screen.findByRole('heading', { level: 1 })
+
+    const results = await axe.run(document.body, { resultTypes: ['violations'] })
+    const summary = results.violations
+      .map(
+        (violation) => `${violation.id}: ${violation.nodes.map((node) => node.html).join(' | ')}`,
+      )
+      .join('\n')
+    expect(summary, summary).toBe('')
+  })
+})

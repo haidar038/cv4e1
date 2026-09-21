@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.6 — metrik initialJsGzip + pipeline impor/ekspor lazy (2026-09-20); utang CSS, font, transfer LUNAS; metrik lab/field ditunda sadar** |
-| Terakhir diperbarui | 2026-09-20 |
+| Status | **v0.7 — renderer Creative lahir lazy (Task 11, 2026-09-21); ruang JS/CSS makin tipis — keputusan checkpoint gerbang** |
+| Terakhir diperbarui | 2026-09-21 |
 
 > Pengguna sasaran memakai ponsel kelas menengah dengan koneksi terbatas. Anggaran ini adalah requirement (NFR-008), bukan target.
 
@@ -11,17 +11,17 @@
 
 ## 1. Anggaran dan hasil pengukuran
 
-Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-20 pasca-pipeline lazy · Bun 1.3.14 ·
+Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-21 pasca-Task 11 · Bun 1.3.14 ·
 Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 `scripts/bundle-baseline.json`).
 
-| Metrik | Anggaran | Pasca-Task 10 (2026-09-21) | Status |
+| Metrik | Anggaran | Pasca-Task 11 (2026-09-21) | Status |
 | :-- | :-- | :-- | :-- |
-| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **192,2 KB** (192.165 B) | ✅ terpenuhi, sisa ruang 7,8 KB — lihat catatan utang JS di bawah |
-| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **195,7 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB) | ✅ ratchet OK (+5,7%, di bawah gerbang fatal +10%) |
-| CSS awal (gzip) | ≤ 30 KB | **26,2 KB** (termasuk CSS lazy renderer 0,5 KB) | ✅ terpenuhi |
+| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **192,7 KB** | ✅ terpenuhi, sisa ruang 7,3 KB — lihat catatan utang JS di bawah |
+| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **199,3 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB + `CreativeRenderer` 2,9 KB) | ✅ ratchet OK (+7,6%, di bawah gerbang fatal +10%) — sisa ruang ratchet ±4,4 KB |
+| CSS awal (gzip) | ≤ 30 KB | **27,0 KB** (termasuk CSS lazy renderer: ATS 0,5 KB + Creative 0,8 KB) | ✅ terpenuhi — sisa ruang ratchet ±1,2 KB |
 | Font (raw, woff2) | ≤ 100 KB (di-subset) | **88,8 KB** | ✅ **terpenuhi — utang font lunas** |
-| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **314,7 KB** | ✅ **terpenuhi — utang transfer lunas** |
+| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **319,0 KB** | ✅ **terpenuhi — utang transfer lunas** |
 | LCP ≤ 2.5 s · TTI ≤ 3.5 s · CLS ≤ 0.1 · Muat ulang offline ≤ 1 s | | belum diukur | ⬜ **ditunda sadar** ke tahap polish/persiapan performance testing (keputusan maintainer, 2026-09-20) |
 
 - [x] **Validasi angka bundle lewat pengukuran** (2026-09-20, diperbarui pasca-audit dan pasca-pipeline lazy).
@@ -59,9 +59,16 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   2,4 KB gzip + CSS 0,5 KB keluar dari JS/CSS awal; yang masuk shell hanya gate pratinjau
   (`?preview=ats`, dihapus saat Task 12) dan wrapper lazy (+1,7 KB `initialJsGzip`). Baseline JSON
   **tidak** di-record ulang (semua ratchet hijau). Sisa ruang absolut kini 7,8 KB gzip.
-- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 7,8 KB gzip.
+- **Task 11 (2026-09-21):** renderer Creative **lahir lazy** dengan pola yang sama — chunk
+  `CreativeRenderer` 2,9 KB gzip + CSS module 0,8 KB terpisah; yang masuk shell hanya cabang gate
+  kedua + hook resolver foto (+0,5 KB `initialJsGzip`). Baseline JSON **tidak** di-record ulang
+  (semua ratchet hijau). **Ruang kini nyaris habis di dua metrik:** ratchet `jsGzip` tersisa
+  ±4,4 KB (199,3 / 203,7 KB) dan ratchet `cssGzip` ±1,2 KB (27,0 / 28,2 KB) — Task 12–15 praktis
+  **wajib** lazy untuk kode baru berukuran berarti, dan keputusan re-baseline sadar (atau
+  pemangkasan) kini harus diambil di checkpoint gerbang Fase 1, bukan lagi ditunda.
+- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 7,3 KB gzip.
   Sebelum gerbang Fase 1, audit bundle + pemisahan kode (§3: renderer dimuat lazy) perlu dievaluasi
-  maintainer agar Task 10–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
+  maintainer agar Task 12–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
   checkpoint gerbang.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
