@@ -2,7 +2,7 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.4 — dua renderer lengkap; FR-001/FR-008/FR-303 sisi Creative terbukti (2026-09-21)** |
+| Status | **v0.5 — dual-engine UX lengkap; FR-002/FR-003 sisi UI terbukti (2026-09-21)** |
 | Terakhir diperbarui | 2026-09-21 |
 
 > Memetakan Requirement → Acceptance Criteria (`acceptance-criteria.md`, v0.2) → bukti test yang
@@ -18,7 +18,7 @@
 | 🟡 | Sebagian: jalur data/view model terbukti, tetapi bagian renderer/UI-nya belum ada atau belum diuji |
 | ⬜ | Belum ada test — fitur belum dibangun, atau jalurnya belum diuji |
 
-**Baseline bukti:** 32 file / 319 test unit (`bun run test:unit`) + 20 test e2e lulus,
+**Baseline bukti:** 35 file / 331 test unit (`bun run test:unit`) + 34 test e2e lulus,
 2 skip kapabilitas (`page.pdf()` bukan kapabilitas Firefox — test PDF ATS **dan** Creative
 berjalan di Chromium lokal dan CI Linux) terhadap build produksi via `vite preview` +
 gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
@@ -30,7 +30,7 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 | Requirement | AC | Pernyataan (ringkas) | Bukti test nyata |
 | :-- | :-- | :-- | :-- |
 | **FR-001** | AC-001-a,b | Satu model kanonik untuk dua mode | `src/core/normalize.test.ts` (dua view model dari satu dokumen) · **test divergensi AC-001-a**: setiap string tampilan ATS hadir di markup Creative dan sebaliknya, dari dokumen sumber yang sama (`src/render/creative/CreativeRenderer.test.tsx`) · **AC-001-b**: ubah dokumen → render ulang menampilkan nilai baru pada kedua mode (`ATSRenderer.test.tsx` + `CreativeRenderer.test.tsx` kasus `current: true`; `store.test.ts` untuk commit perubahan) |
-| **FR-003** | AC-003-a,b | Berpindah mode tidak mengubah/menghapus data sumber | `src/features/store/store.test.ts` — *mode switching invariant*: `setMode` hanya mengubah `meta.mode`; mode tersimpan per draft |
+| **FR-003** | AC-003-a,b | Berpindah mode tidak mengubah/menghapus data sumber | `src/features/store/store.test.ts` — *mode switching invariant*: `setMode` hanya mengubah `meta.mode`; mode tersimpan per draft · **sisi UI**: invariant yang sama diuji lewat kontrol nyata (`src/features/preview/ModeToggle.dom.test.tsx`) dan round-trip tanpa reload yang membaca IndexedDB langsung (`e2e/mode-switch.spec.ts`, kecuali `meta.mode` + metadata storage) |
 | **FR-101** | AC-101-a | Draft tersimpan lokal tanpa akun | `src/storage/repository.test.ts` (save/load/list) · `src/features/drafts/DraftPanel.dom.test.tsx` (buat + daftar) |
 | **FR-102** | AC-102-a,b | Autosave tanpa tindakan eksplisit pengguna | `src/features/store/store.test.ts` (perubahan menandai dirty + autosave menyimpan) · `src/features/form/AutoSaveIndicator.dom.test.tsx` (`Menyimpan…` → `Tersimpan`, bertahan setelah reload) |
 | **FR-103** | AC-103-a,b | Mendukung beberapa draft | `src/storage/repository.test.ts` (urut `updatedAt`, fallback judul) · `src/features/drafts/DraftPanel.dom.test.tsx` (ganti nama, duplikat, hapus) |
@@ -45,12 +45,12 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 | **FR-204** | AC-204-a,b | Micro-copy Indonesia nonaktif saat locale bukan `id` | `microcopy.test.ts` (pack `en` = null) · `EducationForm.dom.test.tsx` (guidance disembunyikan) · `src/features/form/section-keys.test.ts` (pack struktural mengosongkan string domain, label tetap ada) |
 | **FR-205** | AC-205-a | Saran kata kerja sadar section: katalog terfilter (`src/content/action-verbs/action-verbs.test.ts`, `src/features/form/section-keys.test.ts`); UI saran per bullet dengan penyisipan pada posisi kursor tanpa menimpa teks (`src/features/form/ActionVerbSuggestions.dom.test.tsx`, `src/features/form/fields/insertAtCursor.test.ts`, `src/features/form/fields/StringListEditor.dom.test.tsx`) |
 | **FR-206** | AC-206-a | Saran bekerja offline: `e2e/no-egress.spec.ts` membuka panel saran dan menyisipkan kata kerja pada build produksi dengan **nol** permintaan di luar origin |
-| **FR-002** | AC-002-a | `ATSViewModel` tanpa field foto (`normalize.test.ts`) **dan** keluaran render ATS tanpa `<img>` meski sumber `photo.enabled: true` (`src/render/ats/ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
+| **FR-002** | AC-002-a | `ATSViewModel` tanpa field foto (`normalize.test.ts`) **dan** keluaran render ATS tanpa `<img>` meski sumber `photo.enabled: true` (`src/render/ats/ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) · **penjelasan saat toggle**: `PhotoNotice` memakai teks verbatim di mode ATS berfoto, sekali per sesi, dismissable (`src/features/preview/PhotoNotice.dom.test.tsx`, `e2e/mode-switch.spec.ts`) |
 | **FR-004** | AC-004-a,b | Renderer ATS satu kolom: markup block-flow tanpa `<div>`; stylesheet bebas grid/flex/column-count/float — ditegakkan test (`ATSRenderer.test.tsx` gerbang CSS + struktur; `e2e/ats-print.spec.ts`) |
 | **FR-005** | AC-005-a | Tidak ada `<table>` pada struktur inti — checker struktural pada markup nyata (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
 | **FR-006** | AC-006-a,b | Section kosong → nol heading pada render (`ATSRenderer.test.tsx`; view model: `normalize.test.ts`) |
 | **FR-007** | AC-007-a | Urutan heading render persis mengikuti `vm.sections`/`sectionOrder` (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
-| **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` + gerbang stylesheet (`ATSRenderer.test.tsx`) · **sisi Creative**: resolver foto disuntikkan dari `features/` (render/ bebas storage), checker struktural + gerbang stylesheet kreatif — `CreativeRenderer.test.tsx` |
+| **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` + gerbang stylesheet (`ATSRenderer.test.tsx`) · **sisi Creative**: resolver foto disuntikkan dari `features/` (render/ bebas storage), checker struktural + gerbang stylesheet kreatif — `CreativeRenderer.test.tsx` · **Task 12**: `PreviewPane` me-mount renderer sesuai mode aktif tanpa mengubah renderer (`src/features/preview/PreviewPane.dom.test.tsx`); path spec `ats-print`/`creative-print` tidak berubah, tetap valid |
 | **FR-303** | AC-303-a | Sisi Creative: PDF hasil cetak halaman pratinjau Creative diekstraksi `pdf-parse` — seluruh baris pratinjau pulih lengkap dan berurutan (`e2e/creative-print.spec.ts`, Chromium) |
 | **FR-302** | AC-302-a | Sisi ATS: PDF hasil cetak halaman pratinjau diekstraksi `pdf-parse` — seluruh konten halaman pulih lengkap dan berurutan (`e2e/ats-print.spec.ts`, Chromium) |
 | **NFR-005** | AC-NFR-005-a | Dapat dioperasikan sepenuhnya dengan keyboard | `src/features/form/FormLayout.dom.test.tsx` (walkthrough keyboard-only, tanpa jebakan fokus, reorder via tombol) · test section memakai `user-event` di seluruh `*.dom.test.tsx` |

@@ -5,9 +5,9 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 | Field | Value |
 | :-- | :-- |
 | Terakhir diperbarui | 2026-09-21 |
-| Fase terakhir selesai | **Fase 1 — Milestone 1.4: Task 11 Renderer Creative** (Task 10 sebelumnya) |
-| Fase berikutnya | **Task 12 (Toggle Mode + Preview Pane)** |
-| Baseline test | 32 file test · 319 test lulus · e2e 20 lulus + 2 skip kapabilitas · `tsc -b --noEmit` bersih (strict aktif) |
+| Fase terakhir selesai | **Fase 1 — Milestone 1.5: Task 12 Toggle Mode + Preview Pane** |
+| Fase berikutnya | **Task 14 (PDF Export Flow + PWA Service Worker)** |
+| Baseline test | 35 file test · 331 test lulus · e2e 34 lulus + 2 skip kapabilitas · `tsc -b --noEmit` bersih (strict aktif) |
 | Wall-clock unit test | ~60 s penuh (node ±6 s · jsdom ±50 s) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
@@ -259,7 +259,7 @@ Isi bagian ini **setelah setiap task Fase 1 selesai**, mengikuti format yang sam
 | 9 | Form UI — Guided Sections | ✅ selesai (2026-09-20) |
 | 10 | Renderer ATS (HTML + Print CSS) | ✅ selesai (2026-09-21) |
 | 11 | Renderer Creative (1 template) | ✅ selesai (2026-09-21) |
-| 12 | Toggle Mode + Preview Pane | ⬜ belum |
+| 12 | Toggle Mode + Preview Pane | ✅ selesai (2026-09-21) |
 | 13 | Action Verbs Catalog + Suggestions UI | ◑ 13a ✅ (data, 2026-09-20) · 13b ⬜ (UI) |
 | 14 | PDF Export Flow + PWA Service Worker | ⬜ belum |
 | 15 | Delete All Data + Local Storage Notice | ⬜ belum |
@@ -900,3 +900,42 @@ divergensi lintas mode (AC-001-a).
 cssGzip 27,0/28,2 KB ratchet · transferGzip 319,0 KB) · `bun run test:e2e` **20 lulus + 2 skip
 kapabilitas** (Chromium + Firefox). Ruang ratchet JS/CSS kini tipis — keputusan re-baseline
 dicatat sebagai item checkpoint gerbang di `performance-budget.md` §1.
+
+---
+
+## Fase 1 — Milestone 1.5
+
+### Task 12 — Toggle Mode + Preview Pane
+**Requirement:** FR-003 (AC-003-a,b), FR-002 (AC-002-a), FR-008 (AC-008-a), J3 —
+ADR-0004, state-management.md §5, accessibility-plan.md §2
+**Status: ✅ SELESAI (2026-09-21).** Fitur pembeda produk: satu klik mengganti
+mode ATS↔Creative tanpa reload dan tanpa menyentuh data, dengan penjelasan
+kontekstual foto. Gate `?preview=ats|creative` dihapus; renderer tidak diubah.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/features/preview/ModeToggle.tsx` (+`.dom.test.tsx`, 6 test) | Segmented control radio native (keputusan sadar: bukan base-ui ToggleGroup — disiplin ukur warisan Task 13b); keyboard panah gratis, fokus tidak hilang, perubahan diumumkan ganda (native + `role="status"` explisit); mutasi hanya lewat `setMode()` |
+| `src/features/preview/PhotoNotice.tsx` (+`.dom.test.tsx`, 5 test) | Notice dismissable `role="status"`: teks verbatim `photo.atsHiddenNotice` dipakai ulang (bukan ditulis ulang); "sekali per sesi" = flag in-memory `uiStore.photoNoticeDismissed` (umur tab, tanpa persistensi) |
+| `src/features/preview/PreviewPane.tsx` (+`.dom.test.tsx`, 6 test) | Pane sesungguhnya: lazy chunk per renderer (pola gate), view model dari selector memoized, `usePhotoResolver` dipakai ulang, preload idle kedua chunk via `setTimeout` (bukan `requestIdleCallback` — jsdom-safe); toggle+notice di LUAR `#cv-preview` agar gerbang ekstraksi tetap dokumen-only; root = labelled region (axe `region`) |
+| `src/App.tsx` (+`src/App.dom.test.tsx`, 2 test) | Workspace `max-w-7xl`: desktop berdampingan, mobile tab Form/Pratinjau (`role=tablist`, `aria-selected`, tanpa base-ui Tabs); kedua pane tetap ter-mount (`hidden` di mobile saja) |
+| `src/features/form/FormLayout.tsx` (+test) | SkipLink unconditional saat draft terbuka — mekanisme Task 9 selesai; warning lint `set-state-in-effect` yang sengaja ditinggalkan kini hilang (24 warning, 0 error) |
+| `src/features/store/{ui-store.ts,actions.ts}` + `test-utils.tsx` | Aditif: `photoNoticeDismissed` + `dismissPhotoNotice()` + reset test |
+| `src/content/microcopy/id.ts` | Aditif bertipe: grup `preview` (+`modeLabel/atsMode/creativeMode/modeStatus/formTab/previewTab/formLabel/dismissNotice`) — struktural, lolos FR-204; tersapu test frasa terlarang otomatis |
+| `e2e/mode-switch.spec.ts` | **Baru, 7 test:** tanpa reload (marker window) · invariant IndexedDB AC-003-a (kecuali `meta.mode` + metadata storage) · notice sekali per sesi · keyboard + SR + fokus · offline jujur (chunk dihangatkan dulu; SW menunggu Task 14) · reduced-motion · tab mobile 360 px |
+| `e2e/ats-print.spec.ts` + `e2e/creative-print.spec.ts` | Helper dimigrasi dari gate ke UI nyata (tanpa query param; **nama file tidak berubah**); seed foto + `despace()` + axe ter-scope + skip Firefox dipertahankan |
+| Docs: plan AC ✓, frontmatter `dual-engine-ux` ✓, matrix v0.5 (FR-002/003/008), roadmap ✓, performance-budget v0.8, accessibility-plan, changelog | Checklist penutup dalam perubahan yang sama |
+
+**Keputusan implementasi (6 poin planning, semua sesuai rencana yang disetujui):**
+
+- **Native dulu:** radio-group + tombol `aria-selected` — eager shell hanya +1,1 KB (`initialJsGzip` 192,7 → **193,8 KB**, sisa 6,2 KB); skenario eager-renderer (±5,3 KB) ditolak.
+- **Tanpa flicker vs lazy:** lazy ×2 dipertahankan + preload idle + `Suspense` kosong tanpa animasi (reduced-motion by construction).
+- **Sesi = umur tab** (in-memory); reload boleh memunculkan notice lagi — harmless untuk guidance.
+- **Axe:** print spec tetap scope `#cv-preview`; `a11y.spec.ts` full-page lolos tanpa perubahan (layout baru tidak menyempitkan form sampai kena `target-size` — tombol `icon-xs` 24 px tepat di ambang, tanpa overlap).
+- **Offline jujur:** `setOffline` pasca-load membuktikan operasi lokal tanpa egress; offline-reload penuh + precache menunggu Task 14.
+- **Temuan e2e yang diperbaiki jujur:** (1) `print:` cetak pada lebar kertas (<`lg`) membuat `hidden lg:block` menyembunyikan pratinjau → PDF kosong — diperbaiki `print:block` (+`print:hidden` pada tab); (2) klik Playwright pada input `sr-only` diintersep span — spec mengklik label terlihat (perilaku pengguna nyata); (3) tunggu h1 ambigu antar mode — tunggu `.cv-creative`; (4) foto seed butuh reload agar resolver mengamati via jalur mount normal (perilaku D14).
+
+**Verifikasi:** `bun run verify` hijau penuh — 35 file / **331 test unit** · `check:boundaries`,
+`check:privacy`, `check:budget` ✅ (initialJsGzip 193,8 KB · jsGzip 200,4 KB (+8,2% ratchet, ⚠️ peringatan advisory >200 KB) ·
+cssGzip 27,2 KB (+5,9%) · transferGzip 320,3 KB) · `bun run test:e2e` **34 lulus + 2 skip
+kapabilitas** (Chromium + Firefox). Keputusan re-baseline/pemangkasan kini **wajib** di
+checkpoint gerbang Fase 1 (sisa ratchet ±3,3 KB JS / ±1,0 KB CSS).

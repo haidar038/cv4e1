@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useStore } from 'zustand'
 import {
   Accordion,
@@ -61,8 +60,9 @@ function normalizeOrder(order: readonly string[] | undefined): SectionKey[] {
  * The guided form shell: section navigation as an accordion (one section open
  * at a time), progress indicator, autosave status, soft CV-length warning, and
  * the guided empty state when no draft is open. The skip link to the preview
- * region only renders once a `#cv-preview` target exists (built in Task 12) —
- * never as a dead link.
+ * region renders unconditionally here because Task 12 mounts `#cv-preview`
+ * whenever a draft is open — never a dead link (the Task 9 effect-based
+ * existence check is gone with it, along with its lint warning).
  */
 export function FormLayout() {
   const pack = useMicrocopy()
@@ -178,14 +178,9 @@ function EmptyState() {
   )
 }
 
-/** Skip link to the preview region; rendered only when the target exists (Task 12). */
+/** Skip link to the preview region; always mounted with a draft open (Task 12). */
 function SkipLink() {
   const pack = useMicrocopy()
-  const [hasPreview, setHasPreview] = useState(false)
-  useEffect(() => {
-    if (document.getElementById('cv-preview') !== null) setHasPreview(true)
-  }, [])
-  if (!hasPreview) return null
   return (
     <a
       href="#cv-preview"

@@ -46,6 +46,11 @@
       (`src/features/form/test-utils.tsx` → `runAxe()`, dipakai 9 berkas `*.dom.test.tsx`) dan
       **halaman penuh** di `e2e/a11y.spec.ts` (tag WCAG 2.0/2.1/2.2 A+AA; `title`, `lang`,
       satu `main`, dan kontras warna).
+- [x] Task 12: `ModeToggle` (radio native + live region), `PhotoNotice`
+      (dismissable `role="status"`), dan tab mobile Form/Pratinjau diaudit axe
+      per komponen (`src/features/preview/*.dom.test.tsx`, `src/App.dom.test.tsx`
+      pola); keyboard-only, pengumuman SR, fokus, dan `prefers-reduced-motion`
+      dibuktikan `e2e/mode-switch.spec.ts` pada build produksi.
 - [x] Struktur dokumen: `index.html` memakai `lang="id"` (antarmuka berbahasa Indonesia) dan judul
       `cv4every1`; diuji eksplisit di `e2e/a11y.spec.ts` dan `e2e/smoke.spec.ts`.
 - [ ] Manual: walkthrough hanya keyboard per rilis

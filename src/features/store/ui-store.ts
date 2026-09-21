@@ -17,6 +17,12 @@ export interface UiState {
   autosaveStatus: StorageStatus
   /** Human-facing storage message in Bahasa Indonesia (D21 tone); null = nothing to say. */
   storageMessage: string | null
+  /**
+   * Task 12: the ATS photo notice was dismissed. In-memory only — "once per
+   * session" means the lifetime of this tab (a reload may show it again,
+   * which is harmless for guidance). Never persisted, never part of the draft.
+   */
+  photoNoticeDismissed: boolean
 }
 
 export const uiStore = createStore<UiState>()(() => ({
@@ -25,4 +31,5 @@ export const uiStore = createStore<UiState>()(() => ({
   openPanel: null,
   autosaveStatus: 'idle',
   storageMessage: null,
+  photoNoticeDismissed: false,
 }))

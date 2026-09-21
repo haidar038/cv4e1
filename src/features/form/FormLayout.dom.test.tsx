@@ -67,7 +67,10 @@ describe('section navigation (keyboard-first)', () => {
       </main>,
     )
 
-    // First Tab stop is the first accordion trigger.
+    // First Tab stop is the skip link to the preview (Task 12: always
+    // mounted with a draft open), then the first accordion trigger.
+    await user.tab()
+    expect(document.activeElement).toHaveAccessibleName('Lewati ke pratinjau CV')
     await user.tab()
     expect(document.activeElement).toHaveAccessibleName('Data Diri')
 
@@ -143,23 +146,24 @@ describe('section reorder (F-B9, D22: buttons, not drag-and-drop)', () => {
 })
 
 describe('skip link to the preview', () => {
-  it('renders only when a preview target exists — never a dead link', () => {
+  it('renders whenever a draft is open — Task 12 always mounts the preview, never a dead link', () => {
     openTestDocument()
-    const { rerender } = render(
+    render(
       <main>
-        <FormLayout />
-      </main>,
-    )
-    expect(screen.queryByRole('link', { name: 'Lewati ke pratinjau CV' })).not.toBeInTheDocument()
-
-    rerender(
-      <main>
-        <div id="cv-preview" />
         <FormLayout />
       </main>,
     )
     const link = screen.getByRole('link', { name: 'Lewati ke pratinjau CV' })
     expect(link).toHaveAttribute('href', '#cv-preview')
+  })
+
+  it('renders nothing in the empty state, where no preview exists', () => {
+    render(
+      <main>
+        <FormLayout />
+      </main>,
+    )
+    expect(screen.queryByRole('link', { name: 'Lewati ke pratinjau CV' })).not.toBeInTheDocument()
   })
 })
 

@@ -2,7 +2,7 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.7 — renderer Creative lahir lazy (Task 11, 2026-09-21); ruang JS/CSS makin tipis — keputusan checkpoint gerbang** |
+| Status | **v0.8 — dual-engine UX lahir eager (+1,1 KB); jsGzip menyentuh garis advisory 200 KB — keputusan checkpoint gerbang (2026-09-21)** |
 | Terakhir diperbarui | 2026-09-21 |
 
 > Pengguna sasaran memakai ponsel kelas menengah dengan koneksi terbatas. Anggaran ini adalah requirement (NFR-008), bukan target.
@@ -11,17 +11,17 @@
 
 ## 1. Anggaran dan hasil pengukuran
 
-Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-21 pasca-Task 11 · Bun 1.3.14 ·
+Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-21 pasca-Task 12 · Bun 1.3.14 ·
 Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 `scripts/bundle-baseline.json`).
 
-| Metrik | Anggaran | Pasca-Task 11 (2026-09-21) | Status |
+| Metrik | Anggaran | Pasca-Task 12 (2026-09-21) | Status |
 | :-- | :-- | :-- | :-- |
-| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **192,7 KB** | ✅ terpenuhi, sisa ruang 7,3 KB — lihat catatan utang JS di bawah |
-| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **199,3 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB + `CreativeRenderer` 2,9 KB) | ✅ ratchet OK (+7,6%, di bawah gerbang fatal +10%) — sisa ruang ratchet ±4,4 KB |
-| CSS awal (gzip) | ≤ 30 KB | **27,0 KB** (termasuk CSS lazy renderer: ATS 0,5 KB + Creative 0,8 KB) | ✅ terpenuhi — sisa ruang ratchet ±1,2 KB |
+| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **193,8 KB** | ✅ terpenuhi, sisa ruang 6,2 KB — lihat catatan utang JS di bawah |
+| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **200,4 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB + `CreativeRenderer` 2,9 KB) | ✅ ratchet OK (+8,2%, di bawah gerbang fatal +10%) — sisa ruang ratchet ±3,3 KB; ⚠️ melewati garis advisory 200 KB |
+| CSS awal (gzip) | ≤ 30 KB | **27,2 KB** (termasuk CSS lazy renderer: ATS 0,5 KB + Creative 0,8 KB) | ✅ terpenuhi — sisa ruang ratchet ±1,0 KB |
 | Font (raw, woff2) | ≤ 100 KB (di-subset) | **88,8 KB** | ✅ **terpenuhi — utang font lunas** |
-| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **319,0 KB** | ✅ **terpenuhi — utang transfer lunas** |
+| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **320,3 KB** | ✅ **terpenuhi — utang transfer lunas** |
 | LCP ≤ 2.5 s · TTI ≤ 3.5 s · CLS ≤ 0.1 · Muat ulang offline ≤ 1 s | | belum diukur | ⬜ **ditunda sadar** ke tahap polish/persiapan performance testing (keputusan maintainer, 2026-09-20) |
 
 - [x] **Validasi angka bundle lewat pengukuran** (2026-09-20, diperbarui pasca-audit dan pasca-pipeline lazy).
@@ -66,7 +66,18 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   ±4,4 KB (199,3 / 203,7 KB) dan ratchet `cssGzip` ±1,2 KB (27,0 / 28,2 KB) — Task 12–15 praktis
   **wajib** lazy untuk kode baru berukuran berarti, dan keputusan re-baseline sadar (atau
   pemangkasan) kini harus diambil di checkpoint gerbang Fase 1, bukan lagi ditunda.
-- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 7,3 KB gzip.
+- **Task 12 (2026-09-21):** task pertama yang menambah UI eager ke shell —
+  `ModeToggle` + `PhotoNotice` + `PreviewPane` + tab mobile + micro-copy —
+  hanya **+1,1 KB** `initialJsGzip` (192,7 → 193,8 KB) karena kedua renderer
+  tetap lazy dan kedua keputusan primitif jatuh ke kontrol native (radio +
+  tombol, tanpa base-ui ToggleGroup/Tabs — disiplin ukur warisan Task 13b).
+  Skenario eager-kedua-renderer (±5,3 KB) ditolak sesuai rencana. Baseline JSON
+  **tidak** di-record ulang (semua ratchet hijau). **Garis baru yang tersentuh:**
+  `jsGzip` 200,4 KB melewati garis advisory 200 KB — `check:budget` memberi
+  peringatan berdokumen (bukan gerbang fatal; ratchet +8,2% masih hijau).
+  Keputusan re-baseline sadar atau pemangkasan kini **wajib** di checkpoint
+  gerbang Fase 1 — ruang ratchet tersisa ±3,3 KB (JS) dan ±1,0 KB (CSS).
+- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 6,2 KB gzip.
   Sebelum gerbang Fase 1, audit bundle + pemisahan kode (§3: renderer dimuat lazy) perlu dievaluasi
   maintainer agar Task 12–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
   checkpoint gerbang.

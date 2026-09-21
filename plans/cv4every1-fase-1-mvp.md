@@ -42,7 +42,7 @@ todos:
       - renderer-ats
   - id: dual-engine-ux
     content: Task 12 — ModeToggle + PreviewPane + PhotoNotice; buktikan switch mode tidak mengubah ResumeDocument
-    status: pending
+    status: completed
     dependencies:
       - renderer-creative
   - id: pdf-and-pwa
@@ -689,13 +689,13 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Toggle mengubah pratinjau tanpa flicker dan tanpa reload.
-- [ ] **Invariant diuji:** snapshot `JSON.stringify(document)` identik sebelum dan sesudah toggle (kecuali `meta.mode`).
-- [ ] `PhotoNotice` muncul saat beralih ke ATS dengan foto ada; tidak muncul dua kali dalam sesi yang sama setelah ditutup.
-- [ ] Perubahan mode diumumkan ke pembaca layar.
-- [ ] Berfungsi dengan jaringan dimatikan (e2e offline).
-- [ ] `prefers-reduced-motion` dihormati.
-- [ ] Fokus tidak hilang saat toggle digunakan dengan keyboard.
+- [x] Toggle mengubah pratinjau tanpa flicker dan tanpa reload.
+- [x] **Invariant diuji:** snapshot `JSON.stringify(document)` identik sebelum dan sesudah toggle (kecuali `meta.mode`).
+- [x] `PhotoNotice` muncul saat beralih ke ATS dengan foto ada; tidak muncul dua kali dalam sesi yang sama setelah ditutup.
+- [x] Perubahan mode diumumkan ke pembaca layar.
+- [x] Berfungsi dengan jaringan dimatikan (e2e offline).
+- [x] `prefers-reduced-motion` dihormati.
+- [x] Fokus tidak hilang saat toggle digunakan dengan keyboard.
 
 **Edge cases**
 

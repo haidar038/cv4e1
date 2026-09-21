@@ -24,6 +24,7 @@ export async function resetFormStores(): Promise<void> {
     openPanel: null,
     autosaveStatus: 'idle',
     storageMessage: null,
+    photoNoticeDismissed: false,
   })
   await Promise.all([db.drafts.clear(), db.assets.clear()])
 }

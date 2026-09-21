@@ -8,8 +8,8 @@ import { PDFParse } from 'pdf-parse'
  * ATS print + text-extraction gates (Task 10, FR-302/FR-304, ats-test-plan §2).
  *
  * ADR-0007: preview and PDF share one HTML + Print CSS codepath, so driving
- * the real production page through the gated preview (`?preview=ats`) is the
- * honest surface. The gates split the fidelity proof per layer:
+ * the real production page through the Task 12 PreviewPane is the honest
+ * surface. The gates split the fidelity proof per layer:
  *   - node suite (ATSRenderer.test.tsx): fixture → markup contains every
  *     display string derived from the view model, in order;
  *   - this spec: rendered preview page → PDF text recovers the page content
@@ -82,8 +82,9 @@ async function previewStructuralViolations(page: Page): Promise<string[]> {
 }
 
 /**
- * Imports the fixture through the real DraftPanel flow, then opens the gated
- * preview page (reload restores the persisted draft from IndexedDB).
+ * Imports the fixture through the real DraftPanel flow. The imported draft
+ * opens in its stored ATS mode with the PreviewPane mounted directly —
+ * no query-param gate since Task 12.
  */
 async function openPreviewWithFixture(page: Page): Promise<void> {
   await page.goto('/')
@@ -92,10 +93,9 @@ async function openPreviewWithFixture(page: Page): Promise<void> {
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(ENVELOPE), 'utf8'),
   })
-  // The imported draft must exist (summary listed) before a reload can
-  // restore it for the gated preview page.
+  // The imported draft opens automatically in its stored mode; the preview
+  // heading proves the pane mounted.
   await expect(page.getByText('Fixture Lengkap').first()).toBeVisible({ timeout: 15_000 })
-  await page.goto('/?preview=ats')
   await expect(page.locator('#cv-preview .cv-ats-name')).toHaveText('Contoh Nama Fiktif', {
     timeout: 15_000,
   })

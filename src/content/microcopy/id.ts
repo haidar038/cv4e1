@@ -128,6 +128,20 @@ export interface MicrocopyPack {
   preview: {
     /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
     regionLabel: string
+    /** Legend of the ATS ↔ Creative segmented control (Task 12). */
+    modeLabel: string
+    /** Mode option labels — structural, kept for every locale. */
+    atsMode: string
+    creativeMode: string
+    /** Screen-reader announcement when the mode changes; `{mode}` is replaced. */
+    modeStatus: string
+    /** Mobile Form/Preview tab labels (Task 12) — structural. */
+    formTab: string
+    previewTab: string
+    /** Accessible name of the form region (Task 12) — structural. */
+    formLabel: string
+    /** Dismiss label for the dismissable ATS photo notice (Task 12). */
+    dismissNotice: string
   }
   drafts: {
     title: string
@@ -412,6 +426,14 @@ export const microcopyId: MicrocopyPack = {
   },
   preview: {
     regionLabel: 'Pratinjau CV',
+    modeLabel: 'Mode tampilan CV',
+    atsMode: 'ATS',
+    creativeMode: 'Creative',
+    modeStatus: 'Mode {mode} aktif',
+    formTab: 'Form',
+    previewTab: 'Pratinjau',
+    formLabel: 'Formulir CV',
+    dismissNotice: 'Tutup pemberitahuan',
   },
   drafts: {
     title: 'CV saya',

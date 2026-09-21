@@ -436,6 +436,11 @@ export function setOpenPanel(panel: string | null): void {
   uiStore.setState({ openPanel: panel })
 }
 
+/** Dismisses the Task 12 ATS photo notice for the rest of this tab's session. */
+export function dismissPhotoNotice(): void {
+  uiStore.setState({ photoNoticeDismissed: true })
+}
+
 /**
  * Reaction to a message from another tab. Non-blocking by design: an update
  * only raises a notice (never overwrites the local copy), a deletion of the

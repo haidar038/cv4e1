@@ -8,8 +8,9 @@ import { PDFParse } from 'pdf-parse'
 /**
  * Creative print + text-extraction gates (Task 11, FR-001/FR-303/FR-304,
  * ADR-0004/0007). Companion of ats-print.spec.ts with the creative mode
- * rules: the same import → gated-preview flow drives `?preview=creative`,
- * and the photo paths are both proven honestly:
+ * rules: the same import flow opens the Task 12 PreviewPane in the stored
+ * ATS mode, the spec switches to Creative through the real ModeToggle, and
+ * the photo paths are both proven honestly:
  *   - layout/extraction test seeds a tiny PNG straight into the IndexedDB
  *     `assets` store (raw browser API, no product import), so the full
  *     storage → object-URL → <img> → PDF path runs in a real browser;
@@ -56,9 +57,8 @@ function violationsReport(violations: Result[]): string {
 /**
  * Scoped to the preview region on purpose: the audit's subject is the
  * creative document surface — the thing that gets printed. The surrounding
- * shell is audited by a11y.spec.ts; on this temporary query-param gate the
- * wide document squeezes the form below axe's target-size rule, a layout
- * artifact that Task 12's PreviewPane replaces with a real layout.
+ * shell is audited by a11y.spec.ts; scoping keeps the form's narrow-column
+ * controls out of this document-surface verdict.
  */
 async function expectNoViolations(page: Page): Promise<void> {
   const results = await new AxeBuilder({ page })
@@ -161,8 +161,12 @@ async function seedPhotoAsset(page: Page): Promise<void> {
 }
 
 /**
- * Imports the fixture through the real DraftPanel flow, then opens the gated
- * creative preview page (reload restores the persisted draft from IndexedDB).
+ * Imports the fixture through the real DraftPanel flow, then switches to
+ * Creative through the real ModeToggle. The imported draft opens in its
+ * stored ATS mode with the PreviewPane mounted directly — no query-param
+ * gate since Task 12. When a photo is seeded, the page reloads once so the
+ * photo resolver observes the asset through its normal mount path (the
+ * reload-restore behaviour of D14), exactly as the Task 11 gate did.
  */
 async function openCreativePreview(page: Page, seedPhoto: boolean): Promise<void> {
   await page.goto('/')
@@ -171,11 +175,19 @@ async function openCreativePreview(page: Page, seedPhoto: boolean): Promise<void
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(ENVELOPE), 'utf8'),
   })
-  // The imported draft must exist (summary listed) before a reload can
-  // restore it for the gated preview page.
+  // The imported draft opens automatically in its stored mode.
   await expect(page.getByText('Fixture Lengkap').first()).toBeVisible({ timeout: 15_000 })
-  if (seedPhoto) await seedPhotoAsset(page)
-  await page.goto('/?preview=creative')
+  if (seedPhoto) {
+    await seedPhotoAsset(page)
+    await page.reload()
+  }
+  await expect(page.locator('#cv-preview .cv-ats-name')).toHaveText('Contoh Nama Fiktif', {
+    timeout: 15_000,
+  })
+  await page.getByText('Creative', { exact: true }).click()
+  // Wait for the Creative surface itself (not just the h1 text, which both
+  // modes render): the lazy chunk suspends the pane to empty in between.
+  await expect(page.locator('#cv-preview .cv-creative')).toBeVisible({ timeout: 15_000 })
   await expect(page.locator('#cv-preview h1')).toHaveText('Contoh Nama Fiktif', {
     timeout: 15_000,
   })
