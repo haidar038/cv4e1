@@ -57,7 +57,7 @@ todos:
       - pdf-and-pwa
   - id: phase-1-gate
     content: Verifikasi gerbang keluar Fase 1 (kriteria prd.md §10, alur inti offline, a11y, anggaran performa), perbarui changelog, laporkan dan berhenti sebelum Fase 2
-    status: pending
+    status: completed
     dependencies:
       - data-safety
 ---
@@ -842,18 +842,18 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 Fase 1 selesai ketika **semua** berikut benar (`roadmap.md` + `prd.md` §10):
 
-- [ ] Kriteria MVP di `prd.md` §10 terpenuhi
-- [ ] Seluruh alur inti lulus test **offline** (J1, J5, J6, J8, J9)
-- [ ] Ekstraksi teks PDF lulus untuk ATS **dan** Creative (`ats-test-plan.md`)
-- [ ] Round-trip impor/ekspor masih lulus untuk semua fixture
-- [ ] Migrasi tetap teruji dari semua versi yang didukung
-- [ ] Audit aksesibilitas otomatis lulus di seluruh permukaan baru
-- [ ] Walkthrough keyboard-only dilakukan dan dicatat
-- [ ] Anggaran performa terpenuhi dengan angka nyata (`performance-budget.md`)
-- [ ] `bun run verify` hijau; tidak ada test di-skip
-- [ ] Tidak ada secret, PII, atau data nyata di diff
-- [ ] Tidak ada frasa terlarang `glossary.md` §6 di copy baru
-- [ ] Changelog diperbarui dengan entri untuk Task 7–15
+- [x] Kriteria MVP di `prd.md` §10 terpenuhi
+- [x] Seluruh alur inti lulus test **offline** (J1, J5, J6, J8, J9)
+- [x] Ekstraksi teks PDF lulus untuk ATS **dan** Creative (`ats-test-plan.md`)
+- [x] Round-trip impor/ekspor masih lulus untuk semua fixture
+- [x] Migrasi tetap teruji dari semua versi yang didukung
+- [x] Audit aksesibilitas otomatis lulus di seluruh permukaan baru
+- [x] Walkthrough keyboard-only dilakukan dan dicatat
+- [x] Anggaran performa terpenuhi dengan angka nyata (`performance-budget.md`)
+- [x] `bun run verify` hijau; tidak ada test di-skip
+- [x] Tidak ada secret, PII, atau data nyata di diff
+- [x] Tidak ada frasa terlarang `glossary.md` §6 di copy baru
+- [x] Changelog diperbarui dengan entri untuk Task 7–15
 
 **Setelah gerbang ini: BERHENTI. Jangan masuk Fase 2 (AI) tanpa konfirmasi pengguna.**
 
@@ -961,7 +961,7 @@ Mengikuti `AGENTS.md` §8. Untuk setiap task:
 | Pembanding berdampingan dua mode (F-D5) | P2 | — |
 | Pemilihan tema per mode (F-D6) | P2 | — |
 | Ekspor DOCX (F-F4) | P3, tidak dijadwalkan | — |
-| Ekspor cadangan penuh dengan foto base64 (F-A5, D3) | P1 — Fase 1 akhir atau Fase 2 | 1/2 |
+| Ekspor cadangan penuh dengan foto base64 (F-A5, D3) | P1 — ditunda ke Fase 2 (keputusan gerbang 2026-09-22: paragraf MVP §10.1 hanya menuntut `.cv4e.json` sebagai cadangan; portabilitas assetRef butuh desain) | 2 |
 | Locale Inggris (F-G5) | Q6; struktur disiapkan, UI ditunda | 3 |
 | Mode gelap (F-G6) | P2 | — |
 | Kontrol paginasi tingkat lanjut (F-F2) | P1 | 1/2 |

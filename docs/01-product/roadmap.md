@@ -45,7 +45,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 - [x] Hapus semua data
 - [x] Peringatan penyimpanan lokal + dorongan ekspor
 
-**Gerbang keluar:** kriteria di `prd.md` §10 terpenuhi; seluruh alur inti lulus test offline.
+**Gerbang keluar:** kriteria di `prd.md` §10 terpenuhi; seluruh alur inti lulus test offline. — **✅ LULUS (2026-09-22)**
 
 ## Fase 2 — AI opsional
 

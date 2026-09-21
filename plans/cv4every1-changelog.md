@@ -4,10 +4,10 @@ Catatan perubahan per fase. Ditulis agar sesi agen AI baru dapat memulai **tanpa
 
 | Field | Value |
 | :-- | :-- |
-| Terakhir diperbarui | 2026-09-21 |
-| Fase terakhir selesai | **Fase 1 â€” Milestone 1.7: Task 15 Delete All Data + Local Storage Notice** |
-| Fase berikutnya | **Gerbang keluar Fase 1 (`phase-1-gate`) â€” BERHENTI, jangan masuk Fase 2** |
-| Baseline test | 45 file test Â· 369 test lulus Â· e2e 52 lulus + 2 skip kapabilitas Â· `tsc -b --noEmit` bersih (strict aktif) |
+| Terakhir diperbarui | 2026-09-22 |
+| Fase terakhir selesai | **Fase 1 -- Gerbang keluar: LULUS (2026-09-22)** |
+| Fase berikutnya | **Fase 2 (AI opsional) -- menunggu kickoff maintainer** |
+| Baseline test | 45 file test, 370 test lulus, e2e 54 lulus + 2 skip kapabilitas, tsc bersih (strict aktif) |
 | Wall-clock unit test | ~60 s penuh (node Â±6 s Â· jsdom Â±50 s) |
 | Package manager | Bun (`bun.lock` dikomit) |
 
@@ -1095,3 +1095,36 @@ Sampingan: `index.html` dinormalisasi formatnya (format-only, 3 baris Task 14).
    `discardPending()` + satu test regresi, pola Task 15) -- unit 370, e2e 54+2.
    Catatan: task `phase-1-gate` sendiri (kriteria prd S10 dkk) tetap pending --
    yang selesai di sini adalah 4 KEPUTUSAN gerbang, bukan verifikasi gerbang.
+
+---
+
+## Gerbang Keluar Fase 1 -- LULUS (2026-09-22)
+
+Verifikasi per kriteria (`cv4every1-fase-1-mvp.md` 12/12 centang, frontmatter
+`phase-1-gate` completed, `roadmap.md` gerbang LULUS):
+
+| Kriteria | Bukti |
+| :-- | :-- |
+| MVP prd S10 | Seluruh fitur P0 + P1 terjadwal terbukti (matrix FR-001..111, NFR-001..015); satu pengecualian tercatat di bawah (F-A5) |
+| Alur inti offline J1/J5/J6/J8/J9 | `e2e/offline.spec.ts` (isi-reload-toggle-cetak offline penuh) + `e2e/wipe-data.spec.ts` (J9, nol egress; wipe murni lokal by construction) |
+| Ekstraksi PDF ATS + Creative | `ats-print` + `creative-print` Chromium; 2 skip Firefox = kapabilitas `page.pdf`, didokumentasikan |
+| Round-trip semua fixture | `export-import.test.ts` (full + empty); `schema.test.ts` (unknown-fields forward-compat) |
+| Migrasi semua versi | `migration.test.ts` (rantai, downgrade protection) |
+| A11y permukaan baru | `a11y.spec.ts` halaman penuh + `runAxe` per komponen + scope `#cv-preview` |
+| Keyboard-only | `FormLayout.dom.test.tsx` walkthrough + focus-trap tests; `mode-switch` keyboard e2e |
+| Anggaran | `performance-budget.md` v0.11; `verify` budget semua +0,0% pasca re-baseline sadar |
+| Verify hijau, skip | `bun run verify` exit 0 (45/370 unit); 0 skip unit; 2 skip e2e kapabilitas (keputusan: lulus dengan catatan) |
+| Secret/PII | `check:privacy` OK; fixture jelas fiktif (`Contoh Nama Fiktif`, example.com); nama e2e sintetis tanpa kontak |
+| Frasa terlarang | Sapuan otomatis `microcopy.test.ts` atas seluruh modul konten |
+| Changelog Task 7-15 | Entri lengkap |
+
+**Keputusan gerbang (maintainer):** F-A5 (cadangan + foto base64) DITUNDA ke Fase 2
+(paragraf MVP S10.1 hanya menuntut `.cv4e.json` sebagai cadangan; portabilitas
+assetRef butuh desain) -- tercatat di tabel penundaan rencana. Kriteria
+"tanpa skip" diartikan: 0 skip unit + skip kapabilitas browser yang
+didokumentasikan. Batasan jujur: reload pasca-wipe dalam kondisi offline tak
+dapat mengambil shell (precache ikut terhapus) -- pengguna tetap di dialog
+sukses; bukan defect untuk MVP online-first-visit.
+
+**Verifikasi segar saat penutupan:** `bun run verify` exit 0 (45 file / 370 test)
+- `bun run test:e2e` 54 lulus + 2 skip (Chromium + Firefox, 0 gagal).
