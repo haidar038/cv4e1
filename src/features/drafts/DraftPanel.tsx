@@ -21,6 +21,7 @@ import {
   loadDraftAction,
   renameDraft,
 } from '../store/actions'
+import { DataManagement } from '../settings/DataManagement'
 import { documentStore } from '../store/document-store'
 import { draftStore } from '../store/draft-store'
 import { useMicrocopy } from '../form/useMicrocopy'
@@ -223,6 +224,10 @@ export function DraftPanel() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Task 15 (J9, F-A6): delete-all-data danger zone — beside the other
+          data actions, never hidden in an advanced menu. */}
+      <DataManagement />
     </aside>
   )
 }

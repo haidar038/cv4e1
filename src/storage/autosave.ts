@@ -129,6 +129,21 @@ export class AutoSaveManager {
     await this.performSave()
   }
 
+  /**
+   * Forgets the held document and drops any pending save without writing.
+   * Used after a full wipe (Task 15): the unload handlers below would
+   * otherwise resurrect the just-deleted document into the empty database
+   * during the reload — the wipe must stay wiped.
+   */
+  public discardPending() {
+    if (this.timerId) {
+      clearTimeout(this.timerId)
+      this.timerId = null
+    }
+    this.currentDoc = null
+    this.currentId = undefined
+  }
+
   private handleVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
       this.flush()

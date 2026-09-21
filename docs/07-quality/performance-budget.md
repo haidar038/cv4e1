@@ -2,7 +2,7 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.8 — dual-engine UX lahir eager (+1,1 KB); jsGzip menyentuh garis advisory 200 KB — keputusan checkpoint gerbang (2026-09-21)** |
+| Status | **v0.11 — Gerbang Fase 1: re-baseline sadar dieksekusi atas persetujuan maintainer (2026-09-22). Semua ratchet +0,0%; utang absolut jsGzip >200 KB tetap tercatat** |
 | Terakhir diperbarui | 2026-09-21 |
 
 > Pengguna sasaran memakai ponsel kelas menengah dengan koneksi terbatas. Anggaran ini adalah requirement (NFR-008), bukan target.
@@ -11,17 +11,17 @@
 
 ## 1. Anggaran dan hasil pengukuran
 
-Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-21 pasca-Task 12 · Bun 1.3.14 ·
+Angka bundle **tervalidasi** dari build produksi (terakhir 2026-09-21 pasca-Task 14 · Bun 1.3.14 ·
 Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 `scripts/bundle-baseline.json`).
 
-| Metrik | Anggaran | Pasca-Task 12 (2026-09-21) | Status |
+| Metrik | Anggaran | Pasca-Task 14 (2026-09-21) | Status |
 | :-- | :-- | :-- | :-- |
-| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **193,8 KB** | ✅ terpenuhi, sisa ruang 6,2 KB — lihat catatan utang JS di bawah |
-| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **200,4 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB + `CreativeRenderer` 2,9 KB) | ✅ ratchet OK (+8,2%, di bawah gerbang fatal +10%) — sisa ruang ratchet ±3,3 KB; ⚠️ melewati garis advisory 200 KB |
-| CSS awal (gzip) | ≤ 30 KB | **27,2 KB** (termasuk CSS lazy renderer: ATS 0,5 KB + Creative 0,8 KB) | ✅ terpenuhi — sisa ruang ratchet ±1,0 KB |
+| JS awal (gzip, `initialJsGzip`) | ≤ 200 KB | **195,7 KB** | ✅ terpenuhi, sisa ruang 4,3 KB |
+| Semua chunk JS (gzip, `jsGzip`) | terpantau ratchet | **203,3 KB** (chunk lazy: `export-import` 1,2 KB + `ATSRenderer` 2,4 KB + `CreativeRenderer` 2,9 KB; `sw.js` 1,0 KB) | ✅ ratchet OK (+9,8%, di bawah gerbang fatal +10%) — sisa ruang ratchet ±0,4 KB; ⚠️ melewati garis advisory 200 KB |
+| CSS awal (gzip) | ≤ 30 KB | **27,2 KB** (termasuk CSS lazy renderer: ATS 0,5 KB + Creative 0,8 KB) | ✅ terpenuhi — sisa ruang ratchet ±0,8 KB |
 | Font (raw, woff2) | ≤ 100 KB (di-subset) | **88,8 KB** | ✅ **terpenuhi — utang font lunas** |
-| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **320,3 KB** | ✅ **terpenuhi — utang transfer lunas** |
+| Total transfer kunjungan pertama (estimasi gzip) | ≤ 400 KB | **325,4 KB** (termasuk precache SW + ikon PWA) | ✅ **terpenuhi** |
 | LCP ≤ 2.5 s · TTI ≤ 3.5 s · CLS ≤ 0.1 · Muat ulang offline ≤ 1 s | | belum diukur | ⬜ **ditunda sadar** ke tahap polish/persiapan performance testing (keputusan maintainer, 2026-09-20) |
 
 - [x] **Validasi angka bundle lewat pengukuran** (2026-09-20, diperbarui pasca-audit dan pasca-pipeline lazy).
@@ -77,7 +77,41 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   peringatan berdokumen (bukan gerbang fatal; ratchet +8,2% masih hijau).
   Keputusan re-baseline sadar atau pemangkasan kini **wajib** di checkpoint
   gerbang Fase 1 — ruang ratchet tersisa ±3,3 KB (JS) dan ±1,0 KB (CSS).
-- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 6,2 KB gzip.
+- **Task 14 (2026-09-21):** PDF + PWA lahir **tanpa re-baseline** —
+  `initialJsGzip` 193,8 → **195,7 KB** (+1,9 KB: tombol/modal cetak, indikator
+  offline, registrasi SW, `persist()`, micro-copy), `jsGzip` → **203,3 KB**
+  (+9,8% ratchet — termasuk `sw.js` 1,0 KB yang ikut dihitung metrik),
+  `transferGzip` 320,3 → **325,4 KB** (+1,6%: precache SW + ikon PWA
+  192/512 + manifest). Baseline JSON **tidak** di-record ulang (semua ratchet
+  hijau). **Dua keputusan sadar:** (1) `injectManifest` dengan SW Cache-API
+  tulisan-tangan ±1 KB, bukan `generateSW` — runtime workbox ±10 KB saja
+  sudah menggagalkan ratchet (deviasi dari teks rencana, dicatat di
+  changelog); (2) ikon dekoratif phosphor pada tombol cetak dibuang saat
+  `check:budget` menyentuh +10,2% — tombol teks berlabel penuh, nol rugi a11y —
+  dan gerbang kembali hijau +9,8%. **Ruang tersisa ±0,4 KB (JS) / ±0,8 KB
+  (CSS): Task 15 praktis pasti menyentuh ratchet — keputusan re-baseline
+  sadar atau pemangkasan kini WAJIB di checkpoint gerbang Fase 1.**
+- **Task 15 (2026-09-21):** prediksi itu terjadi — `jsGzip` 203,3 → **206,1 KB**
+  (**+11,3% ratchet → RATCHET FAIL**; `initialJsGzip` 195,7 → **198,5 KB**
+  (+7,8% ratchet, absolut masih ✅ di bawah 200 KB); `cssGzip` 27,2 → **27,3 KB**
+  (+6,2% ✅ — banner/footer/dialog memakai ulang utilitas yang sudah ada; nol
+  CSS baru); `transferGzip` 325,4 → **328,1 KB** (+8,1% ✅); font tak berubah).
+  Komposisi +2,8 KB: wipe.ts + aksi/broadcast (~0,5 KB), dialog DataManagement
+  (~1 KB, Dialog base-ui dipakai ulang), StorageNotice banner+footer (~0,4 KB),
+  microcopy ID baru (~1 KB, 25 string). **Justifikasi re-baseline sadar**
+  (bukan lemak): fitur wajib F-A6/F-A8 (J9, FR-108/109/111) — tanpa dependensi,
+  ikon, atau primitif baru; pemangkasan 2,4 KB berarti memutilasi fitur.
+  Lazy-loading dialog pun tak membantu `jsGzip` (ia menjumlahkan semua chunk).
+  Baseline JSON **sengaja TIDAK diubah** — keputusan re-baseline atau
+  pemangkasan milik checkpoint gerbang Fase 1 (`phase-1-gate`), bukan task ini.
+- **Gerbang Fase 1 (2026-09-22, disetujui maintainer): re-baseline DIEKSEKUSI**
+  (`check-bundle-size.ts --update`): baseline baru = initialJsGzip 198,5 KB ·
+  jsGzip 206,1 KB · cssGzip 27,3 KB · fontsRaw 88,8 KB · transferGzip 328,2 KB —
+  semua ratchet kembali +0,0% dan melindungi angka pasca-Task-15. Garis
+  advisory absolut jsGzip 200 KB tetap dilewati (206,1 KB) — tercatat sebagai
+  utang berdokumen, bukan gerbang fatal; menurunkannya adalah pekerjaan
+  code-splitting Fase 2+, bukan syarat keluar Fase 1.
+- **Utang JS (diperbarui 2026-09-21):** sisa ruang terhadap anggaran absolut tinggal 4,3 KB gzip.
   Sebelum gerbang Fase 1, audit bundle + pemisahan kode (§3: renderer dimuat lazy) perlu dievaluasi
   maintainer agar Task 12–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
   checkpoint gerbang.
@@ -105,6 +139,9 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 - [x] Tanpa font CDN (C-T11) — hanya berkas `@fontsource-variable` yang dibundel; dibuktikan
       `e2e/no-egress.spec.ts` (nol permintaan keluar origin)
 - [x] Tanpa skrip pihak ketiga (C-T10) — `e2e/no-egress.spec.ts`
+- [x] PWA precache-only (Task 14): `src/pwa/sw.ts` tulisan-tangan ±1 KB
+      (injectManifest `vite-plugin-pwa`, build-time saja) — precache app shell,
+      **tanpa** runtime caching untuk data CV; ikon 192/512 + manifest lokal
 - [ ] Optimasi gambar untuk foto pengguna
 
 ## 4. Yang tidak masuk anggaran awal

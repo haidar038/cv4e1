@@ -40,10 +40,10 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 - [x] Renderer Creative (1–2 template)
 - [x] Toggle mode + peringatan kontekstual foto
 - [x] Action Verbs Catalog + UI saran
-- [ ] Ekspor PDF
-- [ ] Service worker PWA + offline penuh
-- [ ] Hapus semua data
-- [ ] Peringatan penyimpanan lokal + dorongan ekspor
+- [x] Ekspor PDF
+- [x] Service worker PWA + offline penuh
+- [x] Hapus semua data
+- [x] Peringatan penyimpanan lokal + dorongan ekspor
 
 **Gerbang keluar:** kriteria di `prd.md` §10 terpenuhi; seluruh alur inti lulus test offline.
 

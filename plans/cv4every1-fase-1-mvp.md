@@ -47,12 +47,12 @@ todos:
       - renderer-creative
   - id: pdf-and-pwa
     content: Task 14 — Tombol cetak + modal instruksi header/footer, vite-plugin-pwa, manifest, uji offline e2e
-    status: pending
+    status: completed
     dependencies:
       - dual-engine-ux
   - id: data-safety
     content: Task 15 — Hapus semua data (IndexedDB + localStorage + Cache Storage) dengan tawaran ekspor, peringatan penyimpanan lokal
-    status: pending
+    status: completed
     dependencies:
       - pdf-and-pwa
   - id: phase-1-gate
@@ -755,14 +755,14 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Kunjungan pertama memuat app shell; kunjungan berikutnya bekerja **offline sepenuhnya**.
-- [ ] E2E offline lulus untuk: isi form → simpan → reload offline → muat draft → toggle mode → cetak.
-- [ ] Tombol cetak membuka dialog cetak dengan ukuran kertas benar.
-- [ ] Modal instruksi menjelaskan cara menonaktifkan header/footer untuk Chrome/Firefox/Safari.
-- [ ] **Verifikasi eksplisit:** tidak ada permintaan jaringan saat memakai fitur inti offline (network log kosong).
-- [ ] Manifest valid dan aplikasi dapat dipasang.
-- [ ] Tidak ada skrip pihak ketiga dimuat saat runtime (NFR-009).
-- [ ] Ikon dan manifest dilayani dari origin sendiri.
+- [x] Kunjungan pertama memuat app shell; kunjungan berikutnya bekerja **offline sepenuhnya**. *(reload offline penuh dari precache SW — `e2e/offline.spec.ts`, Chromium + Firefox)*
+- [x] E2E offline lulus untuk: isi form → simpan → reload offline → muat draft → toggle mode → cetak. *(idem; debounce autosave 2 s ditunggu eksplisit seperti preseden mode-switch)*
+- [x] Tombol cetak membuka dialog cetak dengan ukuran kertas benar. *(dialog tak dapat diotomatisasi — stub `window.print()` membuktikan tombol mencapai API cetak pada mode aktif; ukuran kertas milik stylesheet `@page` A4 Task 10/11)*
+- [x] Modal instruksi menjelaskan cara menonaktifkan header/footer untuk Chrome/Firefox/Safari. *(`PrintInstructionsModal`, diuji dom + e2e)*
+- [x] **Verifikasi eksplisit:** tidak ada permintaan jaringan saat memakai fitur inti offline (network log kosong). *(kolektor off-origin di `offline.spec.ts`, kosong di Chromium + Firefox)*
+- [x] Manifest valid dan aplikasi dapat dipasang. *(fetch + asersi field + ikon 200 di `offline.spec.ts`)*
+- [x] Tidak ada skrip pihak ketiga dimuat saat runtime (NFR-009). *(idem; SW same-origin only by construction)*
+- [x] Ikon dan manifest dilayani dari origin sendiri. *(asersi `src: /…` + fetch 200; ikon karya original, tanpa aset remote)*
 
 **Edge cases**
 
@@ -813,13 +813,13 @@ Bagian **data** dari Task 13 dipisahkan ke depan karena form membutuhkannya. UI 
 
 **Acceptance criteria**
 
-- [ ] Setelah wipe, reload menampilkan kondisi kosong sepenuhnya.
-- [ ] Test memverifikasi **ketiga** penyimpanan benar-benar kosong.
-- [ ] Ekspor ditawarkan **sebelum** penghapusan dan berfungsi.
-- [ ] Membatalkan dialog tidak menghapus apa pun.
-- [ ] Peringatan memakai teks **verbatim** dari dokumen.
-- [ ] Peringatan muncul pada saat yang tepat (setelah save pertama, bukan pada kunjungan kosong pertama).
-- [ ] Tidak ada klaim "data Anda sepenuhnya aman" (`glossary.md` §6).
+- [x] Setelah wipe, reload menampilkan kondisi kosong sepenuhnya.
+- [x] Test memverifikasi **ketiga** penyimpanan benar-benar kosong.
+- [x] Ekspor ditawarkan **sebelum** penghapusan dan berfungsi.
+- [x] Membatalkan dialog tidak menghapus apa pun.
+- [x] Peringatan memakai teks **verbatim** dari dokumen.
+- [x] Peringatan muncul pada saat yang tepat (setelah save pertama, bukan pada kunjungan kosong pertama).
+- [x] Tidak ada klaim "data Anda sepenuhnya aman" (`glossary.md` §6).
 
 **Edge cases**
 

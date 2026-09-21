@@ -19,6 +19,10 @@ bun.lock
 # Test data: stable, hand-controlled formatting matters more than prettiness.
 fixtures/
 
+# Personal scratch area (screenshots, probe scripts, verify logs) — never
+# committed, never format-checked. Contents are owned by whoever created them.
+testing-result/
+
 # Historical spike artefacts referenced by ADR-0007.
 experiments/
 

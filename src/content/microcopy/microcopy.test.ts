@@ -37,6 +37,14 @@ describe('ATS photo notice', () => {
   })
 })
 
+describe('local-storage notice (Task 15, FR-109)', () => {
+  it('uses the verbatim strategy text — never paraphrased', () => {
+    expect(microcopyId.storageNotice.notice).toBe(
+      'Data Anda tersimpan di peramban pada perangkat ini. Membersihkan data peramban, mode penyamaran, atau pembersihan otomatis dapat menghapus draft Anda. Gunakan Ekspor Draft untuk membuat salinan cadangan.',
+    )
+  })
+})
+
 describe('education status copy (localization-guide §3.2)', () => {
   it('provides exactly the four decided labels', () => {
     expect(Object.keys(microcopyId.educationStatus).sort()).toEqual([

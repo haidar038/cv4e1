@@ -2,7 +2,7 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.5 — dual-engine UX lengkap; FR-002/FR-003 sisi UI terbukti (2026-09-21)** |
+| Status | **v0.6 — PDF export flow + PWA offline lengkap; FR-301/FR-304/NFR-001/NFR-003 terbukti (2026-09-21)** |
 | Terakhir diperbarui | 2026-09-21 |
 
 > Memetakan Requirement → Acceptance Criteria (`acceptance-criteria.md`, v0.2) → bukti test yang
@@ -18,7 +18,7 @@
 | 🟡 | Sebagian: jalur data/view model terbukti, tetapi bagian renderer/UI-nya belum ada atau belum diuji |
 | ⬜ | Belum ada test — fitur belum dibangun, atau jalurnya belum diuji |
 
-**Baseline bukti:** 35 file / 331 test unit (`bun run test:unit`) + 34 test e2e lulus,
+**Baseline bukti:** 41 file / 346 test unit (`bun run test:unit`) + 42 test e2e lulus,
 2 skip kapabilitas (`page.pdf()` bukan kapabilitas Firefox — test PDF ATS **dan** Creative
 berjalan di Chromium lokal dan CI Linux) terhadap build produksi via `vite preview` +
 gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
@@ -38,7 +38,9 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 | **FR-105** | AC-105-a,b | Impor JSON valid | `src/storage/export-import.test.ts` · `store.test.ts` (`importDraftAction` sebagai draft **baru**) · `DraftPanel.dom.test.tsx` |
 | **FR-106** | AC-106-a,b | Pesan error impor yang dapat dipahami | `export-import.test.ts` (tujuh `ImportErrorReason`) · `store.test.ts` (reason spesifik, draft aktif tak tersentuh) · `DraftPanel.dom.test.tsx` (pesan `NOT_JSON`) |
 | **FR-107** | AC-107-a,b | Migrasi tanpa kehilangan data | `src/core/migration.test.ts` (versi terkini, proteksi downgrade, satu langkah, rantai, tanpa jalur) |
-| **FR-111** | AC-111-a | Tetap dapat dipakai saat storage diblokir | `store.test.ts` (draft di memori tetap utuh, status dilaporkan) · `AutoSaveIndicator.dom.test.tsx` (pesan mode privat) |
+| **FR-108** | AC-108-a | Hapus seluruh data lokal: IndexedDB (drafts + assets + meta), `localStorage` (`cv4every1:*`), Cache Storage (precache) — lalu reload ke kondisi kosong | `src/storage/wipe.ts` + `src/storage/wipe.test.ts` (ketiga tempat, never-throws, partial jujur, `file://` tanpa cache) · `repository.test.ts` (`wipeAllData` kontrakt tetap) · `src/features/settings/DataManagement.dom.test.tsx` (batal tak menghapus, ekspor-dulu berfungsi, konfirmasi menghapus + tawaran muat-ulang eksplisit) · `store.test.ts` (`wipeAllDataAction` + broadcast `data_wiped`) · `e2e/wipe-data.spec.ts` (wipe+reload → kosong penuh, ketiga store terverifikasi kosong sebelum reload; ekspor-dulu envelope valid; batal; tab kedua reset tanpa reload; nol egress) |
+| **FR-109** | AC-109-a | Pemberitahuan penyimpanan lokal teks verbatim | `src/content/microcopy/microcopy.test.ts` (verbatim §9, anti-parafrase) · `src/features/settings/StorageNotice.dom.test.tsx` (banner hanya setelah save pertama + dismiss persisten, footer permanen, FR-204 blanking) · `e2e/a11y.spec.ts` (audit permukaan dialog + banner) · `e2e/wipe-data.spec.ts` (footer terlihat pasca-reload) |
+| **FR-111** | AC-111-a | Tetap dapat dipakai saat storage diblokir | `store.test.ts` (draft di memori tetap utuh, status dilaporkan) · `AutoSaveIndicator.dom.test.tsx` (pesan mode privat) · **Task 15**: wipe tak pernah melempar — storage diblokir/tak tersedia dilaporkan jujur (`src/storage/wipe.test.ts` unavailable/partial/failed, `store.test.ts` `wipeAllDataAction` + broadcast `data_wiped`) |
 | **FR-201** | AC-201-a | Saran format IPK beserta skala | `src/content/microcopy/microcopy.test.ts` (format kanonik `3.52 / 4.00`) · `src/features/form/sections/EducationForm.dom.test.tsx` (peringatan skala kosong) |
 | **FR-202** | AC-202-a | Pilihan status pendidikan sesuai konteks Indonesia | `microcopy.test.ts` (empat label + contoh penulisan) · `EducationForm.dom.test.tsx` |
 | **FR-203** | AC-203-a | Menjelaskan **alasan** foto disembunyikan di mode ATS | `microcopy.test.ts` (teks verbatim) · `src/features/form/photo/PhotoUpload.dom.test.tsx` (muncul di ATS, tidak di Creative) |
@@ -51,13 +53,17 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 | **FR-006** | AC-006-a,b | Section kosong → nol heading pada render (`ATSRenderer.test.tsx`; view model: `normalize.test.ts`) |
 | **FR-007** | AC-007-a | Urutan heading render persis mengikuti `vm.sections`/`sectionOrder` (`ATSRenderer.test.tsx`, `e2e/ats-print.spec.ts`) |
 | **FR-008** | AC-008-a | Sisi ATS: `ATSRenderer` hanya menerima `ATSViewModel` + gerbang stylesheet (`ATSRenderer.test.tsx`) · **sisi Creative**: resolver foto disuntikkan dari `features/` (render/ bebas storage), checker struktural + gerbang stylesheet kreatif — `CreativeRenderer.test.tsx` · **Task 12**: `PreviewPane` me-mount renderer sesuai mode aktif tanpa mengubah renderer (`src/features/preview/PreviewPane.dom.test.tsx`); path spec `ats-print`/`creative-print` tidak berubah, tetap valid |
-| **FR-303** | AC-303-a | Sisi Creative: PDF hasil cetak halaman pratinjau Creative diekstraksi `pdf-parse` — seluruh baris pratinjau pulih lengkap dan berurutan (`e2e/creative-print.spec.ts`, Chromium) |
-| **FR-302** | AC-302-a | Sisi ATS: PDF hasil cetak halaman pratinjau diekstraksi `pdf-parse` — seluruh konten halaman pulih lengkap dan berurutan (`e2e/ats-print.spec.ts`, Chromium) |
+| **FR-303** | AC-303-a | Sisi Creative: PDF hasil cetak halaman pratinjau Creative diekstraksi `pdf-parse` — seluruh baris pratinjau pulih lengkap dan berurutan (`e2e/creative-print.spec.ts`, Chromium) · **tetap valid pasca-Task 14** (rerun penuh 42+2, path spec tak berubah) |
+| **FR-302** | AC-302-a | Sisi ATS: PDF hasil cetak halaman pratinjau diekstraksi `pdf-parse` — seluruh konten halaman pulih lengkap dan berurutan (`e2e/ats-print.spec.ts`, Chromium) · **tetap valid pasca-Task 14** (rerun penuh 42+2, path spec tak berubah) |
+| **FR-301** | AC-301-a,b | PDF mengikuti mode aktif: `PrintButton` memanggil `window.print()` pada stylesheet mode aktif; modal instruksi (Chrome/Firefox/Safari + saran `CV-<slug>-<mode>.pdf`, pola J5) pada cetakan pertama | `src/features/export/slug.test.ts` (J5: slug, diakritik, fallback, cap 40) · `src/features/export/print-prefs.test.ts` (flag `localStorage`, storage diblokir) · `src/features/export/PrintButton.dom.test.tsx` (modal pertama + nama saran, cetak langsung setelahnya, bantuan Chrome/Firefox/Safari, axe modal terbuka) · `e2e/offline.spec.ts` (jalur cetak offline mencapai `window.print()` pada mode aktif, Chromium + Firefox) |
+| **FR-304** | AC-304-a | Ekspor PDF tanpa API eksternal: selesai offline, nol permintaan keluar-origin | `e2e/offline.spec.ts` (cetak setelah reload offline, network log kosong, Chromium + Firefox) |
+| **NFR-001** | AC-NFR-001-a | Fitur inti offline setelah app shell terpasang: isi form → autosave → reload offline → draft pulih → toggle mode → cetak | `e2e/offline.spec.ts` (reload offline penuh dari precache SW, bukan potong-jaringan-tanpa-reload; Chromium + Firefox) · `src/storage/persist.test.ts` (`navigator.storage.persist()` best-effort saat draft pertama) |
+| **NFR-003** | AC-NFR-003-a | PDF tanpa API eksternal (kontrak sama dengan AC-304-a) | `e2e/offline.spec.ts` (bukti yang sama dengan FR-304) |
 | **NFR-005** | AC-NFR-005-a | Dapat dioperasikan sepenuhnya dengan keyboard | `src/features/form/FormLayout.dom.test.tsx` (walkthrough keyboard-only, tanpa jebakan fokus, reorder via tombol) · test section memakai `user-event` di seluruh `*.dom.test.tsx` |
 | **NFR-006** | AC-NFR-006-a,b | Build produksi tanpa API key rahasia | `scripts/privacy-rules.test.ts` (13 test: pola kredensial, kutipan disensor, allowlist tertutup) · gerbang `bun run check:privacy` memindai `dist/` nyata di `verify` + CI |
-| **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px) · **region pratinjau ATS & Creative**: axe pada `#cv-preview` (`e2e/ats-print.spec.ts`, `e2e/creative-print.spec.ts`) |
+| **NFR-007** | AC-NFR-007-a | WCAG 2.2 AA | Audit axe per komponen: `src/features/form/test-utils.tsx` `runAxe()` dipakai 9 berkas `*.dom.test.tsx` · **halaman penuh**: `e2e/a11y.spec.ts` (kontras warna, `lang`, `title`, satu `main`, pada build produksi, desktop + 360 px — Task 14 menambah audit permukaan cetak/help-modal/indikator offline) · **region pratinjau ATS & Creative**: axe pada `#cv-preview` (`e2e/ats-print.spec.ts`, `e2e/creative-print.spec.ts`) · **aturan query live-region**: region `role="status"` diuji via role + teks, bukan role + nama (kedua engine gagal mencocokkan nama dari konten live-region — lihat komentar `OfflineIndicator.tsx`) |
 | **NFR-008** | AC-NFR-008-a | Anggaran performa app shell | `scripts/bundle-budget.test.ts` (batas ratchet, agregasi, baseline malformed) · gerbang `check:budget` di `verify` + CI · angka di `docs/07-quality/performance-budget.md` |
-| **NFR-009** | AC-NFR-009-a | Tidak ada skrip pihak ketiga saat runtime | `e2e/no-egress.spec.ts` (alur inti memicu **nol** permintaan ke luar origin) |
+| **NFR-009** | AC-NFR-009-a | Tidak ada skrip pihak ketiga saat runtime | `e2e/no-egress.spec.ts` (alur inti memicu **nol** permintaan ke luar origin) · `e2e/offline.spec.ts` (manifest valid + ikon 192/512 same-origin, nol egress selama alur offline penuh) · `e2e/wipe-data.spec.ts` (kolektor off-origin di setiap test wipe/ekspor — tetap nol) |
 | **NFR-011** | AC-NFR-011-a | Data resume tidak pernah masuk log | `scripts/privacy-rules.test.ts` (interpolasi/variabel selalu ditolak; hanya pesan tetap allowlist) · audit `console.*` di `src/` oleh `check:privacy` di `verify` + CI |
 | **NFR-012** | AC-NFR-012-a | Dapat disajikan sebagai aset statis tanpa runtime server | `bun run build` di `verify`/CI · seluruh `test:e2e` berjalan terhadap `dist/` yang disajikan `vite preview` (`playwright.config.ts`) |
 | **NFR-015** | AC-NFR-015-a | Font dibundel, bukan diambil dari CDN | `src/index.css` `@font-face` menunjuk berkas `@fontsource-variable` yang dibundel · `e2e/no-egress.spec.ts` · metrik `fontsRaw` (88,8 KB) di `check:budget` |
@@ -66,8 +72,7 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 
 | Requirement | AC | Sudah terbukti | Belum terbukti — pemilik |
 | :-- | :-- | :-- | :-- |
-| **FR-108** | AC-108-a | Penghapusan penyimpanan teruji di lapisan storage (`repository.test.ts`: `wipeAllData` mengosongkan drafts + assets) | Alur UI hapus-semua + `localStorage` + Cache Storage — Task 15 |
-| **NFR-002** | AC-NFR-002-a | Tidak ada kode jaringan di `core/`/`storage/`/`render/` (ditegakkan `check:boundaries`); alur inti memicu nol permintaan keluar-origin (`e2e/no-egress.spec.ts`) | Aturan egress untuk AI (persetujuan per operasi, AC-NFR-002-b) — Fase 2 |
+| **NFR-002** | AC-NFR-002-a | Tidak ada kode jaringan di `core/`/`storage/`/`render/` (ditegakkan `check:boundaries`); alur inti memicu nol permintaan keluar-origin (`e2e/no-egress.spec.ts`, `e2e/offline.spec.ts`, `e2e/wipe-data.spec.ts`) | Aturan egress untuk AI (persetujuan per operasi, AC-NFR-002-b) — Fase 2 |
 | **NFR-010** | AC-NFR-010-a | e2e lulus di **Chromium + Firefox** | Matriks peramban penuh (Safari/mobile) — `browser-device-matrix.md`, Fase 4 |
 | **NFR-013** | AC-NFR-013-a | Autosave terpicu per perubahan dan tahan kegagalan kuota (`store.test.ts`, `repository.test.ts`) | Uji pemulihan setelah crash/reload paksa — belum dijadwalkan |
 | **NFR-014** | AC-NFR-014-a | Pembesaran 200% diverifikasi manual di peramban (tercatat di changelog Task 9) | Test otomatis zoom 200% — belum ada |
@@ -76,11 +81,7 @@ gerbang `check:privacy` dan `check:budget` di `bun run verify`/CI.
 
 | Requirement | AC | Alasan | Pemilik |
 | :-- | :-- | :-- | :-- |
-| FR-301, FR-304 (PDF mengikuti mode aktif, tombol/UX ekspor) | AC-301-a,b · AC-304-a | Ekstraksi teks kedua mode sudah terbukti (Task 10: FR-302; Task 11: FR-303); ekspor mengikuti toggle mode dan tombolnya menunggu UI ekspor | Task 12/14 |
-| FR-109 (pemberitahuan penyimpanan lokal) | AC-109-a | Belum dibangun | Task 15 |
 | FR-110 (tanpa API key di ekspor) | AC-110-a,b | Belum ada API key sama sekali; AC-110-a (kondisi kini) terbukti secara vak — ditegakkan `check:privacy` di `dist/`, tetapi test eksplisit pada envelope menyusul | Fase 2 (saat key pertama ada), dengan test |
-| NFR-001 (fitur inti offline setelah app shell terpasang) | AC-NFR-001-a | Service worker belum ada | Task 14 |
-| NFR-003 (ekspor PDF tanpa API eksternal) | AC-NFR-003-a | Bergantung FR-301 | Task 14 |
 | NFR-004 (fallback non-AI) | AC-NFR-004-a | Belum ada kapabilitas AI yang bisa difallback-kan | Fase 2 |
 | FR-401 s.d. FR-408 (AI opsional: persetujuan, fallback, grounding) | AC-401-a,b s.d. AC-408-a | Fase 2 — belum boleh dimulai sebelum gerbang Fase 1 | Fase 2 |
 | FR-501, FR-502 (impor CV, hasil selalu ditinjau) | AC-501-a · AC-502-a | Fase 3 | Fase 3 |

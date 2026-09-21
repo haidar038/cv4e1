@@ -49,5 +49,12 @@ describe('content/core union consistency', () => {
     expect(microcopyStructural.educationStatus.graduated.example).toBe('')
     expect(microcopyStructural.sections.basics).toBe(microcopyId.sections.basics)
     expect(microcopyStructural.fields.name.label).toBe(microcopyId.fields.name.label)
+    // Task 15: wipe guidance + the verbatim storage notice blank, labels stay.
+    expect(microcopyStructural.dataSafety.dialogDescription).toBe('')
+    expect(microcopyStructural.dataSafety.success).toBe('')
+    expect(microcopyStructural.storageNotice.notice).toBe('')
+    expect(microcopyStructural.dataSafety.dialogTitle).toBe(microcopyId.dataSafety.dialogTitle)
+    expect(microcopyStructural.dataSafety.confirm).toBe(microcopyId.dataSafety.confirm)
+    expect(microcopyStructural.storageNotice.dismiss).toBe(microcopyId.storageNotice.dismiss)
   })
 })

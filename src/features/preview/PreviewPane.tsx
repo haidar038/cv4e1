@@ -7,6 +7,7 @@ import { useMicrocopy } from '../form/useMicrocopy'
 import { usePhotoResolver } from './usePhotoResolver'
 import { ModeToggle } from './ModeToggle'
 import { PhotoNotice } from './PhotoNotice'
+import { PrintButton } from '../export/PrintButton'
 
 const LazyATSRenderer = lazy(() =>
   import('@/render/ats/ATSRenderer').then((module) => ({ default: module.ATSRenderer })),
@@ -76,6 +77,9 @@ export function PreviewPane() {
     <section aria-label={pack.preview.regionLabel} className="flex min-w-0 flex-1 flex-col gap-3">
       <ModeToggle />
       <PhotoNotice hasPhoto={hasPhoto} />
+      {/* Task 14: print controls beside the toggle — outside `#cv-preview` so
+          control text never leaks into the extraction gates. */}
+      <PrintButton />
       {/* The printable document surface is a plain div on purpose: the print
           stylesheets hide everything outside `.cv-ats`/`.cv-creative`, so the
           ATS/Creative extraction gates keep proving document-only recovery

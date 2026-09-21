@@ -1,0 +1,8 @@
+<!-- Original PWA icon source (Task 14, D20): a teal rounded square with a white
+  "CV" mark. Hand-drawn for this project — no downloaded assets (C-T10).
+  The installable assets are public/icons/icon-192.png and icon-512.png,
+  re-rendered deterministically by scripts/generate-pwa-icons.ts. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="128" fill="#0f766e"/>
+  <text x="256" y="330" text-anchor="middle" font-family="system-ui, sans-serif" font-size="220" font-weight="700" fill="#ffffff" letter-spacing="8">CV</text>
+</svg>

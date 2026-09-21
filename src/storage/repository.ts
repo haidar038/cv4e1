@@ -2,6 +2,7 @@ import { db } from './db'
 import type { DraftRecord, DraftSummary, AssetRecord } from './types'
 import { StorageFullError, InvalidDataError } from './errors'
 import { validateResumeDocument, type ValidatedResumeDocument } from '../core/schema'
+import { clearIndexedDBStores } from './wipe'
 
 /**
  * Generates a unique ID for a new draft.
@@ -102,14 +103,13 @@ export async function deleteDraft(id: string): Promise<void> {
 }
 
 /**
- * Wipes ALL data from the database (drafts and assets).
- * Used for "Delete All Data" feature (FR-108).
+ * Wipes ALL data from the database (drafts, assets, and meta).
+ * Used for "Delete All Data" feature (FR-108). The full Task-15 wipe
+ * (localStorage + Cache Storage on top) lives in `wipe.ts`; this keeps the
+ * original contract — clear IndexedDB, throw nothing new.
  */
 export async function wipeAllData(): Promise<void> {
-  await db.transaction('rw', db.drafts, db.assets, async () => {
-    await db.drafts.clear()
-    await db.assets.clear()
-  })
+  await clearIndexedDBStores()
 }
 
 // --- Asset Operations ---

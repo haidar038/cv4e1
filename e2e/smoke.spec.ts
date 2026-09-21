@@ -31,3 +31,27 @@ test('app shell loads cleanly', async ({ page }) => {
   expect(consoleErrors).toEqual([])
   expect(pageErrors).toEqual([])
 })
+
+/**
+ * Full-height shell regression: with short content (empty state) no element
+ * in the html > body > #root chain sets a viewport baseline, so the page box
+ * used to end right after the footer and left a gap below it. The shell must
+ * be at least viewport-tall with the footer pinned to the bottom (sticky
+ * footer via `min-h-dvh` + `flex-1` in App.tsx).
+ */
+test('shell fills the viewport height with the footer at the bottom', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('#root')).not.toBeEmpty()
+  await expect(page.getByRole('button', { name: 'Buat CV pertama' })).toBeVisible()
+
+  const viewport = page.viewportSize()
+  expect(viewport).not.toBeNull()
+  const box = await page.getByRole('contentinfo').boundingBox()
+  expect(box).not.toBeNull()
+  if (viewport === null || box === null) return
+  // The shell root carries `p-4`, so a pinned footer sits exactly 16 px above
+  // the viewport bottom by design (not a gap bug — anything larger is).
+  const gap = viewport.height - (box.y + box.height)
+  expect(gap).toBeGreaterThanOrEqual(0)
+  expect(gap).toBeLessThanOrEqual(20)
+})

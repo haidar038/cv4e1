@@ -64,6 +64,61 @@ test.describe('full-page WCAG 2.2 AA audit', () => {
     await expectNoViolations(page)
   })
 
+  test('print controls, help modal, and offline indicator (Task 14 surfaces)', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Buat CV pertama' }).click()
+    await page.getByRole('button', { name: 'Data Diri', exact: true }).click()
+    await page.getByLabel('Nama lengkap').fill('Budi Santoso')
+    await expect(page.locator('#cv-preview .cv-ats')).toBeVisible({ timeout: 15_000 })
+
+    await page.getByRole('button', { name: 'Panduan cetak' }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    await expectNoViolations(page)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+
+    // Harness honesty: `context.setOffline()` blocks requests but does not
+    // deliver the window online/offline events in this setup, so the banner
+    // is driven by the real browser signal directly. The component contract
+    // is "offline event → live-region banner", which is exactly what a real
+    // network loss fires; the offline request-blocking itself is proven by
+    // offline.spec.ts.
+    await page.evaluate(() => window.dispatchEvent(new Event('offline')))
+    // Live regions are queried by role + text, never role + name: both
+    // Testing Library (jsdom) and Playwright/Chromium fail to match an
+    // accessible *name* from live-region contents (the node reports Name ""
+    // to the query engine even with text), while text matching works in both.
+    await expect(
+      page.getByRole('status').filter({
+        hasText: 'Anda sedang offline. Semua perubahan tetap tersimpan di perangkat ini.',
+      }),
+    ).toBeVisible({ timeout: 15_000 })
+    await expectNoViolations(page)
+  })
+
+  test('wipe dialog and storage notice surfaces (Task 15)', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Buat CV pertama' }).click()
+    await page.getByRole('button', { name: 'Data Diri', exact: true }).click()
+    await page.getByLabel('Nama lengkap').fill('Budi Santoso')
+    await page.waitForTimeout(3000)
+    await expect(page.getByText('Tersimpan').first()).toBeVisible({ timeout: 15_000 })
+
+    // The prominent banner shows only after the first successful save.
+    // Live regions are queried by role + text, never role + name (Task 14 rule).
+    await expect(
+      page.getByRole('status').filter({
+        hasText: 'Membersihkan data peramban, mode penyamaran',
+      }),
+    ).toBeVisible({ timeout: 15_000 })
+
+    await page.getByRole('button', { name: 'Hapus semua data', exact: true }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    await expectNoViolations(page)
+    // The dialog stays open on purpose: the wipe itself belongs to
+    // wipe-data.spec.ts — this test only proves the new surfaces are clean.
+  })
+
   test.describe('mobile', () => {
     test.use({ viewport: { width: 360, height: 740 } })
 

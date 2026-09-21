@@ -8,11 +8,19 @@
  * It does NOT persist data; it only notifies other tabs that data has changed.
  */
 
-export interface SyncMessage {
-  type: 'draft_updated' | 'draft_deleted'
-  draftId: string
+export interface SyncMessageBase {
   timestamp: number
 }
+
+export type SyncMessage =
+  | (SyncMessageBase & {
+      type: 'draft_updated' | 'draft_deleted'
+      draftId: string
+    })
+  | (SyncMessageBase & {
+      /** Task 15: every local trace is gone — tabs reset to the empty condition. */
+      type: 'data_wiped'
+    })
 
 type SyncCallback = (message: SyncMessage) => void
 
@@ -44,7 +52,7 @@ export function initSync() {
  * Sends a sync notification to other tabs.
  * Should be called AFTER a successful save/delete operation in IndexedDB.
  */
-export function notifyTabs(type: SyncMessage['type'], draftId: string) {
+export function notifyTabs(type: 'draft_updated' | 'draft_deleted', draftId: string) {
   if (!channel) return
 
   const message: SyncMessage = {
@@ -58,6 +66,26 @@ export function notifyTabs(type: SyncMessage['type'], draftId: string) {
   } catch (error) {
     // PostMessage can fail if payload is too large or non-serializable,
     // but our message is simple JSON. Log and ignore for resilience.
+    console.error('Failed to broadcast sync message:', error)
+  }
+}
+
+/**
+ * Broadcasts a completed full wipe (Task 15). Receiving tabs reset to the
+ * empty condition instead of reloading. Uses the same allowlisted diagnostic
+ * literal as `notifyTabs` (NFR-011 — no new console message).
+ */
+export function notifyDataWiped() {
+  if (!channel) return
+
+  const message: SyncMessage = {
+    type: 'data_wiped',
+    timestamp: Date.now(),
+  }
+
+  try {
+    channel.postMessage(message)
+  } catch (error) {
     console.error('Failed to broadcast sync message:', error)
   }
 }

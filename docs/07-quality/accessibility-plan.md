@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.2 — outline + audit halaman penuh sudah berjalan (2026-09-20)** |
-| Terakhir diperbarui | 2026-09-20 |
+| Status | **v0.3 — permukaan Task 14 (cetak + offline) diaudit (2026-09-21)** |
+| Terakhir diperbarui | 2026-09-21 |
 
 > Nama produk mengandung janji. Aksesibilitas adalah requirement, bukan peningkatan, dan tidak ditunda ke fase akhir.
 
@@ -51,6 +51,16 @@
       per komponen (`src/features/preview/*.dom.test.tsx`, `src/App.dom.test.tsx`
       pola); keyboard-only, pengumuman SR, fokus, dan `prefers-reduced-motion`
       dibuktikan `e2e/mode-switch.spec.ts` pada build produksi.
+- [x] Task 14: `PrintButton` + `PrintInstructionsModal` (dialog base-ui: focus
+      trap, Escape menutup, fokus kembali) diaudit axe per komponen
+      (`src/features/export/PrintButton.dom.test.tsx`, modal terbuka) dan
+      halaman penuh (`e2e/a11y.spec.ts`: tombol cetak, bantuan, dialog, banner
+      offline); `OfflineIndicator` (`role="status"`, diam saat online).
+      **Aturan query live-region** (temuan Task 14): region `role="status"`
+      diuji via role + teks, bukan role + nama — kedua engine (Testing
+      Library/jsdom dan Playwright/Chromium) gagal mencocokkan nama aksesibel
+      dari konten live-region (node dilaporkan Name ""), sementara pencocokan
+      teks bekerja di keduanya. Lihat komentar `OfflineIndicator.tsx`.
 - [x] Struktur dokumen: `index.html` memakai `lang="id"` (antarmuka berbahasa Indonesia) dan judul
       `cv4every1`; diuji eksplisit di `e2e/a11y.spec.ts` dan `e2e/smoke.spec.ts`.
 - [ ] Manual: walkthrough hanya keyboard per rilis

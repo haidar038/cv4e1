@@ -12,11 +12,15 @@ import {
   InvalidDataError,
   listDrafts,
   loadDraft as loadDraftFromStorage,
+  notifyDataWiped,
   notifyTabs,
   onExternalUpdate,
+  requestPersistentStorage,
   saveDraft,
   StorageBlockedError,
+  wipeLocalData,
   type SyncMessage,
+  type WipeReport,
 } from '../../storage'
 import { importResumeLazy } from '../../storage/export-import-lazy'
 import { ImportError, type ImportErrorReason } from '../../storage/export-import-types'
@@ -172,6 +176,9 @@ function mutateSectionItems<K extends SectionKey>(
 
 export async function createDraft(): Promise<void> {
   const doc = withMaterializedMeta(createEmptyResumeDocument())
+  // F-G4: ask for persistent storage on first-draft creation. Best-effort and
+  // fire-and-forget — denial changes nothing about saving or editing.
+  void requestPersistentStorage()
   documentStore.setState({
     document: doc,
     draftId: null,
@@ -234,6 +241,9 @@ export async function deleteDraftAction(draftId: string): Promise<void> {
     return
   }
   if (documentStore.getState().draftId === draftId) {
+    // Same resurrection guard as wipeAllDataAction (gate fix): the autosave
+    // still holds the deleted document and would re-save it on tab unload.
+    getAutosave().discardPending()
     documentStore.setState({
       document: null,
       draftId: null,
@@ -244,6 +254,35 @@ export async function deleteDraftAction(draftId: string): Promise<void> {
     draftStore.setState({ selectedId: null })
   }
   await refreshDrafts()
+}
+
+/**
+ * Full local wipe (Task 15, FR-108, DF-8): IndexedDB + localStorage +
+ * Cache Storage via `wipeLocalData` (which never throws — the report carries
+ * partial failures honestly). On a cleared IndexedDB the in-memory stores
+ * reset and other tabs are told to do the same; the caller reloads the page
+ * as the explicit final step (the dialog offers it — never an instant,
+ * unread auto-reload). No broadcast when nothing was deleted.
+ */
+export async function wipeAllDataAction(): Promise<WipeReport> {
+  const report = await wipeLocalData()
+  const cleared = report.steps.some((step) => step.step === 'indexedDB' && step.ok)
+  if (!cleared) return report
+  // Forget the autosave's held document BEFORE resetting the stores: the
+  // unload handlers would otherwise re-save it into the empty database
+  // during the reload that follows (Task 15 — the wipe must stay wiped).
+  getAutosave().discardPending()
+  documentStore.setState({
+    document: null,
+    draftId: null,
+    dirty: false,
+    lastSavedAt: null,
+    externalNotice: null,
+  })
+  draftStore.setState({ summaries: [], selectedId: null })
+  notifyDataWiped()
+  await refreshDrafts()
+  return report
 }
 
 export async function renameDraft(draftId: string, title: string): Promise<void> {
@@ -444,9 +483,25 @@ export function dismissPhotoNotice(): void {
 /**
  * Reaction to a message from another tab. Non-blocking by design: an update
  * only raises a notice (never overwrites the local copy), a deletion of the
- * open draft moves this tab to the empty condition.
+ * open draft moves this tab to the empty condition, and a completed full
+ * wipe (Task 15) resets this tab to the empty condition without reloading.
  */
 export function handleExternalMessage(message: SyncMessage): void {
+  if (message.type === 'data_wiped') {
+    // Same resurrection guard as wipeAllDataAction: this tab's autosave
+    // still holds the deleted document and would re-save it on unload.
+    getAutosave().discardPending()
+    documentStore.setState({
+      document: null,
+      draftId: null,
+      dirty: false,
+      lastSavedAt: null,
+      externalNotice: null,
+    })
+    draftStore.setState({ summaries: [], selectedId: null })
+    void refreshDrafts()
+    return
+  }
   const { draftId } = documentStore.getState()
   if (message.draftId !== draftId) {
     void refreshDrafts()

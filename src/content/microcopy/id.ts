@@ -143,6 +143,59 @@ export interface MicrocopyPack {
     /** Dismiss label for the dismissable ATS photo notice (Task 12). */
     dismissNotice: string
   }
+  print: {
+    /** Print button + help opener — structural, kept for every locale. */
+    button: string
+    helpButton: string
+    /** Dialog title — structural (accessible name), kept for every locale. */
+    title: string
+    /** Guidance below (ID-specific): blanked for non-id locales (FR-204). */
+    intro: string
+    chrome: string
+    firefox: string
+    safari: string
+    /** Filename advice; `{filename}` is replaced with the suggestion. */
+    filenameNote: string
+    /** Dialog actions — structural. */
+    printAction: string
+    doNotShowAgain: string
+  }
+  offline: {
+    /** Offline status text (F-G3) — status, kept for every locale. */
+    offlineMessage: string
+  }
+  dataSafety: {
+    /** Danger-zone heading + open-dialog button — structural, kept for every locale. */
+    sectionTitle: string
+    openDialog: string
+    /** Dialog title + actions — structural, kept for every locale. */
+    dialogTitle: string
+    exportFirst: string
+    confirm: string
+    cancel: string
+    wiping: string
+    reload: string
+    close: string
+    /** Guidance — ID-specific, blanked for non-id locales (FR-204). */
+    sectionDescription: string
+    dialogDescription: string
+    success: string
+    exportFailedNote: string
+    /** Partial-wipe report; `{remainder}` lists what is left. */
+    partial: string
+    remainderDrafts: string
+    remainderPrefs: string
+    remainderCache: string
+  }
+  storageNotice: {
+    /**
+     * Verbatim from local-storage-strategy.md §9 — do not paraphrase.
+     * ID-specific guidance, blanked for non-id locales (FR-204).
+     */
+    notice: string
+    /** Dismiss action — structural, kept for every locale. */
+    dismiss: string
+  }
   drafts: {
     title: string
     empty: string
@@ -435,6 +488,52 @@ export const microcopyId: MicrocopyPack = {
     formLabel: 'Formulir CV',
     dismissNotice: 'Tutup pemberitahuan',
   },
+  print: {
+    button: 'Cetak / Simpan PDF',
+    helpButton: 'Panduan cetak',
+    title: 'Mencetak CV sebagai PDF',
+    intro:
+      'CV dicetak langsung dari pratinjau yang sedang tampil — hasilnya sama dengan yang Anda lihat. Pada dialog cetak peramban, pilih tujuan "Simpan sebagai PDF".',
+    chrome:
+      'Chrome: buka "Opsi lainnya" pada dialog cetak, lalu hilangkan centang "Header dan footer".',
+    firefox:
+      'Firefox: buka "Opsi lainnya" pada dialog cetak, lalu pilih "Kosong" untuk header dan footer.',
+    safari: 'Safari: pada dialog cetak, hilangkan centang "Cetak header dan footer".',
+    filenameNote: 'Beri nama berkas {filename} saat menyimpan agar mudah ditemukan kembali.',
+    printAction: 'Cetak sekarang',
+    doNotShowAgain: 'Jangan tampilkan lagi',
+  },
+  offline: {
+    offlineMessage: 'Anda sedang offline. Semua perubahan tetap tersimpan di perangkat ini.',
+  },
+  dataSafety: {
+    sectionTitle: 'Hapus semua data',
+    openDialog: 'Hapus semua data',
+    dialogTitle: 'Hapus semua data?',
+    exportFirst: 'Ekspor dulu (.json)',
+    confirm: 'Ya, hapus semua',
+    cancel: 'Batal',
+    wiping: 'Menghapus…',
+    reload: 'Muat ulang',
+    close: 'Tutup',
+    sectionDescription:
+      'Menghapus seluruh draft, foto, dan pengaturan dari peramban ini. Berguna di perangkat bersama seperti lab kampus atau warnet.',
+    dialogDescription:
+      'Tindakan ini menghapus seluruh draft dan foto dari peramban ini dan tidak bisa dibatalkan. Ekspor dulu draft yang sedang terbuka bila masih dibutuhkan.',
+    success: 'Semua data terhapus dari peramban ini. Muat ulang untuk kembali ke kondisi kosong.',
+    exportFailedNote:
+      'Ekspor gagal — periksa kembali unduhan peramban Anda. Anda tetap bisa melanjutkan penghapusan atau membatalkannya.',
+    partial:
+      'Sebagian data terhapus. Yang tersisa: {remainder}. Muat ulang, lalu ulangi penghapusan bila perlu.',
+    remainderDrafts: 'sebagian draft',
+    remainderPrefs: 'sebagian pengaturan',
+    remainderCache: 'cache aplikasi',
+  },
+  storageNotice: {
+    notice:
+      'Data Anda tersimpan di peramban pada perangkat ini. Membersihkan data peramban, mode penyamaran, atau pembersihan otomatis dapat menghapus draft Anda. Gunakan Ekspor Draft untuk membuat salinan cadangan.',
+    dismiss: 'Mengerti',
+  },
   drafts: {
     title: 'CV saya',
     empty: 'Belum ada CV tersimpan.',
@@ -512,6 +611,26 @@ export const microcopyId: MicrocopyPack = {
  */
 export const microcopyStructural: MicrocopyPack = {
   ...microcopyId,
+  dataSafety: {
+    ...microcopyId.dataSafety,
+    sectionDescription: '',
+    dialogDescription: '',
+    success: '',
+    exportFailedNote: '',
+    partial: '',
+    remainderDrafts: '',
+    remainderPrefs: '',
+    remainderCache: '',
+  },
+  storageNotice: { ...microcopyId.storageNotice, notice: '' },
+  print: {
+    ...microcopyId.print,
+    intro: '',
+    chrome: '',
+    firefox: '',
+    safari: '',
+    filenameNote: '',
+  },
   gpa: { hint: '', missingScaleWarning: '', displayAdvice: '' },
   educationStatus: {
     graduated: { label: microcopyId.educationStatus.graduated.label, example: '' },

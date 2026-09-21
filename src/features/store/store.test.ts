@@ -6,6 +6,7 @@ import {
   loadDraft,
   saveDraft,
   StorageBlockedError,
+  wipeLocalData,
   type DraftRecord,
 } from '../../storage'
 import { exportResume } from '../../storage/export-import'
@@ -28,6 +29,7 @@ import {
   stopStoreSync,
   updateBasics,
   updateSectionItem,
+  wipeAllDataAction,
 } from './actions'
 import type { EducationItem } from '../../core/schema'
 import { documentStore } from './document-store'
@@ -70,7 +72,7 @@ beforeEach(async () => {
     autosaveStatus: 'idle',
     storageMessage: null,
   })
-  await Promise.all([db.drafts.clear(), db.assets.clear()])
+  await Promise.all([db.drafts.clear(), db.assets.clear(), db.meta.clear()])
 })
 
 afterEach(async () => {
@@ -300,6 +302,20 @@ describe('draft list actions', () => {
     expect(draftStore.getState().selectedId).toBeNull()
     expect(draftStore.getState().summaries).toHaveLength(0)
   })
+
+  it('a post-delete unload flush cannot resurrect the deleted open draft (gate fix)', async () => {
+    await createDraft()
+    updateBasics({ name: 'Jangan Bangkit Lagi' })
+    await flushAutosave()
+    const draftId = documentStore.getState().draftId ?? ''
+    expect(await db.drafts.count()).toBe(1)
+
+    await deleteDraftAction(draftId)
+    // Simulates the beforeunload/visibilitychange flush on tab close.
+    await flushAutosave()
+
+    expect(await db.drafts.count()).toBe(0)
+  })
 })
 
 describe('multi-tab (state-management.md §6)', () => {
@@ -346,6 +362,73 @@ describe('multi-tab (state-management.md §6)', () => {
         },
         { timeout: 2000 },
       )
+    } finally {
+      other.close()
+    }
+  })
+
+  it("a 'data_wiped' message resets this tab to the empty condition", async () => {
+    await createDraft()
+    expect(documentStore.getState().document).not.toBeNull()
+
+    handleExternalMessage({ type: 'data_wiped', timestamp: 555 })
+
+    expect(documentStore.getState().document).toBeNull()
+    expect(documentStore.getState().draftId).toBeNull()
+    expect(draftStore.getState().summaries).toHaveLength(0)
+    expect(draftStore.getState().selectedId).toBeNull()
+  })
+})
+
+describe('wipeAllDataAction (Task 15, FR-108)', () => {
+  it('clears drafts, assets, and meta, resets the stores, and reports honestly', async () => {
+    await createDraft()
+    await db.assets.put({ ref: 'photo-1', blob: new Blob(['x'], { type: 'image/png' }) })
+    await db.meta.put({ key: 'mode', value: 'ats' })
+
+    const report = await wipeAllDataAction()
+
+    expect(report.ok).toBe(true)
+    expect(report.steps.find((step) => step.step === 'indexedDB')).toMatchObject({ ok: true })
+    expect(await db.drafts.count()).toBe(0)
+    expect(await db.assets.count()).toBe(0)
+    expect(await db.meta.count()).toBe(0)
+    expect(documentStore.getState().document).toBeNull()
+    expect(draftStore.getState().summaries).toHaveLength(0)
+  })
+
+  it('a post-wipe unload flush cannot resurrect the deleted document', async () => {
+    await createDraft()
+    updateBasics({ name: 'Jangan Bangkit Lagi' })
+    await flushAutosave()
+    expect(await db.drafts.count()).toBe(1)
+
+    await wipeAllDataAction()
+    // Simulates the beforeunload/visibilitychange flush during the reload.
+    await flushAutosave()
+
+    expect(await db.drafts.count()).toBe(0)
+  })
+
+  it('broadcasts the wipe so other tabs reset without reloading', async () => {
+    await createDraft()
+    initStoreSync()
+
+    const other = new BroadcastChannel('cv4every1-sync')
+    try {
+      // Reality order: the wiping tab deletes IndexedDB first, then broadcasts.
+      await wipeLocalData()
+      other.postMessage({ type: 'data_wiped', timestamp: 666 })
+      await vi.waitFor(
+        () => {
+          expect(documentStore.getState().document).toBeNull()
+        },
+        { timeout: 2000 },
+      )
+      // The receiver's own unload flush must not resurrect anything either.
+      await flushAutosave()
+      expect(await db.drafts.count()).toBe(0)
+      expect(draftStore.getState().summaries).toHaveLength(0)
     } finally {
       other.close()
     }

@@ -30,4 +30,26 @@ export {
 export { AutoSaveManager } from './autosave'
 
 // Multi-tab Sync
-export { initSync, notifyTabs, onExternalUpdate, destroySync, type SyncMessage } from './sync'
+export {
+  initSync,
+  notifyTabs,
+  notifyDataWiped,
+  onExternalUpdate,
+  destroySync,
+  type SyncMessage,
+} from './sync'
+
+// Full local wipe: IndexedDB + localStorage + Cache Storage (Task 15, FR-108).
+export {
+  wipeLocalData,
+  clearIndexedDBStores,
+  WIPE_KEY_PREFIX,
+  WIPE_PRECACHE_NAME,
+  type WipeDeps,
+  type WipeReport,
+  type WipeStepName,
+  type WipeStepResult,
+} from './wipe'
+
+// Persistent-storage request (F-G4): best-effort eviction protection.
+export { requestPersistentStorage, type PersistNavigator } from './persist'

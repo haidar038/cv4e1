@@ -15,6 +15,7 @@ dist-ssr
 # Test and coverage artefacts
 coverage
 test-results
+testing-result
 playwright-report
 blob-report
 playwright/.cache
