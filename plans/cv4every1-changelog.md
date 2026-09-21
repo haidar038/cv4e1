@@ -939,3 +939,12 @@ kontekstual foto. Gate `?preview=ats|creative` dihapus; renderer tidak diubah.
 cssGzip 27,2 KB (+5,9%) · transferGzip 320,3 KB) · `bun run test:e2e` **34 lulus + 2 skip
 kapabilitas** (Chromium + Firefox). Keputusan re-baseline/pemangkasan kini **wajib** di
 checkpoint gerbang Fase 1 (sisa ratchet ±3,3 KB JS / ±1,0 KB CSS).
+
+**Polish pasca-checkpoint (2026-09-21, review visual maintainer):** shell `max-w-7xl`
+menjepit sidebar Creative (34% dari kolom ±480 px) — shell kini full-width
+(`max-w-none` + `xl:px-8`), form berhenti di `xl:max-w-[540px]`, pratinjau satu-satunya
+kolom tanpa cap sehingga dokumen mencapai cap 210mm-nya sendiri; di bawah `xl`
+split tidak berubah. Tanpa logika baru, tanpa test baru — `verify` + `test:e2e`
+penuh diulang hijau (34 + 2 skip), `check:budget` tetap ✅ (JS tak berubah;
+cssGzip +6,0% — 3 utilitas baru). Verifikasi visual akhir milik maintainer
+(dev server) karena repo tidak menyimpan baseline piksel.

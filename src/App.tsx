@@ -49,7 +49,12 @@ function App() {
   }, [draftId])
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 lg:flex-row">
+    // Full-width shell (Task 12 polish): the preview pane is the only
+    // uncapped column — DraftPanel keeps `lg:w-64`, the form stops growing at
+    // `xl:max-w-[540px]` — so the Creative document can reach its own 210mm
+    // cap instead of being squeezed by `max-w-7xl`. Below `xl` the split is
+    // unchanged (equal halves). Print is unaffected (paper-width layout).
+    <div className="mx-auto flex w-full max-w-none flex-col gap-4 p-4 lg:flex-row xl:px-8">
       <DraftPanel />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {hasDocument && <MobileTabs mobileView={mobileView} onChange={setMobileView} />}
@@ -57,7 +62,7 @@ function App() {
           <main
             id="cv-form"
             aria-label={pack.preview.formLabel}
-            className={`min-w-0 flex-1 ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex'}`}
+            className={`min-w-0 flex-1 xl:max-w-[540px] ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex'}`}
           >
             <FormLayout />
           </main>
