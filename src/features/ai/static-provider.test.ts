@@ -1,0 +1,137 @@
+import { describe, expect, it } from 'vitest'
+import { AIProviderError, NoopProvider } from '../../ai'
+import type { AIProvider, BulletGenerationInput } from '../../ai'
+import { getVerbsForSection } from '../../content/action-verbs'
+import { StaticSuggestionProvider } from './static-provider'
+
+const input: BulletGenerationInput = {
+  rawTask: 'Membantu menyusun laporan penjualan mingguan.',
+  section: 'experience',
+  locale: 'id',
+  allowedFacts: 'Membantu menyusun laporan penjualan mingguan.',
+}
+
+function digitSequences(text: string): string[] {
+  return text.match(/\d+/g) ?? []
+}
+
+describe('provider contract conformance', () => {
+  const providers: AIProvider[] = [new StaticSuggestionProvider(), new NoopProvider()]
+
+  it('every provider has a unique non-empty id and a network flag', () => {
+    const ids = providers.map((provider) => provider.id)
+    expect(ids).toEqual(['static', 'noop'])
+    for (const provider of providers) {
+      expect(typeof provider.requiresNetwork).toBe('boolean')
+      expect(typeof provider.isAvailable).toBe('function')
+      expect(typeof provider.generateBullets).toBe('function')
+      expect(typeof provider.polishText).toBe('function')
+      expect(typeof provider.tailorToJob).toBe('function')
+    }
+  })
+
+  it('static is always available offline; noop never is', async () => {
+    const [staticProvider, noop] = providers as [AIProvider, AIProvider]
+    expect(staticProvider.requiresNetwork).toBe(false)
+    await expect(staticProvider.isAvailable()).resolves.toBe(true)
+    await expect(noop.isAvailable()).resolves.toBe(false)
+  })
+})
+
+describe('StaticSuggestionProvider.generateBullets', () => {
+  it('is deterministic: repeated calls are identical', async () => {
+    const provider = new StaticSuggestionProvider()
+    const first = await provider.generateBullets(input)
+    const second = await provider.generateBullets(input)
+    expect(second).toEqual(first)
+    expect(first.length).toBeGreaterThan(0)
+    expect(first.length).toBeLessThanOrEqual(3)
+  })
+
+  it('builds verb-led suggestions that reuse the raw task verbatim', async () => {
+    const provider = new StaticSuggestionProvider()
+    const suggestions = await provider.generateBullets(input)
+    const catalogVerbs = getVerbsForSection('experience').map((entry) => entry.verb)
+
+    for (const suggestion of suggestions) {
+      expect(catalogVerbs).toContain(suggestion.actionVerb)
+      expect(suggestion.text).toContain(input.rawTask)
+      expect(suggestion.text).toContain(suggestion.actionVerb)
+      expect(suggestion.usesPlaceholder).toBe(true)
+      expect(suggestion.text).toContain('[dampak yang dapat diukur]')
+      expect(suggestion.rationale).toContain(suggestion.actionVerb)
+      expect(suggestion.warnings).toEqual([])
+    }
+  })
+
+  it('never starts a suggestion with an excluded verb', async () => {
+    const provider = new StaticSuggestionProvider()
+    const suggestions = await provider.generateBullets(input)
+
+    for (const suggestion of suggestions) {
+      expect(suggestion.actionVerb).not.toBe('Memimpin')
+    }
+    // Eligible catalog verbs fill the freed slot, so the count is unchanged.
+    expect(suggestions).toHaveLength(3)
+    expect(suggestions[0]?.actionVerb).toBe('Mengelola')
+  })
+
+  it('returns a verb-less generic suggestion for sections without verbs', async () => {
+    expect(getVerbsForSection('education')).toEqual([])
+    const provider = new StaticSuggestionProvider()
+    const suggestions = await provider.generateBullets({ ...input, section: 'education' })
+
+    expect(suggestions).toHaveLength(1)
+    const [suggestion] = suggestions
+    expect(suggestion?.actionVerb).toBe('')
+    expect(suggestion?.text).toContain(input.rawTask)
+    expect(suggestion?.usesPlaceholder).toBe(true)
+  })
+
+  it('returns no suggestions for empty input', async () => {
+    const provider = new StaticSuggestionProvider()
+    await expect(provider.generateBullets({ ...input, rawTask: '' })).resolves.toEqual([])
+    await expect(provider.generateBullets({ ...input, rawTask: '   ' })).resolves.toEqual([])
+  })
+
+  it('grounding invariant: no digits in the output that are absent from the input', async () => {
+    const provider = new StaticSuggestionProvider()
+    const suggestions = await provider.generateBullets(input)
+    for (const suggestion of suggestions) {
+      for (const digits of digitSequences(suggestion.text)) {
+        expect(digitSequences(input.rawTask)).toContain(digits)
+      }
+    }
+  })
+
+  it('grounding invariant: digits present in the input survive accurately', async () => {
+    const provider = new StaticSuggestionProvider()
+    const withNumbers = await provider.generateBullets({
+      ...input,
+      rawTask: 'Mengelola tim beranggotakan 5 orang selama 2 tahun.',
+      allowedFacts: 'Mengelola tim beranggotakan 5 orang selama 2 tahun.',
+    })
+    expect(withNumbers.length).toBeGreaterThan(0)
+    for (const suggestion of withNumbers) {
+      expect(suggestion.text).toContain('5')
+      expect(suggestion.text).toContain('2')
+    }
+  })
+})
+
+describe('StaticSuggestionProvider unimplemented capabilities', () => {
+  it('rejects polish and tailoring with capability-not-implemented', async () => {
+    const provider = new StaticSuggestionProvider()
+    await expect(
+      provider.polishText({ text: 'Contoh kalimat.', mode: 'id' }),
+    ).rejects.toMatchObject({ code: 'capability-not-implemented' })
+    await expect(
+      provider.tailorToJob({
+        jobDescription: 'Contoh lowongan.',
+        section: 'experience',
+        locale: 'id',
+        allowedFacts: 'Contoh fakta.',
+      }),
+    ).rejects.toBeInstanceOf(AIProviderError)
+  })
+})

@@ -20,8 +20,8 @@ interface AIProvider {
   tailorToJob(input: JobTailoringInput): Promise<TailoringResult>;
 }
 ```
-- [ ] Finalkan tipe input dan output
-- [ ] Penanganan error: timeout, rate limit, keluaran cacat, gagal auth
+- [x] Finalkan tipe input dan output (Task 16, Fase 2: `src/ai/types.ts` — bullets + polish penuh, tailoring sketsa C3 untuk Fase 3)
+- [x] Penanganan error: timeout, rate limit, keluaran cacat, gagal auth (Task 16: `src/ai/errors.ts` — taksonomi `AIErrorCode` + `AIProviderError` + flag retryable)
 
 ## 2. Implementasi
 

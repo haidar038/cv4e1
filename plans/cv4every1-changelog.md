@@ -1128,3 +1128,58 @@ sukses; bukan defect untuk MVP online-first-visit.
 
 **Verifikasi segar saat penutupan:** `bun run verify` exit 0 (45 file / 370 test)
 - `bun run test:e2e` 54 lulus + 2 skip (Chromium + Firefox, 0 gagal).
+
+---
+
+## Fase 2 -- AI opsional
+
+Keputusan desain Fase 2 disetujui maintainer (2026-09-22, 9 poin): provider pertama Groq + OpenAICompatible; key memori-sesi saja; consent per operasi pada pengiriman pertama lalu per sesi; minimisasi DF-6 = teks mentah + konteks section + bahasa (tanpa nama/kontak/foto/draft lain); Polish (EN) = operasi teks bukan locale UI; eval ber-key tidak di CI; ADR-0006 Opsi 4 (BYO-key sekarang); angka sah dari input boleh dipertahankan verbatim; F-A5 dikerjakan terakhir.
+
+### Task 16 -- Antarmuka AIProvider + StaticSuggestionProvider
+**Requirement:** FR-403, NFR-004 (fondasi fallback; AC-403-a/AC-NFR-004-a baru terpenuhi saat fallback terkabel per kapabilitas di Task 19/20)
+**Status: SELESAI (2026-09-22).** Kontrak provider + taksonomi error final; fallback statis offline deterministik dari katalog action-verbs -- tanpa network call, tanpa UI, tanpa key, tanpa perubahan `ResumeDocument`.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/ai/types.ts` | **Baru.** `AIProvider` (+`requiresNetwork`), input/output bullets + polish penuh, tailoring sketsa C3 untuk Fase 3, `AILocale` mirror `LOCALES` core |
+| `src/ai/errors.ts` (+`errors.test.ts`, 14 test) | **Baru.** Taksonomi `AIErrorCode` (10 kode) + `AIProviderError` + `isRetryableErrorCode`; hanya kode, tanpa wording |
+| `src/ai/noop-provider.ts` (+test, 3 test) | **Baru.** Test double: tak pernah available, menolak semua kapabilitas |
+| `src/ai/index.ts` | **Baru.** Barrel |
+| `src/ai/README.md` | Aturan nol-dependensi + alasan Static tinggal di features/ |
+| `src/features/ai/static-provider.ts` (+test, 9 test) | **Baru.** `StaticSuggestionProvider`: ≤3 saran dari `getVerbsForSection` (rawTask verbatim + placeholder `[dampak yang dapat diukur]`), 1 generik untuk section tanpa verb, `[]` untuk input kosong; polish/tailor → `capability-not-implemented` (titik ekstensi Task 20/21) |
+| `src/content/microcopy/id.ts` | Aditif bertipe: grup `aiStatic` (3 string) + blanking struktural FR-204; tersapu test frasa terlarang otomatis |
+| Docs: strategy §1 2 checkbox, roadmap Fase 2 baris 1 | Checklist penutup dalam perubahan yang sama |
+
+**Keputusan implementasi:**
+
+- **Static tinggal di `features/ai/`, bukan `src/ai/`:** `ai/` hanya boleh impor `core/` + nol bare package (boundary checker menegakkan; test pun dipindai). Static mengomposisi katalog `content/` → lapisan komposisi `features/` adalah rumahnya yang sah. Tanpa perubahan arsitektur.
+- **`ai/` nol-dependensi total (bahkan `zod`):** validasi respons di Task 17 memakai guard tulisan-tangan agar chunk provider lazy tetap minimal dan tak perlu amandemen `MODULE_RULES`.
+- **Wording di `content/`, bukan hardcode ala `actions.ts`:** rationale statis impor `microcopyId` langsung (microcopy sudah eager — nol biaya marginal) sehingga sweep frasa terlarang + blanking EN berlaku otomatis.
+- **Grounding by construction:** statis hanya memakai ulang rawTask verbatim; `targetRole`/`locale`/`allowedFacts` diterima demi konformansi tanpa menyetir output (terdokumentasi di kode).
+- **Interface invariant diuji, bukan string:** determinisme, keanggotaan verb katalog, invariant digit (tak ada digit keluaran di luar input; digit input dipertahankan), bentuk error.
+
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (195 file / 823 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **48 file / 396 test unit** (370 + 26 baru: 14 errors + 3 noop + 9 static; 8 microcopy tetap hijau) · build OK · `check:privacy` OK · `check:budget` OK (initialJsGzip/jsGzip/transferGzip +0,1% dari string `aiStatic` yang eager — semua ratchet hijau; modul `ai/`/`features/ai` belum diimpor App sehingga tak menambah chunk). Matrix FR-401..408/NFR-004 sengaja tak diubah: barisnya sudah benar menunjuk Fase 2 dan belum ada AC yang bisa diklaim.
+
+Full `bun run verify` + e2e dijadwalkan di checkpoint Task 18 (wiring pertama yang menyentuh bundle/UX).
+
+### Follow-up Task 16 -- Pengecualian "Memimpin" + higiene repo (2026-09-22)
+Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal sebagai pengawali bullet. `StaticSuggestionProvider` kini melewatkan `"Memimpin"` (`EXCLUDED_STARTER_VERBS` terdokumentasi — dilewat, bukan diubah katanya; katalog tetap sumber kurasi) dan slotnya diisi verb berikutnya (56 verb experience menjamin fill-through). +1 test (tak ada saran ber-`actionVerb` "Memimpin", jumlah tetap 3). Bersamaan: `.gitignore` memulihkan baris `testing-result` yang ikut terkomentari + menambah `verify-results/`; typo `vision md` di AGENTS.md kembali `vision.md`. Tanpa perubahan kontrak/interface.
+
+### Task 17 -- Pipeline validasi structured output + grounding check
+**Requirement:** FR-404 (AC-404-a), FR-405 (AC-405-a)
+**Status: SELESAI (2026-09-22).** Respons AI mentah yang cacat atau mengarang fakta ditolak seluruhnya sebelum menyentuh state apa pun — murni, tanpa jaringan, tanpa `zod` (guard tulisan-tangan agar `ai/` tetap nol-dependensi).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/ai/validation.ts` (+`validation.test.ts`, 16 test) | **Baru.** `extractJsonFromText` (JSON polos + 1 blok fence; prosa di sekitar JSON ditolak, bukan diselamatkan) → guard bentuk (`suggestions` non-kosong; `text` non-kosong; field wajib bertipe tepat; field asing diabaikan) → `checkGrounding` (lapisan sendiri, bukan schema): tiap angka + kandidat entitas (kata kapital, span `[...]` disingkirkan dulu) wajib sudah ada di sumber grounding; angka dinormalisasi (`30 %`=`30%`, `3,52` dipertahankan verbatim — Q8); pelanggaran dideduplikasi dan dibatasi 5 detail |
+| `src/ai/errors.ts` (+1 test) | Aditif: `AIProviderError.details` (tak pernah di-log, NFR-011) |
+| `src/ai/index.ts`, `src/ai/README.md` | Barrel + baris tabel |
+
+**Keputusan implementasi:**
+
+- **Rationale ikut diperiksa grounding**, bukan hanya `text` — angka karangan di penjelasan sama menyesatkannya.
+- **Polish memakai containment yang sama** terhadap teks sumber: tanpa fakta baru, tanpa tanggal berubah (aturan C2) — tanpa validator kedua.
+- **Satu-satunya kegagalan test (jujur):** ekspektasi saya bahwa primitif JSON ditolak ekstraksi — salah; ekstraksi primitif valid memang lolos tahap 1 dan ditolak tahap bentuk. Test diperbaiki mendokumentasikan layering itu, bukan kode yang diubah menutupi test.
+- Roadmap baris "Generator bullet + validasi structured output" **belum** dicentang: validasi selesai, generator berkabel (Task 19) belum.
+
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (197 file / 831 specifier) · lint 0 error (24 warning pre-existing) · format OK · **49 file / 414 test unit** · build OK · `check:privacy` OK · `check:budget` OK (+0,1% tak berubah dari Task 16 — follow-up + Task 17 nol byte eager baru; modul tetap tak diimpor App). **Catatan flake jujur:** satu run suite penuh exit 1 tanpa nama test gagal di output (wall-clock 164 dtk, mesin berat); dua run ulang penuh hijau 49/414 (70–111 dtk). Dugaan kontensi worker Windows seperti preseden Task 13b — bukan kegagalan asersi; dipantau bila berulang.

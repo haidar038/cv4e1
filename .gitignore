@@ -16,6 +16,7 @@ dist-ssr
 coverage
 test-results
 testing-result
+verify-results
 playwright-report
 blob-report
 playwright/.cache
@@ -30,3 +31,7 @@ playwright/.cache
 *.njsproj
 *.sln
 *.sw?
+
+# Additional ignore rules for your project below
+.zcode
+additional

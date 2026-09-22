@@ -49,7 +49,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 ## Fase 2 — AI opsional
 
-- [ ] Antarmuka `AIProvider` + `StaticSuggestionProvider`
+- [x] Antarmuka `AIProvider` + `StaticSuggestionProvider` (Task 16)
 - [ ] Alur BYO-key + layar persetujuan
 - [ ] Generator bullet + validasi structured output
 - [ ] Polish (ID/EN)

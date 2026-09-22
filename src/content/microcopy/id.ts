@@ -125,6 +125,14 @@ export interface MicrocopyPack {
     hint: string
     emptyState: string
   }
+  aiStatic: {
+    /** Rationale shown under each static bullet; `{verb}` is replaced. Guidance — blanked for non-id locales. */
+    rationaleTemplate: string
+    /** Rationale for sections without action verbs. Guidance — blanked for non-id locales. */
+    genericRationale: string
+    /** Shown when there is no raw task to build on. Guidance — blanked for non-id locales. */
+    emptyInputNote: string
+  }
   preview: {
     /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
     regionLabel: string
@@ -477,6 +485,13 @@ export const microcopyId: MicrocopyPack = {
     hint: 'Pilih kata kerja untuk menyisipkannya di posisi kursor, lalu sesuaikan dengan pengalaman Anda.',
     emptyState: 'Belum ada saran kata kerja untuk bagian ini.',
   },
+  aiStatic: {
+    rationaleTemplate:
+      'Saran: Awali dengan "{verb}" agar terbaca sebagai pencapaian. Sesuaikan dengan pengalaman Anda dan ganti [dampak yang dapat diukur] dengan hasil nyata — hapus bagian itu bila tidak ada datanya.',
+    genericRationale:
+      'Bagian ini belum memakai kata kerja aksi. Tambahkan [dampak yang dapat diukur] bila ada datanya, atau hapus bagian itu.',
+    emptyInputNote: 'Tulis dulu deskripsi tugas mentah Anda, lalu saran akan muncul di sini.',
+  },
   preview: {
     regionLabel: 'Pratinjau CV',
     modeLabel: 'Mode tampilan CV',
@@ -650,6 +665,7 @@ export const microcopyStructural: MicrocopyPack = {
   },
   organizations: { guidance: '', examples: '' },
   cvLength: { guidance: '', softWarning: '' },
+  aiStatic: { rationaleTemplate: '', genericRationale: '', emptyInputNote: '' },
   fields: {
     ...microcopyId.fields,
     email: { ...microcopyId.fields.email, hint: '' },
