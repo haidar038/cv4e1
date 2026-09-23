@@ -1,6 +1,6 @@
 'use no memo'
 import { useRef, useState } from 'react'
-import { SparkleIcon } from '@phosphor-icons/react'
+import { PencilLineIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import { buttonVariants } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -23,7 +23,9 @@ export interface PolishTriggerProps {
  * Per-text C2 entry point (Task 20, FR-401/402/403).
  *
  * Same inline-panel shape as BulletGenerator (Task 19): the trigger joins
- * the row's flex line while the panel unfolds below it. Opted out of React
+ * the row's flex line while the panel unfolds below it. The icon differs
+ * on purpose — pencil for polish versus sparkle for generation — so the two
+ * side-by-side triggers are visually distinct, not just by accessible name. Opted out of React
  * Compiler memoization like the bullet UI — the open/close handlers own
  * focus restoration, and only the production-build e2e can prove the flow.
  */
@@ -49,7 +51,7 @@ export function PolishTrigger({ target, label, text, onApply }: PolishTriggerPro
         aria-label={triggerLabel}
         className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }))}
       >
-        <SparkleIcon aria-hidden="true" />
+        <PencilLineIcon aria-hidden="true" />
       </CollapsibleTrigger>
       <CollapsibleContent className="order-last basis-full">
         <PolishSuggestionsPanel

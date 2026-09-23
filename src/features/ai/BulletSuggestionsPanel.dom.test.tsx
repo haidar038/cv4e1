@@ -6,7 +6,7 @@ import { clearBulletState } from '../store/ai-store'
 import { addSectionItem } from '../store/actions'
 import { documentStore } from '../store/document-store'
 import { BulletSuggestionsPanel } from './BulletSuggestionsPanel'
-import { clearSessionCredentials } from './session-keys'
+import { clearSessionCredentials, setSessionCredentials } from './session-keys'
 import { consentStore } from './consent-store'
 
 const RAW_TASK = 'membantu menyusun laporan untuk 30 peserta'
@@ -97,6 +97,25 @@ describe('BulletSuggestionsPanel (Task 19, FR-401/AC-401-a/b)', () => {
     expect(
       screen.getByText('Tulis dulu deskripsi tugas mentah Anda, lalu saran akan muncul di sini.'),
     ).toBeInTheDocument()
+  })
+
+  it('tells the user the role field is ignored while no AI key is stored (FR-408)', async () => {
+    renderPanel()
+    expect(
+      screen.getByText(
+        'Kolom ini baru dipakai setelah Anda menyimpan kunci AI — saran manual di bawah mengabaikannya.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('hides the offline role note once a key is stored', async () => {
+    setSessionCredentials('groq', { apiKey: 'gsk-test' })
+    renderPanel()
+    expect(
+      screen.queryByText(
+        'Kolom ini baru dipakai setelah Anda menyimpan kunci AI — saran manual di bawah mengabaikannya.',
+      ),
+    ).toBeNull()
   })
 
   it('Escape requests close without applying anything', async () => {

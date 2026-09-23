@@ -182,6 +182,8 @@ export interface MicrocopyPack {
     panelTitle: string
     targetRoleLabel: string
     targetRolePlaceholder: string
+    /** Shown under the role field while no AI key is stored — static output ignores it. */
+    targetRoleOfflineNote: string
     generateAction: string
     applyAction: string
     closeAction: string
@@ -620,6 +622,8 @@ export const microcopyId: MicrocopyPack = {
     panelTitle: 'Saran bullet AI',
     targetRoleLabel: 'Peran yang dilamar (opsional)',
     targetRolePlaceholder: 'mis. Staff administrasi',
+    targetRoleOfflineNote:
+      'Kolom ini baru dipakai setelah Anda menyimpan kunci AI — saran manual di bawah mengabaikannya.',
     generateAction: 'Minta saran',
     applyAction: 'Terapkan',
     closeAction: 'Tutup',
@@ -879,6 +883,7 @@ export const microcopyStructural: MicrocopyPack = {
     consentNote: '',
     unconfiguredNote: '',
     errorNote: '',
+    targetRoleOfflineNote: '',
   },
   aiPolish: {
     ...microcopyId.aiPolish,

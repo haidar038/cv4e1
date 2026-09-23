@@ -117,6 +117,47 @@ describe('StaticSuggestionProvider.generateBullets', () => {
       expect(suggestion.text).toContain('2')
     }
   })
+
+  it('never prefixes a verb the raw task already opens with', async () => {
+    const provider = new StaticSuggestionProvider()
+    const raw = 'Mengelola tim kecil dan menyusun jadwal'
+    const suggestions = await provider.generateBullets({ ...input, rawTask: raw })
+    expect(suggestions).toHaveLength(3)
+    for (const suggestion of suggestions) {
+      expect(suggestion.text.toLowerCase()).not.toMatch(/^mengelola mengelola\b/)
+      expect(suggestion.actionVerb.toLowerCase()).not.toBe('mengelola')
+      expect(suggestion.text).toContain(raw)
+    }
+  })
+
+  it('never doubles a placeholder the raw task already carries', async () => {
+    const provider = new StaticSuggestionProvider()
+    const raw = 'Membantu acara kampus [dampak yang dapat diukur]'
+    const suggestions = await provider.generateBullets({ ...input, rawTask: raw })
+    expect(suggestions.length).toBeGreaterThan(0)
+    for (const suggestion of suggestions) {
+      expect(suggestion.text.match(/\[dampak yang dapat diukur\]/g)).toHaveLength(1)
+      expect(suggestion.usesPlaceholder).toBe(true)
+    }
+  })
+
+  it('appends exactly one placeholder when the raw task has none', async () => {
+    const provider = new StaticSuggestionProvider()
+    const suggestions = await provider.generateBullets({
+      ...input,
+      rawTask: 'Membantu acara kampus',
+    })
+    for (const suggestion of suggestions) {
+      expect(suggestion.text.match(/\[dampak yang dapat diukur\]/g)).toHaveLength(1)
+    }
+  })
+
+  it('honesty contract: targetRole never steers the static output', async () => {
+    const provider = new StaticSuggestionProvider()
+    const without = await provider.generateBullets(input)
+    const withRole = await provider.generateBullets({ ...input, targetRole: 'Staff Administrasi' })
+    expect(withRole).toEqual(without)
+  })
 })
 
 describe('StaticSuggestionProvider polish fallback (Task 20, FR-403)', () => {

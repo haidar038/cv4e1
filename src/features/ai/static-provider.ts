@@ -40,6 +40,22 @@ const IMPACT_PLACEHOLDER = '[dampak yang dapat diukur]'
  */
 const EXCLUDED_STARTER_VERBS: readonly string[] = ['Memimpin']
 
+const BRACKET_SPAN_PATTERN = /\[[^\]]*\]/
+
+/** First word of the raw task, lowercased — the duplication guard below. */
+function firstWord(text: string): string {
+  const match = /^[\p{L}][\p{L}\p{M}'-]*/u.exec(text)
+  return match?.[0].toLowerCase() ?? ''
+}
+
+/**
+ * Appends the metric placeholder unless the text already carries a bracket
+ * span (a previous Apply, a user-typed note). Never doubles it.
+ */
+function withPlaceholder(raw: string): string {
+  return BRACKET_SPAN_PATTERN.test(raw) ? raw : `${raw} ${IMPACT_PLACEHOLDER}`
+}
+
 export class StaticSuggestionProvider implements AIProvider {
   readonly id = 'static'
   readonly requiresNetwork = false
@@ -52,13 +68,18 @@ export class StaticSuggestionProvider implements AIProvider {
     const raw = input.rawTask.trim()
     if (raw === '') return []
 
+    // Never prefix a verb the raw task already opens with ("Mengelola
+    // Mengelola ..."): the next eligible catalog verbs fill the slots, so
+    // the count stays stable while the duplication disappears.
+    const leading = firstWord(raw)
     const verbs = getVerbsForSection(input.section)
       .filter((entry) => !EXCLUDED_STARTER_VERBS.includes(entry.verb))
+      .filter((entry) => entry.verb.toLowerCase() !== leading)
       .slice(0, MAX_STATIC_SUGGESTIONS)
     if (verbs.length === 0) {
       return [
         {
-          text: `${raw} ${IMPACT_PLACEHOLDER}`,
+          text: withPlaceholder(raw),
           actionVerb: '',
           usesPlaceholder: true,
           rationale: microcopyId.aiStatic.genericRationale,
@@ -68,7 +89,7 @@ export class StaticSuggestionProvider implements AIProvider {
     }
 
     return verbs.map((entry) => ({
-      text: `${entry.verb} ${raw} ${IMPACT_PLACEHOLDER}`,
+      text: withPlaceholder(`${entry.verb} ${raw}`),
       actionVerb: entry.verb,
       usesPlaceholder: true,
       rationale: microcopyId.aiStatic.rationaleTemplate.replace('{verb}', entry.verb),

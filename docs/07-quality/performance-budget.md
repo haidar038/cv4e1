@@ -139,6 +139,10 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   utang advisory yang sama, bukan utang baru); `jsGzip` 217,7 → **224,5 KB** (+3,1% ✅,
   sisa ruang ratchet ±1,1 poin — Task 21 wajib hemat); css/font datar;
   `transferGzip` 339,8 → 346,8 KB (+2,1% ✅). Baseline JSON **tidak** diubah.
+- **Tindak lanjut Task 19/20 (2026-09-24):** ikon polish `PencilLineIcon`, dedup verb +
+  placeholder tunggal di provider statis, catatan offline kolom peran: `initialJsGzip`
+  208,2 → **208,7 KB**, `jsGzip` 224,5 → **225,2 KB** (+9,2% ratchet ✅ — sisa ruang
+  ±0,8 poin, Task 21 wajib hemat atau tarik keputusan lazy-load yang ditunda).
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

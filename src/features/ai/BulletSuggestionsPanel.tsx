@@ -11,6 +11,7 @@ import { documentStore } from '../store/document-store'
 import { ConsentDialog } from './ConsentDialog'
 import { consentStore } from './consent-store'
 import type { AiProviderId } from './consent-store'
+import { hasSessionCredentials } from './session-keys'
 import type { BulletSectionKey } from './bullet-generator'
 
 /**
@@ -85,6 +86,12 @@ export function BulletSuggestionsPanel({
   const consentForRef = useRef<AiProviderId | null>(null)
 
   const trimmedRaw = rawTask.trim()
+  // The static fallback has no model to steer, so the role field does
+  // nothing without a stored key — FR-408 says so with a reason instead of
+  // silently ignoring the input. Read at render (fresh every keystroke);
+  // session-keys is already in the initial chunk via AiSettings.
+  const roleFieldHonest =
+    hasSessionCredentials('groq') || hasSessionCredentials('openai-compatible')
 
   const generate = async (retryScope?: BulletScope): Promise<void> => {
     const liveRaw = retryScope?.rawTask ?? readRowText(section, itemIndex, position).trim()
@@ -167,6 +174,9 @@ export function BulletSuggestionsPanel({
             setTargetRole(event.target.value)
           }}
         />
+        {!roleFieldHonest && pack.aiBullets.targetRoleOfflineNote !== '' && (
+          <p className="px-1 text-muted-foreground">{pack.aiBullets.targetRoleOfflineNote}</p>
+        )}
       </div>
       <div>
         <Button
