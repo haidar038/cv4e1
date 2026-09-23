@@ -22,6 +22,7 @@ import {
   renameDraft,
 } from '../store/actions'
 import { DataManagement } from '../settings/DataManagement'
+import { AiSettings } from '../ai/AiSettings'
 import { documentStore } from '../store/document-store'
 import { draftStore } from '../store/draft-store'
 import { useMicrocopy } from '../form/useMicrocopy'
@@ -228,6 +229,10 @@ export function DraftPanel() {
       {/* Task 15 (J9, F-A6): delete-all-data danger zone — beside the other
           data actions, never hidden in an advanced menu. */}
       <DataManagement />
+
+      {/* Task 18 (FR-402/407/408): BYO-key session settings — with the other
+          data-session configuration, outside #cv-preview. */}
+      <AiSettings />
     </aside>
   )
 }

@@ -38,12 +38,19 @@ test('app shell loads cleanly', async ({ page }) => {
  * used to end right after the footer and left a gap below it. The shell must
  * be at least viewport-tall with the footer pinned to the bottom (sticky
  * footer via `min-h-dvh` + `flex-1` in App.tsx).
+ *
+ * Task 18 note: the DraftPanel settings (data management + AI keys) made the
+ * empty state taller than the viewport, so "no scroll" no longer holds by
+ * design. The test now scrolls the footer into view first; the asserted
+ * property is unchanged — the footer terminates the page with only the
+ * shell padding below it, never a gap and never clipped mid-content.
  */
 test('shell fills the viewport height with the footer at the bottom', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('#root')).not.toBeEmpty()
   await expect(page.getByRole('button', { name: 'Buat CV pertama' })).toBeVisible()
 
+  await page.getByRole('contentinfo').scrollIntoViewIfNeeded()
   const viewport = page.viewportSize()
   expect(viewport).not.toBeNull()
   const box = await page.getByRole('contentinfo').boundingBox()

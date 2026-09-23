@@ -32,11 +32,11 @@
 | :-- | :-- | :-- | :-- |
 | Data resume | Dibaca skrip berbahaya | CSP ketat, audit dependensi, minimalkan skrip pihak ketiga | ⬜ |
 | Data resume | Bocor lewat cache peramban | Dokumentasikan; batasi cache; sediakan wipe | ⬜ |
-| API key pengguna | Dicuri lewat XSS | Jangan simpan sebagai bawaan; peringatan BYO-key; memori sesi | ⬜ |
-| API key pengguna | Ikut terbawa ekspor | **Dilarang secara schema**; diuji | ⬜ |
+| API key pengguna | Dicuri lewat XSS | Jangan simpan sebagai bawaan (vault memori sesi Task 18 — tak ada di storage untuk dicuri diam-diam); peringatan BYO-key; memori sesi | ⬜ (CSP menyusul) |
+| API key pengguna | Ikut terbawa ekspor | **Dilarang secara schema**; kunci di luar `ResumeDocument` by construction + round-trip test FR-110 (Task 18) | ✅ |
 | Foto profil | Bocor lewat ekspor atau cache | Dokumentasikan perilaku ekspor; sediakan wipe | ⬜ |
 | Draft lokal | Terhapus pembersihan peramban | Dorongan ekspor, storage persisten, peringatan jujur | ⬜ |
-| Permintaan AI | PII terkirim ke penyedia | Persetujuan, minimisasi data, pemberitahuan privasi | ⬜ |
+| Permintaan AI | PII terkirim ke penyedia | Persetujuan per-operasi-pertama-lalu-per-sesi (dialog + gate Task 18, e2e nol-request), minimisasi DF-6 struktural (payload allowlist Task 18), pemberitahuan privasi | 🟡 (gate jadi; pengiriman nyata Task 19) |
 | PDF | Tata letak salah menghasilkan berkas tidak terpakai | Regresi visual + uji ekstraksi teks | ⬜ |
 | Impor JSON | Payload berbahaya atau cacat | Validasi schema, batas ukuran, sanitasi | ⬜ |
 | Impor JSON | Bom dekompresi / berkas raksasa | Batas ukuran sebelum parsing | ⬜ |

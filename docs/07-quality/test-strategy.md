@@ -119,3 +119,7 @@ serta CI — tidak ada test yang di-skip (`AGENTS.md` §8).
   yang diuji adalah logika pipeline (loop encoder, dimensi, jalur gagal), bukan encoder peramban.
 - Normalisasi EXIF (`createImageBitmap` + `imageOrientation: 'from-image'`) hanya bisa diverifikasi di
   peramban nyata; tercatat sebagai keterbatasan, bukan sebagai test yang lewat.
+- Vitest (esbuild) tidak menjalankan React Compiler — miscompile produksi tidak tertangkap unit/jsdom.
+  Insiden Task 18 (`AiSettings`: handler save membaca state basi di build produksi, hijau di jsdom)
+  hanya tertangkap e2e pada production build. Preseden perbaikan: `'use no memo'` per file/komponen
+  dengan alasan terdokumentasi; e2e build produksi adalah gerbang untuk kelas bug ini.

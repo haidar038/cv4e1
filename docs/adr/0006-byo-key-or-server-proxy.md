@@ -1,6 +1,6 @@
 # ADR-0006: BYO-key versus proxy server
 
-- **Status:** **Proposed** — belum diputuskan
+- **Status:** **Accepted** (Opsi 4) — diputuskan 2026-09-23, diimplementasikan Task 18
 - **Date:** 2026-09-15
 - **Decision owner:** Maintainer proyek
 - **Depends on:** ADR-0005
@@ -44,16 +44,24 @@ Kirim BYO-key pada Fase 2. Amati apakah hambatannya benar-benar menghentikan ora
 
 ## Decision
 
-**Belum diputuskan.** Usulan condong ke **Opsi 4**.
+**Opsi 4 — BYO-key sekarang, tinjau ulang nanti.** Diputuskan maintainer 2026-09-23.
 
 Alasan usulan: opsi ini mempertahankan seluruh batasan yang ada, dapat dikirim paling cepat, dan menunda keputusan yang tidak punya cukup bukti hingga ada bukti. Jika hambatan BYO-key terbukti fatal, Opsi 3 menjadi jalur berikutnya yang paling masuk akal karena tidak memaksa kami mengoperasikan server.
+
+**Parameter implementasi yang dikunci (Task 18):**
+
+- Penyedia pertama: Groq + OpenAI-compatible (endpoint custom tervalidasi, https wajib kecuali loopback).
+- Kunci **hanya memori sesi** — opsi "ingat di perangkat" ditolak; tidak ada API persistensi di vault.
+- Consent: dialog penuh pada pengiriman pertama per penyedia per sesi (umur tab), grant berlaku selebihnya; dapat dicabut kapan saja.
+- Model default Groq: `openai/gpt-oss-120b` (dapat dikonfigurasi, tidak dipaku).
+- Timeout default 30 detik; tanpa retry agresif (kebijakan Task 21).
 
 ## Consequences
 
 **Jika Opsi 4 diambil**
 - Positif: tanpa server, tanpa biaya, seluruh batasan terjaga, dapat dikirim cepat
 - Negatif: adopsi fitur AI kemungkinan besar rendah; kami tidak akan tahu apakah fitur ini bernilai
-- Negatif: tanpa analytics, "amati apakah hambatannya menghentikan orang" sulit diukur — **ini kelemahan nyata usulan ini dan perlu diselesaikan sebelum keputusan difinalkan**
+- Negatif: tanpa analytics, "amati apakah hambatannya menghentikan orang" sulit diukur — **ditunda sadar ke rekomendasi pasca-implementasi (permintaan maintainer Task 18 Q7), bukan dijawab di sini**
 
 **Apa pun pilihannya**
 - Kunci tidak pernah masuk bundel, repositori, atau ekspor
@@ -62,7 +70,7 @@ Alasan usulan: opsi ini mempertahankan seluruh batasan yang ada, dapat dikirim p
 
 ## Open questions
 
-- [ ] Bagaimana mengukur adopsi fitur AI tanpa analytics?
-- [ ] Apakah ada career center kampus yang benar-benar bersedia menghosting proxy?
-- [ ] Apakah penyedia model lokal (Ollama) membuat masalah ini kurang relevan untuk sebagian pengguna?
-- [ ] Jika proxy pernah ada, apakah ADR-0001 perlu diperbarui atau digantikan?
+- [ ] Bagaimana mengukur adopsi fitur AI tanpa analytics? → rekomendasi pasca-implementasi (Task 18 Q7)
+- [ ] Apakah ada career center kampus yang benar-benar bersedia menghosting proxy? → terbuka untuk tinjauan Opsi 3
+- [ ] Apakah penyedia model lokal (Ollama) membuat masalah ini kurang relevan untuk sebagian pengguna? → didukung via OpenAI-compatible + loopback http (Task 18)
+- [ ] Jika proxy pernah ada, apakah ADR-0001 perlu diperbarui atau digantikan? → tetap terbuka

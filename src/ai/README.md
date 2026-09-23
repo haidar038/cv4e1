@@ -17,6 +17,10 @@ AI provider interface and implementations for cv4every1.
 | `types.ts` | `AIProvider` contract + capability input/output types (FR-403 foundation) |
 | `errors.ts` | Failure taxonomy + `AIProviderError` (codes only, never wording) |
 | `validation.ts` | Structured-output pipeline: extract JSON → shape guard → grounding check (FR-404/405) |
+| `http.ts` | `postJson` transport: timeout, status→taxonomy mapping (Task 18) |
+| `chat-provider.ts` | Shared OpenAI-compatible base + DF-6 payload builders (Task 18) |
+| `groq-provider.ts` | `GroqProvider` (`api.groq.com`, default `openai/gpt-oss-120b`) |
+| `openai-compatible-provider.ts` | Custom endpoint (https, http loopback-only) |
 | `noop-provider.ts` | Test double: never available, rejects everything |
 | `index.ts` | Barrel |
 

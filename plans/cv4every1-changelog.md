@@ -1182,4 +1182,30 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Satu-satunya kegagalan test (jujur):** ekspektasi saya bahwa primitif JSON ditolak ekstraksi — salah; ekstraksi primitif valid memang lolos tahap 1 dan ditolak tahap bentuk. Test diperbaiki mendokumentasikan layering itu, bukan kode yang diubah menutupi test.
 - Roadmap baris "Generator bullet + validasi structured output" **belum** dicentang: validasi selesai, generator berkabel (Task 19) belum.
 
-**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (197 file / 831 specifier) · lint 0 error (24 warning pre-existing) · format OK · **49 file / 414 test unit** · build OK · `check:privacy` OK · `check:budget` OK (+0,1% tak berubah dari Task 16 — follow-up + Task 17 nol byte eager baru; modul tetap tak diimpor App). **Catatan flake jujur:** satu run suite penuh exit 1 tanpa nama test gagal di output (wall-clock 164 dtk, mesin berat); dua run ulang penuh hijau 49/414 (70–111 dtk). Dugaan kontensi worker Windows seperti preseden Task 13b — bukan kegagalan asersi; dipantau bila berulang.
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (197 file / 831 specifier) · lint 0 error (24 warning pre-existing) · format OK · **49 file / 414 test unit** · build OK · `check:privacy` OK · `check:budget` OK (+0,1% tak berubah dari Task 16 — follow-up + Task 17 nol byte eager baru; modul tetap tak diimpor App). **Catatan flake jujur:** satu run suite penuh exit 1 tanpa nama test gagal di output (wall-clock 164 dtk, mesin berat); dua run ulang penuh hijau 49/414 (70–111 dtk). Dugaan kontensi worker Windows seperti preseden Task 13b — bukan kegagalan asersi; dipantau bila berulang.\n
+### Task 18 -- Alur BYO-key + layar persetujuan
+**Requirement:** FR-402 (AC-402-a), FR-407 (AC-407-a), FR-110; finalisasi ADR-0006 (Opsi 4)
+**Status: SELESAI (2026-09-23).** Kunci API hanya di memori sesi, dialog persetujuan mengawal setiap pengiriman pertama, transport Groq + OpenAI-compatible dengan mapping error + validasi Task 17 -- tanpa network call asli di test mana pun, tanpa perubahan ResumeDocument.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/ai/http.ts` (+test) | **Baru.** `postJson`: timeout 30 dtk (AbortController), status ke taksonomi (401/403 auth, 429 rate-limit, 5xx/network, body non-JSON malformed). Tanpa retry, tanpa log |
+| `src/ai/chat-provider.ts` (+test) | **Baru.** Base OpenAI-compatible + builder payload DF-6 eksplisit (allowlist field diuji, bukan spread); key kosong tak pernah menyentuh network; tailor Fase 3 |
+| `src/ai/groq-provider.ts` (+test) | **Baru.** `api.groq.com/openai/v1`, default `openai/gpt-oss-120b` (dapat dikonfigurasi), JSON mode, temperatur 0.2 |
+| `src/ai/openai-compatible-provider.ts` (+test) | **Baru.** Endpoint custom tervalidasi murni (https; http hanya loopback) |
+| `src/features/ai/session-keys.ts` (+test) | **Baru.** Vault Map per-tab: set/get/has/clear, tanpa API persistensi (diuji enumerasi) + round-trip test FR-110 |
+| `src/features/ai/consent-store.ts` (+test) | **Baru.** Grant per penyedia per sesi (umur tab); absen = tanya dulu; revoke kembali prompt |
+| `src/features/ai/ConsentDialog.tsx` + `AiSettings.tsx` (+dom test, axe) | **Baru.** Dialog terkontrol (tutup/Escape = tolak) + pengaturan kunci per penyedia, status FR-408, cabut consent; mount di DraftPanel |
+| `src/content/microcopy/id.ts` | Aditif: grup `aiKeys` + `aiConsent` + blanking FR-204; tersapu frasa terlarang |
+| `e2e/ai-consent.spec.ts` | **Baru.** Tolak = 0 request (route counter); simpan = configured; reload = kembali unconfigured (bukti memori-sesi di browser nyata) |
+| Docs | ADR-0006 Accepted + parameter; privacy-policy S2/S3; strategy S1/S4/S5/S8; threat-model review; test-strategy batas compiler; roadmap baris 2 |
+
+**Keputusan implementasi:**
+
+- **System prompt diinjeksikan, bukan di-inline:** provider menerima `systemPrompt` string; Task 19 memasok isi berkas berversi. Tanpa teks prompt sementara di bundle.
+- **Tanpa CSP baru:** endpoint custom runtime tak bisa di-whitelist statis; CSP tetap TODO + batasan dicatat di threat-model (keputusan sadar, bukan kelalaian).
+- **Insiden React Compiler (temuan penting):** flow simpan kunci gagal deterministik di build produksi (state basi di handler) sementara hijau di jsdom -- vitest tak menjalankan compiler. Terbukti via pencabutan plugin (hijau) dan diperbaiki surgical dengan `'use no memo'` pada AiSettings (4/4 e2e hijau, compiler tetap aktif global). Unit/jsdom tak bisa menjaga kelas bug ini; e2e build produksi adalah gerbangnya (dicatat di test-strategy).
+- **Tiga kegagalan test milik saya, bukan produk:** (1) ekspektasi envelope vs teks mentah di polish test; (2) mock hanging mengabaikan sinyal abort; (3) titik hilang di string asersi dialog. Semua diperbaiki di test.
+- **Harness:** webServer e2e timeout 120 dtk saat mesin berat -- build manual + preview persisten + reuseExistingServer sebagai pola kerja.
+
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (212 file / 897 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **56 file / 451 test unit** · build OK · `check:privacy` OK · `check:budget` OK (ratchet +1,4% semua hijau; `initialJsGzip` 201,4 KB melewati garis absolut 200 KB — utang advisory baru, terdokumentasi di performance-budget) · `test:e2e` **58 lulus + 2 skip kapabilitas** (Chromium + Firefox; skip `page.pdf` Firefox utuh). +1,4% JS awal berasal dari seksi pengaturan eager + microcopy; modul `src/ai` (provider + validasi) belum diimpor App sehingga siap lazy penuh di Task 19. Matrix FR-401..408/NFR-004 tetap Fase 2: AC-402-a terbukti di gate + browser, pengiriman nyata (Task 19) belum ada sehingga belum diklaim.

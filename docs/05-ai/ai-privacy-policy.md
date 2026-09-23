@@ -31,16 +31,16 @@ untuk diproses.
 - [ ] Jangan pernah berpindah mode tanpa sepengetahuan pengguna
 
 ## 2. Apa yang dikirim, tepatnya
-- [ ] **Minimisasi data:** field terpilih saja, tidak pernah seluruh CV
-- [ ] TODO: daftar tepat per kapabilitas
-- [ ] Apakah nama ikut terkirim? (usulan: tidak, kecuali benar-benar dibutuhkan)
-- [ ] Apakah kontak ikut terkirim? (usulan: tidak pernah)
+- [x] **Minimisasi data:** field terpilih saja, tidak pernah seluruh CV (ditegakkan struktural di `src/ai/chat-provider.ts` — payload builder eksplisit, diuji allowlist; Task 18)
+- [x] Daftar tepat per kapabilitas: bullets = teks mentah + section + targetRole (bila ada) + bahasa + fakta yang boleh dipakai; polish = teks terpilih + mode. Daftar tampil di dialog persetujuan (Task 18; perumusan prompt Task 19)
+- [x] Nama ikut terkirim? Tidak — di luar daftar di atas (keputusan Task 18 Q4)
+- [x] Kontak ikut terkirim? Tidak pernah (keputusan Task 18 Q4)
 
 ## 3. Persetujuan
-- [ ] Persetujuan eksplisit sebelum pengiriman pertama (FR-402)
-- [ ] Layar persetujuan menampilkan: penyedia mana, data apa, apa akibatnya
-- [ ] Persetujuan dapat dicabut
-- [ ] TODO: sekali per sesi, sekali per penyedia, atau tiap operasi?
+- [x] Persetujuan eksplisit sebelum pengiriman pertama (FR-402) — dialog `ConsentDialog` + gate, e2e nol-request (Task 18)
+- [x] Layar persetujuan menampilkan: penyedia mana, data apa, apa akibatnya
+- [x] Persetujuan dapat dicabut — tombol di pengaturan + grant baru ditanya ulang (Task 18)
+- [x] Granularitas: dialog penuh pada pengiriman pertama per penyedia per sesi (umur tab), berlaku selebihnya (keputusan Task 18 Q3)
 
 ## 4. Yang disimpan penyedia
 - [ ] Kami tidak mengendalikan ini — **katakan demikian dengan jujur**

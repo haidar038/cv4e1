@@ -115,6 +115,14 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   Sebelum gerbang Fase 1, audit bundle + pemisahan kode (§3: renderer dimuat lazy) perlu dievaluasi
   maintainer agar Task 12–15 tidak menggelontorkan JS baru tanpa ruang. Ini item keputusan
   checkpoint gerbang.
+- **Task 18 (2026-09-23):** pengaturan AI lahir eager di DraftPanel (form kunci + dialog consent,
+  tanpa primitif/base-ui baru — Dialog dipakai ulang): `initialJsGzip` 198,5 → **201,4 KB**
+  (+1,4% ratchet ✅) — **melewati garis absolut 200 KB untuk pertama kali** (utang absolut baru,
+  advisory bukan fatal); `jsGzip` 206,1 → **209,0 KB** (+1,4% ✅); css/font nyaris tak berubah;
+  `transferGzip` 328,2 → 331,1 KB. Baseline JSON **tidak** diubah (semua ratchet hijau).
+  Kandidat penurun: lazy-load seksi pengaturan (dialog + form) keluar chunk awal — ditunda sadar
+  ke Task 19/21 saat permukaan AI bertambah, agar keputusan code-splitting diambil sekali
+  dengan data lengkap, bukan per task.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

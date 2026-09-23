@@ -14,6 +14,7 @@
 ```typescript
 interface AIProvider {
   readonly id: string;
+  readonly requiresNetwork: boolean; // Task 16: UI dapat menjanjikan nol egress untuk provider offline
   isAvailable(): Promise<boolean>;
   generateBullets(input: BulletGenerationInput): Promise<BulletSuggestion[]>;
   polishText(input: PolishInput): Promise<PolishSuggestion>;
@@ -40,18 +41,18 @@ interface AIProvider {
 - [ ] Agen tidak perlu mengubah logika saat penyedia berubah
 
 ## 4. Penanganan API key
-- [ ] Kunci dimasukkan pengguna, tidak pernah dibundel (C-T2)
-- [ ] Penyimpanan bawaan: **hanya memori sesi** — usulan, konfirmasi
-- [ ] Opsional "ingat di perangkat ini" → IndexedDB dengan peringatan jelas
-- [ ] Kunci tidak pernah masuk ekspor (FR-110)
-- [ ] Kunci tidak pernah dikirim ke mana pun selain penyedia yang dipilih (FR-407)
-- [ ] Kunci tidak pernah dicatat di log
-- [ ] Cara menghapus kunci, mudah ditemukan
+- [x] Kunci dimasukkan pengguna, tidak pernah dibundel (C-T2)
+- [x] Penyimpanan bawaan: **hanya memori sesi** — diputuskan (opsi "ingat di perangkat" ditolak, Task 18 Q2); vault tanpa API persistensi + round-trip test FR-110
+- [ ] Opsional "ingat di perangkat ini" → IndexedDB dengan peringatan jelas — **ditolak (lihat di atas)**
+- [x] Kunci tidak pernah masuk ekspor (FR-110)
+- [x] Kunci tidak pernah dikirim ke mana pun selain penyedia yang dipilih (FR-407) — header Authorization ke origin terkonfigurasi saja, diuji asal tiap request
+- [x] Kunci tidak pernah dicatat di log — modul tanpa `console.*`, dijaga `check:privacy`
+- [x] Cara menghapus kunci, mudah ditemukan — tombol Hapus di pengaturan + hilang saat tab ditutup/dimuat ulang (dibuktikan e2e)
 
 ## 5. Pemilihan model
-- [ ] Utamakan model kecil dan cepat — tugasnya pendek
-- [ ] Model dapat dikonfigurasi, tidak dipaku
-- [ ] TODO: model bawaan yang disarankan per penyedia
+- [x] Utamakan model kecil dan cepat — tugasnya pendek (default Groq di bawah; timeout 30 dtk Task 18)
+- [x] Model dapat dikonfigurasi, tidak dipaku — field model di pengaturan per penyedia
+- [x] Model bawaan Groq: `openai/gpt-oss-120b` (keputusan Task 18 Q6 — lini stabil); OpenAI-compatible: wajib diisi pengguna
 
 ## 6. Rate limit dan kuota
 - [ ] Tangani 429 dengan baik: pesan yang jelas, fallback ke statis
@@ -63,5 +64,5 @@ interface AIProvider {
 - [ ] Menambah penyedia berarti mengubah CSP — perlakukan sebagai keputusan sadar
 
 ## 8. Keputusan terbuka
-- [ ] **Q3:** BYO-key saja, atau sediakan proxy server opsional? → ADR-0006
-- [ ] Penyedia apa saja yang dikirim pada Fase 2 (usulan: Groq saja, plus OpenAI-compatible)
+- [x] **Q3:** BYO-key saja, atau sediakan proxy server opsional? → ADR-0006 Accepted (Opsi 4, Task 18)
+- [x] Penyedia Fase 2: Groq + OpenAI-compatible (keputusan Task 18 Q1) — `GroqProvider` + `OpenAICompatibleProvider` di `src/ai/`

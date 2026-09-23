@@ -133,6 +133,47 @@ export interface MicrocopyPack {
     /** Shown when there is no raw task to build on. Guidance — blanked for non-id locales. */
     emptyInputNote: string
   }
+  aiKeys: {
+    /** Section heading — structural, kept for every locale. */
+    sectionTitle: string
+    /** What session-only means. Guidance — blanked for non-id locales. */
+    intro: string
+    /** Field labels — structural, kept for every locale. */
+    apiKeyLabel: string
+    keyPlaceholder: string
+    modelLabel: string
+    endpointLabel: string
+    /** Endpoint validation feedback — kept (cf. `validation` group precedent). */
+    endpointInvalid: string
+    /** Actions — structural, kept for every locale. */
+    saveAction: string
+    clearAction: string
+    reviewConsent: string
+    revokeConsent: string
+    /** Session key status — structural, kept for every locale. */
+    configuredStatus: string
+    /** FR-408 reason when unusable. Guidance — blanked for non-id locales. */
+    unconfiguredReason: string
+    /** Shown when the OAI form is incomplete. Guidance — blanked for non-id locales. */
+    incompleteNote: string
+    /** Session-grant note. Guidance — blanked for non-id locales. */
+    grantedNote: string
+  }
+  aiConsent: {
+    /** Dialog title and field labels — structural, kept for every locale. */
+    title: string
+    providerLabel: string
+    dataLabel: string
+    consequenceLabel: string
+    grantAction: string
+    declineAction: string
+    policyLabel: string
+    /** Explanation prose. Guidance — blanked for non-id locales. */
+    intro: string
+    consequenceText: string
+    /** DF-6 field list for the bullet capability (Task 19 refines per capability). */
+    dataFieldsList: string
+  }
   preview: {
     /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
     regionLabel: string
@@ -492,6 +533,38 @@ export const microcopyId: MicrocopyPack = {
       'Bagian ini belum memakai kata kerja aksi. Tambahkan [dampak yang dapat diukur] bila ada datanya, atau hapus bagian itu.',
     emptyInputNote: 'Tulis dulu deskripsi tugas mentah Anda, lalu saran akan muncul di sini.',
   },
+  aiKeys: {
+    sectionTitle: 'Bantuan AI (opsional)',
+    intro:
+      'AI bersifat opsional dan selalu punya alternatif manual. Kunci hanya tersimpan di tab ini — menutup atau memuat ulang tab akan menghapusnya.',
+    apiKeyLabel: 'Kunci API',
+    keyPlaceholder: 'Tempel kunci API di sini',
+    modelLabel: 'Model',
+    endpointLabel: 'Alamat endpoint',
+    endpointInvalid: 'Alamat tidak valid. Gunakan https, atau http hanya untuk localhost.',
+    saveAction: 'Simpan di sesi ini',
+    clearAction: 'Hapus kunci',
+    reviewConsent: 'Tinjau persetujuan',
+    revokeConsent: 'Cabut persetujuan',
+    configuredStatus: 'Kunci tersimpan di sesi ini.',
+    unconfiguredReason: 'Belum ada kunci — fitur AI nonaktif. Saran manual tetap tersedia.',
+    incompleteNote: 'Lengkapi alamat, kunci, dan model untuk menyimpan.',
+    grantedNote: 'Persetujuan sesi ini aktif. Anda bisa mencabutnya kapan saja.',
+  },
+  aiConsent: {
+    title: 'Izinkan pengiriman data ke AI?',
+    providerLabel: 'Penyedia',
+    dataLabel: 'Data yang dikirim',
+    consequenceLabel: 'Akibatnya',
+    grantAction: 'Setuju dan kirim',
+    declineAction: 'Tolak',
+    policyLabel: 'Baca kebijakan privasi penyedia',
+    intro:
+      'Operasi ini mengirim sebagian kecil data CV Anda ke penyedia AI. Tanpa persetujuan, tidak ada yang dikirim.',
+    consequenceText:
+      'Data di atas diproses oleh penyedia sesuai kebijakannya — kebijakan itu bisa berubah dan di luar kendali kami.',
+    dataFieldsList: 'Deskripsi tugas mentah, konteks bagian, bahasa, fakta yang boleh dipakai',
+  },
   preview: {
     regionLabel: 'Pratinjau CV',
     modeLabel: 'Mode tampilan CV',
@@ -666,6 +739,15 @@ export const microcopyStructural: MicrocopyPack = {
   organizations: { guidance: '', examples: '' },
   cvLength: { guidance: '', softWarning: '' },
   aiStatic: { rationaleTemplate: '', genericRationale: '', emptyInputNote: '' },
+  aiKeys: {
+    ...microcopyId.aiKeys,
+    intro: '',
+    keyPlaceholder: '',
+    unconfiguredReason: '',
+    grantedNote: '',
+    incompleteNote: '',
+  },
+  aiConsent: { ...microcopyId.aiConsent, intro: '', consequenceText: '', dataFieldsList: '' },
   fields: {
     ...microcopyId.fields,
     email: { ...microcopyId.fields.email, hint: '' },
