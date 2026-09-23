@@ -54,3 +54,13 @@ tempat, lalu ulangi protokol penuh.
   (bukan fakta karangan) — perlu aturan dedup di prompt v2 + provider
   statis. Kasus ini wajib masuk set eval kualitas akhir, bukan diperbaiki
   sekarang.
+- **translate-en tak bisa lolos containment (temuan Task 22, 2026-09-24):**
+  terjemahan sejati memakai kosakata bahasa lain sehingga selalu gagal
+  `checkGrounding` terhadap teks sumber — mode ini terdegradasi ke panduan
+  statis secara graceful (bukan bug karangan). Perbaikan sejati butuh desain
+  grounding dwibahasa — didiskusikan sebelum Fase 3, bukan di sini.
+- **Slot kurasi statis di luar gate (batasan Task 22, 2026-09-24):** prefix
+  kata kerja katalog + template rationale adalah tambahan kurasi (tujuan
+  FR-403 itu sendiri), bukan output model — runner terima meng-allowlist
+  keduanya secara eksplisit, angka/entitas-fakta tak pernah allowlist.
+  Rationale tetap dijaga sapu frasa terlarang.

@@ -1,0 +1,143 @@
+{
+  "promptVersion": "v1",
+  "note": "Positive grounding set (Task 22, FR-405): every pinned mock output MUST validate whole, and the live static fallback MUST carry no numbers or fact-entities beyond the input. The set only grows (evaluation-dataset.md §4).",
+  "cases": [
+    {
+      "name": "short-input",
+      "section": "experience",
+      "locale": "id",
+      "rawTask": "membantu acara kampus",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Membantu acara kampus [dampak yang dapat diukur].",
+            "actionVerb": "Membantu",
+            "usesPlaceholder": true,
+            "rationale": "Membantu acara kampus.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "numbers-present",
+      "section": "experience",
+      "locale": "id",
+      "rawTask": "membantu menyusun laporan penjualan mingguan untuk 30 peserta",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Menyusun laporan penjualan mingguan untuk 30 peserta.",
+            "actionVerb": "Menyusun",
+            "usesPlaceholder": false,
+            "rationale": "Membantu menyusun laporan penjualan mingguan untuk 30 peserta.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "numbers-absent-placeholder",
+      "section": "experience",
+      "locale": "id",
+      "rawTask": "membantu menyusun laporan penjualan",
+      "expectPlaceholder": true,
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Menyusun laporan penjualan [dampak yang dapat diukur].",
+            "actionVerb": "Menyusun",
+            "usesPlaceholder": true,
+            "rationale": "Membantu menyusun laporan penjualan.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "organizations-context",
+      "section": "organizations",
+      "locale": "id",
+      "rawTask": "mengikuti pelatihan kepemimpinan tingkat kota",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Mengikuti pelatihan kepemimpinan tingkat kota.",
+            "actionVerb": "Mengikuti",
+            "usesPlaceholder": false,
+            "rationale": "Mengikuti pelatihan kepemimpinan tingkat kota.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "verb-leading-dedup",
+      "section": "experience",
+      "locale": "id",
+      "rawTask": "Mengelola arsip surat masuk dan keluar",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Mengelola arsip surat masuk dan keluar [dampak yang dapat diukur].",
+            "actionVerb": "Mengelola",
+            "usesPlaceholder": true,
+            "rationale": "Mengelola arsip surat masuk dan keluar.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "long-input-truncated",
+      "section": "projects",
+      "locale": "id",
+      "rawTask": "membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah membangun aplikasi kasir untuk koperasi sekolah ",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Membangun aplikasi kasir untuk koperasi sekolah [dampak yang dapat diukur].",
+            "actionVerb": "Membangun",
+            "usesPlaceholder": true,
+            "rationale": "Membangun aplikasi kasir untuk koperasi sekolah.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "special-chars",
+      "section": "projects",
+      "locale": "id",
+      "rawTask": "membuat poster dan video dokumentasi acara (divisi publikasi)",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Membuat poster dan video dokumentasi acara [dampak yang dapat diukur].",
+            "actionVerb": "Membuat",
+            "usesPlaceholder": true,
+            "rationale": "Membuat poster dan video dokumentasi acara.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "input-entity-survives",
+      "section": "experience",
+      "locale": "id",
+      "rawTask": "membantu membuat materi presentasi dengan Canva untuk 20 peserta",
+      "mockOutput": {
+        "suggestions": [
+          {
+            "text": "Membantu membuat materi presentasi dengan Canva untuk 20 peserta.",
+            "actionVerb": "Membantu",
+            "usesPlaceholder": false,
+            "rationale": "Membantu membuat materi presentasi dengan Canva untuk 20 peserta.",
+            "warnings": []
+          }
+        ]
+      }
+    }
+  ]
+}

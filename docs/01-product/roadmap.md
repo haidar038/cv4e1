@@ -53,7 +53,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 - [x] Alur BYO-key + layar persetujuan (Task 18)
 - [x] Generator bullet + validasi structured output (Task 19: prompt berversi, orkestrator DF-6, panel pratinjau + Apply per-item, fallback statis terkabel)
 - [x] Polish (ID/EN)
-- [ ] Uji invariant grounding + set evaluasi
+- [x] Uji invariant grounding + set evaluasi (Task 22: set terima 8+4 + set tolak 4+4, runner per-versi-prompt di CI; ber-key tetap manual)
 - [x] Penanganan rate limit, timeout, dan kegagalan penyedia (Task 21: retry terbatas 1+2 dengan backoff + hormat `Retry-After` max 10 dtk, fallback statis saat habis, nota FR-408 per-kode)
 
 **Gerbang keluar:** nol pelanggaran grounding pada set evaluasi; seluruh fitur AI punya fallback yang lulus test.

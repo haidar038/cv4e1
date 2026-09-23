@@ -10,15 +10,15 @@
 ---
 
 ## 1. Invariant yang diuji
-- [ ] Output berupa JSON yang valid
-- [ ] **Tidak ada angka yang tidak ada di input**
-- [ ] **Tidak ada tanggal baru**
-- [ ] **Tidak ada nama perusahaan atau institusi baru**
-- [ ] Setiap bullet memuat kata kerja aksi
-- [ ] Output sesuai bahasa yang diminta
-- [ ] Data asli tidak berubah sebelum Apply
-- [ ] Timeout menghasilkan fallback
-- [ ] Error penyedia tidak menghapus draft
+- [x] Output berupa JSON yang valid (Task 22: `validateBulletOutput`/`validatePolishOutput` di runner terima + set tolak)
+- [x] **Tidak ada angka yang tidak ada di input** (Task 22: `checkGrounding` kedua sisi, angka tak pernah allowlist)
+- [x] **Tidak ada tanggal baru** (Task 22: tanggal adalah angka bagi checker — tercakup di atas)
+- [x] **Tidak ada nama perusahaan atau institusi baru** (Task 22: entity check kedua sisi)
+- [x] Setiap bullet memuat kata kerja aksi (Task 22: `actionVerb` non-kosong di set terima)
+- [ ] Output sesuai bahasa yang diminta (kualitas bahasa — ditunda akhir project)
+- [x] Data asli tidak berubah sebelum Apply (Task 19/20: orkestrator + panel, AC-401-a)
+- [x] Timeout menghasilkan fallback (Task 21: retry terbatas lalu statis)
+- [x] Error penyedia tidak menghapus draft (Task 21: `shouldStop` + fallback, AC-406-a)
 
 ## 2. Kasus fixture
 
@@ -37,10 +37,10 @@
 | Input sangat panjang | Batas token ditangani |
 
 ## 3. Menjalankan evaluasi
-- [ ] TODO: apakah dijalankan di CI? Butuh API key — mungkin manual atau terjadwal
-- [ ] Simpan hasil per versi prompt
-- [ ] Ambang kelulusan: **nol pelanggaran grounding**
+- [x] CI menjalankan mock + invariant (`test:unit` — putusan Task 18/kunci #6). Evaluasi ber-key TIDAK di CI (C-T2): hanya manual via UI (`manual-eval-protocol.md`). TODO outline terjawab — bukan terjadwal, bukan di CI.
+- [x] Hasil tersimpan per versi prompt (Task 22: runner menegaskan `promptVersion` fixture = versi loader aktif; bump tanpa eval ulang = merah)
+- [x] Ambang kelulusan: **nol pelanggaran grounding** (Task 22: satu pelanggaran = suite merah)
 
 ## 4. Memelihara set
-- [ ] Setiap pelanggaran grounding yang ditemukan menjadi fixture permanen
-- [ ] Set hanya bertambah, tidak pernah menyusut
+- [x] Setiap pelanggaran grounding yang ditemukan menjadi fixture permanen (mekanik sejak Task 19/20, diperluas Task 22)
+- [x] Set hanya bertambah, tidak pernah menyusut (daftar nama di-pin test — pertumbuhan disengaja)

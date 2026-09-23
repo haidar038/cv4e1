@@ -1308,3 +1308,23 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Validasi di dalam attempt:** grounding/malformed dilempar provider di dalam `call()`, tapi karena non-retryable ia langsung keluar tanpa retry — kuota user aman (dikunci test `calls === 1`).
 
 **Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · `check:boundaries` OK (230 file / 1024 specifier) · **unit 65 file / 570 test** (535 + 35 baru: 20 retry + 1 errors + 2 http + 4 orkestrator bullet + 4 orkestrator polish + 2 panel bullet + 2 panel polish) · build OK (chunk lazy `bullet-generator` 3,0 KB + `polish-text` 4,5 KB gzip, di luar JS awal) · `check:privacy` OK · `check:budget` OK (+5,2%/+9,5% hijau; sisa ruang ratchet jsGzip ±0,5 poin) · `test:e2e` AI **26/26** (ai-retry 3 + ai-bullets 4 + ai-polish 4 + ai-consent 2, × Chromium + Firefox, production build).
+
+### Task 22 — Set evaluasi terima + runner per-versi-prompt (FR-405/FR-404)
+**Requirement:** FR-405 (AC-405-a invariant), FR-404 (AC-404-a tolak schema); tanpa FR/AC baru — tidak ada requirement eval khusus di SRS; tanpa perubahan `ResumeDocument`; tanpa kode produksi (fixture + test + docs saja, bundle tak berubah)
+**Status: SELESAI (2026-09-24).** Keputusan kickoff yang disetujui: D1a (runner = file vitest pola eval-fixtures, auto-CI tanpa wiring baru), D2a (provider statis live per kasus + mock ter-pin jalur AI), D3a (subset grounding-relevan eksplisit; injection + kualitas dikecualikan tercatat), D4a (tanpa runner ber-key — manual tetap via UI), D5 (lanjut tanpa menunggu eval manual maintainer).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `fixtures/ai-eval/bullet-grounding-accept.json` (baru, 8 kasus) | Set terima C1: pendek, angka ada/tak-ada (+placeholder), organisasi, dedup verb-awal, truncate 2000, karakter khusus, entitas input lolos |
+| `fixtures/ai-eval/polish-grounding-accept.json` (baru, 4 kasus) | Set terima C2: angka, pendek, mode EN, karakter khusus; `translate-en` dikecualikan by-design (temuan F-T22-1) |
+| `src/features/ai/bullet-eval-accept.test.ts` (baru, 10 test) | Runner C1: statis live bersih (allowlist verb eksplisit) + mock valid whole + orkestrator kirim AI + pin nama + kontrol negatif |
+| `src/features/ai/polish-eval-accept.test.ts` (baru, 6 test) | Runner C2: statis verbatim + panduan + mock valid whole + orkestrator kirim AI + pin nama + kontrol negatif |
+| Docs | evaluation-dataset §1/§3/§4 + prompt-spec §4/§6 dicentang yang termekanisasi; manual-protocol §6 +2 temuan; roadmap Fase 2 baris eval → [x] |
+
+**Keputusan implementasi:**
+
+- **Temuan F-T22-1 (translate-en, dilaporkan bukan diperbaiki):** terjemahan sejati tak bisa lolos containment grounding (kosakata beda bahasa) — mode terdegradasi graceful ke panduan statis. Perbaikan butuh desain dwibahasa (diskusi pra-Fase 3).
+- **Batasan F-T22-2 (slot kurasi, diungkap di header test):** verb katalog + rationale template allowlist eksplisit (tujuan FR-403 + dataset §1 mewajibkan verb); angka/entitas-fakta tak pernah allowlist.
+- **Kegagalan test milik saya (jujur):** `as const` scope vs `BulletScope`? — lolos; tidak ada; runner hijau percobaan pertama kecuali penambahan asersi `actionVerb` susulan (tetap hijau).
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · format OK · `check:boundaries` OK · **unit 67 file / 586 test** (570 + 16 baru: 10 accept bullet + 6 accept polish) · tanpa kode produksi (build/budget/e2e tak terdampak — e2e AI 26/26 warisan tetap acuan).

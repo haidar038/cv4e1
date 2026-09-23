@@ -1,0 +1,46 @@
+{
+  "promptVersion": "v1",
+  "note": "Positive grounding set (Task 22, FR-405): every pinned mock output MUST validate whole, and the live static fallback MUST return the input verbatim. translate-en is excluded by design: a genuine translation cannot pass containment grounding (different-language vocabulary), so that mode degrades to static guidance — see manual-eval-protocol.md §6. The set only grows (evaluation-dataset.md §4).",
+  "cases": [
+    {
+      "name": "numbers-kept",
+      "mode": "id",
+      "text": "membantu menyusun laporan penjualan mingguan untuk 30 peserta",
+      "mockOutput": {
+        "text": "Membantu menyusun laporan penjualan mingguan untuk 30 peserta.",
+        "changes": ["Memperbaiki kapitalisasi awal kalimat."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "short-input",
+      "mode": "id",
+      "text": "membantu acara kampus",
+      "mockOutput": {
+        "text": "Membantu acara kampus.",
+        "changes": ["Memperbaiki kapitalisasi awal kalimat."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "en-mode",
+      "mode": "en",
+      "text": "helped organize campus events for 50 participants",
+      "mockOutput": {
+        "text": "Helped organize campus events for 50 participants.",
+        "changes": ["Fixed sentence capitalization."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "special-chars",
+      "mode": "id",
+      "text": "membuat poster dan video dokumentasi divisi publikasi",
+      "mockOutput": {
+        "text": "Membuat poster dan video dokumentasi divisi publikasi.",
+        "changes": ["Memperbaiki kapitalisasi awal kalimat."],
+        "warnings": []
+      }
+    }
+  ]
+}

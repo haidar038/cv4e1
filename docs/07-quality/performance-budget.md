@@ -152,6 +152,9 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   Keputusan lazy-load yang ditunda (seksi pengaturan + panel AI) **tidak** ditarik — ratchet
   masih hijau (K4a). Sisa ruang kini tipis: task berikutnya yang menyentuh JS awal wajib
   menimbang split tersebut lebih dulu.
+- **Task 22 (2026-09-24):** tanpa kode produksi (fixture JSON + test vitest + docs saja) —
+  bundle identik, `check:budget` tak perlu diulang; metrik acuan tetap Task 21
+  (`initialJsGzip` 208,9 KB, `jsGzip` 225,8 KB, ratchet +5,2%/+9,5% ✅).
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

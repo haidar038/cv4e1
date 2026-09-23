@@ -48,7 +48,7 @@ Harus disertakan di setiap prompt. Lihat `hallucination-policy.md` untuk teks le
 ## 4. Versioning
 - [ ] Prompt bersifat append-only seperti ADR: `v1`, `v2`, jangan edit di tempat
 - [ ] Alasan: keluaran dapat berubah drastis; kita harus bisa menelusuri ke belakang
-- [ ] Set evaluasi dijalankan terhadap setiap versi prompt
+- [x] Set evaluasi dijalankan terhadap setiap versi prompt (Task 22: runner menolak fixture yang versinya != loader aktif)
 
 ## 5. Konteks yang disisipkan
 - [ ] Field mana yang boleh disisipkan ke prompt (minimisasi data)
@@ -56,5 +56,5 @@ Harus disertakan di setiap prompt. Lihat `hallucination-policy.md` untuk teks le
 - [ ] Anggaran token
 
 ## 6. Pengujian
-- [ ] Setiap prompt dijalankan terhadap `evaluation-dataset.md`
+- [x] Setiap prompt dijalankan terhadap `evaluation-dataset.md` (Task 22: set terima + tolak C1/C2 per versi aktif)
 - [ ] Uji invariant, bukan string persis
