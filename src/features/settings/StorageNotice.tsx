@@ -37,7 +37,7 @@ export function StorageNoticeBanner() {
   return (
     <div
       role="status"
-      className="flex items-center justify-between gap-2 border p-2 text-xs text-muted-foreground print:hidden"
+      className="flex items-center justify-between gap-2 border border-info p-2 text-xs text-info bg-info/10 print:hidden"
     >
       <p className="min-w-0 flex-1">{pack.storageNotice.notice}</p>
       <Button type="button" variant="outline" size="sm" onClick={dismiss}>
@@ -51,7 +51,7 @@ export function StorageNoticeFooter() {
   const pack = useMicrocopy()
   if (pack.storageNotice.notice === '') return null
   return (
-    <footer className="border p-2 text-center text-xs text-muted-foreground print:hidden">
+    <footer className="border border-info p-2 text-center text-xs text-info bg-info/10 print:hidden">
       <p>{pack.storageNotice.notice}</p>
     </footer>
   )
