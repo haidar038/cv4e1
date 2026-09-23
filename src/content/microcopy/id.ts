@@ -174,6 +174,25 @@ export interface MicrocopyPack {
     /** DF-6 field list for the bullet capability (Task 19 refines per capability). */
     dataFieldsList: string
   }
+  aiBullets: {
+    /** Trigger and panel names — structural, kept for every locale. */
+    triggerLabel: string
+    panelTitle: string
+    targetRoleLabel: string
+    targetRolePlaceholder: string
+    generateAction: string
+    applyAction: string
+    closeAction: string
+    suggestionLabel: string
+    /** Guidance prose — blanked for non-id locales. */
+    hint: string
+    loadingNote: string
+    readyNote: string
+    staticNote: string
+    consentNote: string
+    unconfiguredNote: string
+    errorNote: string
+  }
   preview: {
     /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
     regionLabel: string
@@ -565,6 +584,23 @@ export const microcopyId: MicrocopyPack = {
       'Data di atas diproses oleh penyedia sesuai kebijakannya — kebijakan itu bisa berubah dan di luar kendali kami.',
     dataFieldsList: 'Deskripsi tugas mentah, konteks bagian, bahasa, fakta yang boleh dipakai',
   },
+  aiBullets: {
+    triggerLabel: 'Saran bullet AI',
+    panelTitle: 'Saran bullet AI',
+    targetRoleLabel: 'Peran yang dilamar (opsional)',
+    targetRolePlaceholder: 'mis. Staff administrasi',
+    generateAction: 'Minta saran',
+    applyAction: 'Terapkan',
+    closeAction: 'Tutup',
+    suggestionLabel: 'Saran',
+    hint: 'Tulis dulu deskripsi tugas mentah pada baris ini, lalu minta saran. Saran hanya kandidat — tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    loadingNote: 'Meminta saran…',
+    readyNote: 'Saran siap. Tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    staticNote: 'Menampilkan saran manual yang tetap bisa dipakai.',
+    consentNote: 'Persetujuan ditolak — menampilkan saran manual. Tidak ada data yang dikirim.',
+    unconfiguredNote: 'Belum ada kunci — menampilkan saran manual yang tetap bisa dipakai.',
+    errorNote: 'AI tidak menjawab — menampilkan saran manual. Draft Anda tidak berubah.',
+  },
   preview: {
     regionLabel: 'Pratinjau CV',
     modeLabel: 'Mode tampilan CV',
@@ -748,6 +784,16 @@ export const microcopyStructural: MicrocopyPack = {
     incompleteNote: '',
   },
   aiConsent: { ...microcopyId.aiConsent, intro: '', consequenceText: '', dataFieldsList: '' },
+  aiBullets: {
+    ...microcopyId.aiBullets,
+    hint: '',
+    loadingNote: '',
+    readyNote: '',
+    staticNote: '',
+    consentNote: '',
+    unconfiguredNote: '',
+    errorNote: '',
+  },
   fields: {
     ...microcopyId.fields,
     email: { ...microcopyId.fields.email, hint: '' },

@@ -10,7 +10,7 @@ import {
   type DraftRecord,
 } from '../../storage'
 import { exportResume } from '../../storage/export-import'
-import { aiStore } from './ai-store'
+import { aiStore, clearBulletState, resolveBulletRequest, startBulletRequest } from './ai-store'
 import {
   addSectionItem,
   createDraft,
@@ -435,9 +435,63 @@ describe('wipeAllDataAction (Task 15, FR-108)', () => {
   })
 })
 
-describe('AI store', () => {
-  it('exists as an inert basket and stays empty', () => {
-    expect(aiStore.getState()).toEqual({})
+describe('AI store (Task 19, FR-401)', () => {
+  const scope = {
+    section: 'experience' as const,
+    itemIndex: 0,
+    position: 1,
+    rawTask: 'membantu acara kampus',
+  }
+
+  beforeEach(() => {
+    clearBulletState()
+  })
+
+  it('starts empty and records a loading request', () => {
+    expect(aiStore.getState().bulletStatus).toBe('idle')
+    startBulletRequest(scope)
+    expect(aiStore.getState().bulletStatus).toBe('loading')
+    expect(aiStore.getState().bulletScope).toEqual(scope)
+    expect(aiStore.getState().bulletSuggestions).toEqual([])
+  })
+
+  it('resolves the outcome for the current scope only (stale responses dropped)', () => {
+    startBulletRequest(scope)
+    resolveBulletRequest(
+      {
+        suggestions: [
+          {
+            text: 'Membantu acara kampus [dampak yang dapat diukur]',
+            actionVerb: 'Membantu',
+            usesPlaceholder: true,
+            rationale: 'r',
+            warnings: [],
+          },
+        ],
+        source: 'static',
+        errorCode: null,
+      },
+      scope,
+    )
+    expect(aiStore.getState().bulletStatus).toBe('ready')
+    expect(aiStore.getState().bulletSuggestions).toHaveLength(1)
+
+    // A late response for an older scope must not overwrite the current one.
+    startBulletRequest({ ...scope, rawTask: 'teks baru' })
+    resolveBulletRequest({ suggestions: [], source: 'static', errorCode: null }, scope)
+    expect(aiStore.getState().bulletStatus).toBe('loading')
+  })
+
+  it('clears back to idle', () => {
+    startBulletRequest(scope)
+    clearBulletState()
+    expect(aiStore.getState()).toEqual({
+      bulletScope: null,
+      bulletStatus: 'idle',
+      bulletSuggestions: [],
+      bulletSource: null,
+      bulletErrorCode: null,
+    })
   })
 })
 

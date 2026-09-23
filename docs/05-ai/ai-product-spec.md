@@ -20,12 +20,12 @@
 
 ## 2. Kapabilitas menurut fase
 
-### C1 — Generator bullet *(Fase 2, prioritas tertinggi)*
-- [ ] Input: deskripsi tugas mentah, konteks section, target peran, bahasa, fakta yang boleh dipakai
-- [ ] Output: 3 alternatif bullet, masing-masing dengan kata kerja aksi dan dampak
-- [ ] Placeholder metrik ketika angka tidak tersedia — **tidak pernah mengarang angka**
-- [ ] Alasan singkat per saran
-- [ ] Fallback: Action Verbs Catalog + pola kalimat
+### C1 — Generator bullet *(Fase 2, prioritas tertinggi — terkabel Task 19)*
+- [x] Input: deskripsi tugas mentah, konteks section, target peran, bahasa, fakta yang boleh dipakai
+- [x] Output: 3 alternatif bullet, masing-masing dengan kata kerja aksi dan dampak
+- [x] Placeholder metrik ketika angka tidak tersedia — **tidak pernah mengarang angka**
+- [x] Alasan singkat per saran
+- [x] Fallback: Action Verbs Catalog + pola kalimat
 
 ### C2 — Polish *(Fase 2)*
 - [ ] Hanya memperbaiki: tata bahasa, kejelasan, panjang, konsistensi, kata kerja aksi

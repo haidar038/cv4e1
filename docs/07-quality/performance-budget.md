@@ -123,6 +123,14 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   Kandidat penurun: lazy-load seksi pengaturan (dialog + form) keluar chunk awal — ditunda sadar
   ke Task 19/21 saat permukaan AI bertambah, agar keputusan code-splitting diambil sekali
   dengan data lengkap, bukan per task.
+- **Task 19 (2026-09-23):** panel + trigger generator eager di tiap baris bullet
+  (`BulletGenerator`, `BulletSuggestionsPanel`, `ai-store`, microcopy `aiBullets`, ikon Sparkle),
+  transport + prompt + validasi di chunk lazy `bullet-generator` (~3,5 KB gzip, di luar JS awal):
+  `initialJsGzip` 201,4 → **206,6 KB** (+4,1% ratchet ✅, garis absolut 200 KB tetap dilewati —
+  utang advisory yang sama, bukan utang baru); `jsGzip` 209,0 → **217,7 KB** (+5,6% ✅);
+  css/font datar; `transferGzip` 331,1 → 339,8 KB (+3,5% ✅). Baseline JSON **tidak** diubah.
+  Kandidat penurun tetap sama (lazy-load seksi pengaturan + panel AI) — ditunda sadar ke
+  Task 21 saat retry policy menambah permukaan AI terakhir.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv4every1/output-schema/bullet-generator.v1.json",
+  "title": "BulletGeneratorOutput v1",
+  "description": "Canonical output shape for the C1 bullet generator (Task 19). Runtime validation is hand-written in src/ai/validation.ts; this file is the versioned contract the prompt points at.",
+  "type": "object",
+  "required": ["suggestions"],
+  "properties": {
+    "suggestions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["text", "actionVerb", "usesPlaceholder", "rationale", "warnings"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400,
+            "description": "Bullet text in the requested locale, led by an action verb."
+          },
+          "actionVerb": {
+            "type": "string",
+            "description": "Opening verb of text; empty only for sections without action verbs."
+          },
+          "usesPlaceholder": {
+            "type": "boolean",
+            "description": "True when text carries a metric placeholder instead of a number."
+          },
+          "rationale": {
+            "type": "string",
+            "description": "One sentence on what changed from the raw task."
+          },
+          "warnings": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Input facts left unused, or empty."
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,6 +16,8 @@ export interface StringListRowSlotArgs {
   position: number
   /** Inserts `text` at this row input's caret; never overwrites user text. */
   insertAtCursor: (text: string) => void
+  /** Replaces this row's text wholesale (AI Apply); typing stays untouched. */
+  replaceRow: (text: string) => void
 }
 
 export interface StringListEditorProps {
@@ -72,6 +74,21 @@ export function StringListEditor({
     onCommit(committed)
   }
 
+  // Suggestion application goes through the same commit path as typing:
+  // the whole row is replaced, the store receives the non-empty projection,
+  // and focus returns to the row input so keyboard flow continues there.
+  const replaceRow = (index: number, text: string) => {
+    const next = [...rows]
+    next[index] = text
+    setRows(next)
+    commit(next)
+    requestAnimationFrame(() => {
+      const target = inputRefs.current[index]
+      if (!target) return
+      target.focus()
+      target.setSelectionRange(text.length, text.length)
+    })
+  }
   // Suggestion insertion goes through the same commit path as typing. The
   // selection is read off the input element (it survives the blur a click
   // causes); focus and caret are restored a frame later so the popover's own
@@ -126,6 +143,7 @@ export function StringListEditor({
               {renderRowSlot?.({
                 position: index + 1,
                 insertAtCursor: (text) => insertIntoRow(index, text),
+                replaceRow: (text) => replaceRow(index, text),
               })}
               <Button
                 type="button"

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv4every1/fixtures/bullet-grounding-violations.v1.json",
+  "title": "Bullet grounding violations v1",
+  "description": "Permanent regression fixtures (evaluation-dataset.md §4): every grounding violation found becomes a case here. Each output MUST be rejected by validateBulletOutput with grounding-violation. Fake data only.",
+  "cases": [
+    {
+      "name": "invented-percentage",
+      "allowedFacts": "membantu menyusun laporan penjualan mingguan",
+      "output": {
+        "suggestions": [
+          {
+            "text": "Meningkatkan penjualan sebesar 50%.",
+            "actionVerb": "Meningkatkan",
+            "usesPlaceholder": false,
+            "rationale": "Membantu menyusun laporan penjualan mingguan.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "invented-company",
+      "allowedFacts": "membantu menyusun laporan penjualan mingguan",
+      "output": {
+        "suggestions": [
+          {
+            "text": "Mengkoordinasikan panitia PT Maju Jaya.",
+            "actionVerb": "Mengkoordinasikan",
+            "usesPlaceholder": true,
+            "rationale": "Membantu menyusun laporan penjualan mingguan.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "changed-date",
+      "allowedFacts": "magang sebagai staf administrasi pada 2023",
+      "output": {
+        "suggestions": [
+          {
+            "text": "Magang sebagai staf administrasi pada 2024.",
+            "actionVerb": "Magang",
+            "usesPlaceholder": false,
+            "rationale": "Magang sebagai staf administrasi pada 2023.",
+            "warnings": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "invented-skill",
+      "allowedFacts": "membantu menyusun laporan penjualan mingguan",
+      "output": {
+        "suggestions": [
+          {
+            "text": "Menguasai Python dan React untuk laporan.",
+            "actionVerb": "Menguasai",
+            "usesPlaceholder": false,
+            "rationale": "Membantu menyusun laporan penjualan mingguan.",
+            "warnings": []
+          }
+        ]
+      }
+    }
+  ]
+}

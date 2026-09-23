@@ -51,7 +51,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 - [x] Antarmuka `AIProvider` + `StaticSuggestionProvider` (Task 16)
 - [x] Alur BYO-key + layar persetujuan (Task 18)
-- [ ] Generator bullet + validasi structured output
+- [x] Generator bullet + validasi structured output (Task 19: prompt berversi, orkestrator DF-6, panel pratinjau + Apply per-item, fallback statis terkabel)
 - [ ] Polish (ID/EN)
 - [ ] Uji invariant grounding + set evaluasi
 - [ ] Penanganan rate limit, timeout, dan kegagalan penyedia

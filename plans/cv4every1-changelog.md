@@ -1222,3 +1222,30 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 | `docs/adr/README.md` | Drift: status ADR-0006 → Accepted (Opsi 4, 2026-09-23); baris ADR-0007 ditambahkan; kandidat "Pipeline PDF" dihapus (sudah diputuskan di ADR-0007) |
 
 **Verifikasi:** `scripts/privacy-rules.test.ts` 13/13 hijau · `typecheck` bersih · lint 0 error (24 warning pre-existing, tidak bertambah) · `format:check` OK · `check:privacy` penuh OK pada `dist/` yang ada (nol positif palsu dari pola baru).
+
+### Task 19 -- Generator bullet C1 + prompt berversi + panel pratinjau + Apply per-item
+**Requirement:** FR-401 (AC-401-a/b), FR-404 (AC-404-a), FR-405 (AC-405-a), FR-403 (AC-403-a), FR-402/FR-407/FR-408; tanpa perubahan `ResumeDocument`
+**Status: SELESAI (2026-09-23).** Kapabilitas C1 terkabel penuh: prompt berversi disuntikkan sebagai `systemPrompt`, orkestrator DF-6 memanggil provider lalu selalu jatuh ke statis saat gagal, saran hidup di `ai-store` dan masuk dokumen hanya via Apply per-item, trigger inline di tiap baris bullet memakai consent gate yang sudah ada.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `prompts/id/bullet-generator.v1.md` (+`shared/grounding-rules.v1.md`, `shared/output-schema.v1.json`) | **Baru.** System prompt C1 berversi: tujuan, input/tipe, schema ref, grounding mirror, contoh valid + tidak valid, batas token (input 2000 char, output 800 token), fallback caller-side, changelog versi |
+| `src/features/ai/bullet-prompts.ts` (+test, 8 test) | **Baru.** Loader prompt (single import point, `?raw`) + budget token + `truncateBulletText`; drift guard mirror-vs-kanonik; tanpa inline prompt di komponen |
+| `src/features/ai/bullet-generator.ts` (+test, 15 test) | **Baru.** Orkestrator: `buildBulletInput` DF-6 allowlist (raw + section + targetRole + locale + allowedFacts) → pilih provider vault (Groq diutamakan) → consent fail-closed → panggil → fallback statis tiap gagal; draft tak pernah disentuh |
+| `src/features/store/ai-store.ts` (+test di `store.test.ts`) | **Aktif.** State suggestions/status/source/error + `startBulletRequest`/`resolveBulletRequest` (stale-scope guard) / `clearBulletState`; blok "inert basket" diganti test perilaku |
+| `src/features/ai/BulletSuggestionsPanel.tsx` + `BulletGenerator.tsx` (+dom test, 5 test, axe) | **Baru.** Trigger inline (ikon Sparkle, Collapsible seperti ActionVerbSuggestions) + panel: input targetRole opsional, status FR-408, daftar saran + Apply per-item, ConsentDialog reuse; `'use no memo'` + baca store/ref saat event (kelas insiden Task 18) |
+| `src/features/form/fields/StringListEditor.tsx` | Aditif: `replaceRow` di slot args (Apply mengganti baris lewat commit path yang sama) |
+| `src/features/form/sections/ExperienceForm.tsx`, `ProjectsForm.tsx` | Aditif: trigger generator di slot tiap baris (Organizations otomatis via `ExperienceItemEditor`) |
+| `src/content/microcopy/id.ts` | Aditif: grup `aiBullets` (16 string) + blanking FR-204; tersapu frasa terlarang otomatis |
+| `fixtures/ai-eval/bullet-grounding-violations.json` (+test, 5 test) | **Baru.** 4 fixture pelanggaran permanen (persen, perusahaan, tanggal, skill) — set hanya bertambah |
+| `e2e/ai-bullets.spec.ts` | **Baru.** 4 test production build: jalur AI (consent gate + Apply per-item), fallback tanpa kunci, tolak consent = 0 request, keyboard Enter/Escape |
+| Docs | roadmap Fase 2 baris 3 → [x]; ai-product-spec C1 → [x]; performance-budget entri Task 19 |
+
+**Keputusan implementasi:**
+
+- **Bacaan event-time (temuan e2e, bukan teori):** jalur AI mula-mula 0 request di production build sementara hijau di jsdom — pola insiden Task 18. Sebelum memperbaikinya, duplikasi modul antar-chunk disingkirkan dulu sebagai penyebab (chunk `bullet-generator-*.js` mengimpor binding bersama dari `index-*.js` — vault/consent tidak terduplikasi). Panel kini membaca teks baris dari DocumentStore + `targetRole`/consent dari ref saat event, bukan dari prop/state tangkapan render.
+- **Balapan asersi milik harness, bukan produk:** `toBeVisible` lolos dari fallback statis pra-grant sebelum retry selesai — dikunci dengan `toHaveCount(2)` (mock AI=2, statis=3).
+- **Kegagalan test milik saya (jujur):** `navigator` getter-only di Node (stub via defineProperty); dom test membaca prop padahal panel membaca store (setup tambah `addSectionItem`); `getByLabel` cocok 4 kontrol (ganti role textbox).
+- **Batas token DF-6 terkunci (Q4/Q5 yang disetujui):** `targetRole` = input teks opsional per operasi di panel (bukan dari schema); `allowedFacts` = rawTask + targetRole; truncation `[dipotong]` di dalam span `[...]` sehingga tak dihitung pelanggaran grounding.
+
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (220 file / 957 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **60 file / 486 test unit** (451 + 35 baru: 8 prompts + 15 orkestrator + 3 ai-store + 5 panel + 5 eval − 1 inert) · build OK (chunk lazy `bullet-generator` ~3,5 KB gzip di luar JS awal) · `check:privacy` OK · `check:budget` OK (ratchet +4,1%/+5,6% semua hijau; `initialJsGzip` 206,6 KB — utang advisory yang sama, terdokumentasi di performance-budget) · `test:e2e` **66 lulus + 2 skip kapabilitas** (Chromium + Firefox; 4 test baru × 2 browser; skip `page.pdf` Firefox utuh).
