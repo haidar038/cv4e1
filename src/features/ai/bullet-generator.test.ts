@@ -8,6 +8,7 @@ import {
   type FetchImpl,
   type JobTailoringInput,
   type PolishInput,
+  type RetryPolicy,
 } from '../../ai'
 import {
   buildBulletInput,
@@ -60,6 +61,20 @@ function groundedAiEnvelope(): string {
     ],
   })
 }
+
+/** Grounded candidate reused by the retry-path tests (numbers come from the input). */
+function groundedSuggestion(): BulletSuggestion {
+  return {
+    text: 'Menyusun laporan penjualan mingguan untuk 30 peserta.',
+    actionVerb: 'Menyusun',
+    usesPlaceholder: false,
+    rationale: 'Membantu menyusun laporan penjualan mingguan untuk 30 peserta.',
+    warnings: [],
+  }
+}
+
+/** Retry seam: backoff costs nothing and is deterministic in tests. */
+const noWait: RetryPolicy = { sleep: async () => {}, random: () => 0 }
 
 afterEach(() => {
   clearSessionCredentials()
@@ -138,12 +153,93 @@ describe('requestBulletSuggestions', () => {
     }
   })
 
-  it('falls back to static on timeout without losing the draft input (FR-406)', async () => {
-    const provider = fakeProvider(() => Promise.reject(new AIProviderError('timeout')))
-    const result = await requestBulletSuggestions(request, { provider })
+  it('retries a transient timeout with backoff, then falls back to static (FR-406)', async () => {
+    let calls = 0
+    const sleeps: number[] = []
+    const provider = fakeProvider(() => {
+      calls += 1
+      return Promise.reject(new AIProviderError('timeout'))
+    })
+    const result = await requestBulletSuggestions(request, {
+      provider,
+      retry: {
+        sleep: async (ms: number) => {
+          sleeps.push(ms)
+        },
+        random: () => 0,
+      },
+    })
+    expect(calls).toBe(3)
+    expect(sleeps).toEqual([500, 1000])
     expect(result.source).toBe('static')
     expect(result.errorCode).toBe('timeout')
     expect(result.suggestions.length).toBeGreaterThan(0)
+  })
+
+  it('recovers when a retry succeeds — the AI candidate is used, not static', async () => {
+    let calls = 0
+    const provider = fakeProvider(() => {
+      calls += 1
+      return calls === 1
+        ? Promise.reject(new AIProviderError('network-error'))
+        : Promise.resolve([groundedSuggestion()])
+    })
+    const result = await requestBulletSuggestions(request, { provider, retry: noWait })
+    expect(calls).toBe(2)
+    expect(result.source).toBe('ai')
+    expect(result.errorCode).toBeNull()
+    expect(result.suggestions).toHaveLength(1)
+  })
+
+  it('never retries rejected candidates — grounding failure costs one request (FR-405)', async () => {
+    let calls = 0
+    const provider = fakeProvider(() => {
+      calls += 1
+      return Promise.reject(new AIProviderError('grounding-violation'))
+    })
+    const result = await requestBulletSuggestions(request, { provider, retry: noWait })
+    expect(calls).toBe(1)
+    expect(result.source).toBe('static')
+    expect(result.errorCode).toBe('grounding-violation')
+  })
+
+  it('waits out a server Retry-After hint on rate-limited instead of backing off', async () => {
+    let calls = 0
+    const sleeps: number[] = []
+    const provider = fakeProvider(() => {
+      calls += 1
+      return calls === 1
+        ? Promise.reject(new AIProviderError('rate-limited', undefined, [], { retryAfterMs: 250 }))
+        : Promise.resolve([groundedSuggestion()])
+    })
+    const result = await requestBulletSuggestions(request, {
+      provider,
+      retry: {
+        sleep: async (ms: number) => {
+          sleeps.push(ms)
+        },
+        random: () => 0,
+      },
+    })
+    expect(calls).toBe(2)
+    expect(sleeps).toEqual([250])
+    expect(result.source).toBe('ai')
+    expect(result.errorCode).toBeNull()
+  })
+
+  it('stops retrying when the radio dies mid-retry and reports offline', async () => {
+    let calls = 0
+    const provider = fakeProvider(() => {
+      calls += 1
+      return Promise.reject(new AIProviderError('timeout'))
+    })
+    const result = await requestBulletSuggestions(request, {
+      provider,
+      retry: { ...noWait, shouldStop: () => true },
+    })
+    expect(calls).toBe(1)
+    expect(result.source).toBe('static')
+    expect(result.errorCode).toBe('offline')
   })
 
   it('rejects invented numbers and entities through the real transport (FR-405)', async () => {

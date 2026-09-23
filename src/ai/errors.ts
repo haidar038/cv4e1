@@ -35,7 +35,7 @@ export type AIErrorCode = (typeof AI_ERROR_CODES)[number]
 /**
  * Advisory retry flag. Only transient transport failures are retryable;
  * everything else (auth, validation, grounding, consent) must fall back,
- * never spin. Retry policy itself is Task 21.
+ * never spin. The bounded policy that honors this flag lives in `./retry`.
  */
 export function isRetryableErrorCode(code: AIErrorCode): boolean {
   return code === 'timeout' || code === 'network-error' || code === 'rate-limited'
@@ -50,12 +50,25 @@ export class AIProviderError extends Error {
    * preview/fallback UI mapping in features/.
    */
   readonly details: readonly string[]
+  /**
+   * Server-hinted wait before retrying (ms), parsed from the `Retry-After`
+   * header. Present only on `rate-limited` responses that carry a parseable
+   * header; the retry policy (Task 21, `./retry`) caps it so a hostile or
+   * generous server can never park the UI.
+   */
+  readonly retryAfterMs: number | undefined
 
-  constructor(code: AIErrorCode, message?: string, details: readonly string[] = []) {
+  constructor(
+    code: AIErrorCode,
+    message?: string,
+    details: readonly string[] = [],
+    options?: { readonly retryAfterMs?: number | undefined },
+  ) {
     super(message ?? code)
     this.name = 'AIProviderError'
     this.code = code
     this.retryable = isRetryableErrorCode(code)
     this.details = details
+    this.retryAfterMs = options?.retryAfterMs
   }
 }

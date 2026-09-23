@@ -3,9 +3,17 @@ import {
   GROQ_DEFAULT_MODEL,
   GroqProvider,
   OpenAICompatibleProvider,
+  withRetry,
 } from '../../ai'
-import type { AIErrorCode, AIProvider, FetchImpl, PolishInput, PolishSuggestion } from '../../ai'
-import type { PolishMode } from '../../ai'
+import type {
+  AIErrorCode,
+  AIProvider,
+  FetchImpl,
+  PolishInput,
+  PolishMode,
+  PolishSuggestion,
+  RetryPolicy,
+} from '../../ai'
 import {
   POLISH_MAX_COMPLETION_TOKENS,
   POLISH_MAX_INPUT_CHARS,
@@ -21,7 +29,8 @@ import { StaticSuggestionProvider } from './static-provider'
  *
  * Same contract as the C1 bullet orchestrator (Task 19): build the DF-6
  * minimal input → pick the configured network provider (or none) → call
- * it → return the validated candidate. Every failure lands on the offline
+ * it (bounded retry on transient failures, Task 21) → return the validated
+ * candidate. Every failure lands on the offline
  * static provider (guidance, not a rewrite); the draft is never touched
  * here (the polished text reaches the DocumentStore only through an
  * explicit Apply in the panel — FR-401).
@@ -56,6 +65,12 @@ export interface PolishRequestOptions {
    * for the contract/malformed/timeout paths use this; production never does.
    */
   readonly provider?: AIProvider
+  /**
+   * Retry seam: overrides the bounded retry policy (waits, entropy). Unit
+   * tests inject a no-op sleep so the backoff costs nothing; production
+   * passes nothing and gets the default 1+2 attempts with real timers.
+   */
+  readonly retry?: RetryPolicy
 }
 
 /** Which network provider (if any) has session credentials. Groq wins ties. */
@@ -132,8 +147,9 @@ export async function requestPolishSuggestion(
   }
 
   if (options?.provider !== undefined) {
+    const testProvider = options.provider
     try {
-      const suggestion = await options.provider.polishText(input)
+      const suggestion = await withRetry(() => testProvider.polishText(input), options.retry)
       return { suggestion, source: 'ai', errorCode: null }
     } catch (error) {
       const code = error instanceof AIProviderError ? error.code : 'network-error'
@@ -149,7 +165,14 @@ export async function requestPolishSuggestion(
   const provider = buildNetworkProvider(providerId, input.mode, options?.fetchImpl)
   if (provider === null) return staticFallback(input, 'provider-unavailable')
   try {
-    const suggestion = await provider.polishText(input)
+    // Bounded retry (Task 21, FR-406): transient failures get up to two more
+    // attempts with backoff; anything else — and a radio that dies mid-retry
+    // — falls through to the static provider below. Validation and grounding
+    // run inside the provider call, so a rejected candidate is never retried.
+    const suggestion = await withRetry(() => provider.polishText(input), {
+      ...options?.retry,
+      shouldStop: isOffline,
+    })
     return { suggestion, source: 'ai', errorCode: null }
   } catch (error) {
     const code = error instanceof AIProviderError ? error.code : 'network-error'

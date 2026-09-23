@@ -18,6 +18,14 @@ export type {
 } from './types'
 export { AI_ERROR_CODES, AIProviderError, isRetryableErrorCode } from './errors'
 export type { AIErrorCode } from './errors'
+export {
+  computeRetryDelayMs,
+  RETRY_AFTER_MAX_MS,
+  RETRY_BASE_DELAY_MS,
+  RETRY_MAX_ATTEMPTS,
+  withRetry,
+} from './retry'
+export type { RetryPolicy } from './retry'
 export { NoopProvider } from './noop-provider'
 export { AI_REQUEST_TIMEOUT_MS, postJson } from './http'
 export type { ChatMessage, FetchImpl, PostJsonOptions } from './http'

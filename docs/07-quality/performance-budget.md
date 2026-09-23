@@ -143,6 +143,15 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   placeholder tunggal di provider statis, catatan offline kolom peran: `initialJsGzip`
   208,2 → **208,7 KB**, `jsGzip` 224,5 → **225,2 KB** (+9,2% ratchet ✅ — sisa ruang
   ±0,8 poin, Task 21 wajib hemat atau tarik keputusan lazy-load yang ditunda).
+- **Task 21 (2026-09-24):** retry terbatas tanpa permukaan UI baru (K3a: retry diam-diam,
+  tanpa state/transien di store): `src/ai/retry.ts` + `Retry-After` di `http.ts` masuk chunk
+  lazy `bullet-generator`/`polish-text`, nota `rateLimitedNote`/`timeoutNote` ke microcopy awal:
+  `initialJsGzip` 208,7 → **208,9 KB** (+5,2% ratchet ✅, utang absolut yang sama);
+  `jsGzip` 225,2 → **225,8 KB** (+9,5% ✅ — sisa ruang ratchet ±0,5 poin);
+  css/font datar; `transferGzip` 347,4 → 348,0 KB. Baseline JSON **tidak** diubah.
+  Keputusan lazy-load yang ditunda (seksi pengaturan + panel AI) **tidak** ditarik — ratchet
+  masih hijau (K4a). Sisa ruang kini tipis: task berikutnya yang menyentuh JS awal wajib
+  menimbang split tersebut lebih dulu.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

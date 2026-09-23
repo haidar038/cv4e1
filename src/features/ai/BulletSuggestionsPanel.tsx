@@ -145,11 +145,15 @@ export function BulletSuggestionsPanel({
         ? pack.aiBullets.consentNote
         : bulletErrorCode === 'provider-unavailable'
           ? pack.aiBullets.unconfiguredNote
-          : bulletErrorCode !== null
-            ? pack.aiBullets.errorNote
-            : bulletSource === 'static'
-              ? pack.aiBullets.staticNote
-              : pack.aiBullets.readyNote
+          : bulletErrorCode === 'rate-limited'
+            ? pack.aiBullets.rateLimitedNote
+            : bulletErrorCode === 'timeout'
+              ? pack.aiBullets.timeoutNote
+              : bulletErrorCode !== null
+                ? pack.aiBullets.errorNote
+                : bulletSource === 'static'
+                  ? pack.aiBullets.staticNote
+                  : pack.aiBullets.readyNote
 
   return (
     <div

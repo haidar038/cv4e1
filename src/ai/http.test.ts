@@ -123,4 +123,33 @@ describe('postJson', () => {
   it('exposes the maintainer-approved default timeout', () => {
     expect(AI_REQUEST_TIMEOUT_MS).toBe(30_000)
   })
+
+  it('carries a parseable Retry-After hint on 429 for the retry policy', async () => {
+    const hinted: FetchImpl = async () =>
+      new Response('{}', { status: 429, headers: { 'Retry-After': '2' } })
+    try {
+      await postJson('https://x.test', { body: {}, fetchImpl: hinted })
+      throw new Error('expected AIProviderError, nothing was thrown')
+    } catch (error) {
+      expect(error).toBeInstanceOf(AIProviderError)
+      const providerError = error as AIProviderError
+      expect(providerError.code).toBe('rate-limited')
+      expect(providerError.retryAfterMs).toBe(2000)
+    }
+  })
+
+  it('leaves the hint empty when 429 carries no usable Retry-After', async () => {
+    for (const headers of [{}, { 'Retry-After': 'soon' }, { 'Retry-After': '-5' }]) {
+      const bare: FetchImpl = async () => new Response('{}', { status: 429, headers })
+      try {
+        await postJson('https://x.test', { body: {}, fetchImpl: bare })
+        throw new Error('expected AIProviderError, nothing was thrown')
+      } catch (error) {
+        expect(error).toBeInstanceOf(AIProviderError)
+        const providerError = error as AIProviderError
+        expect(providerError.code).toBe('rate-limited')
+        expect(providerError.retryAfterMs).toBeUndefined()
+      }
+    }
+  })
 })

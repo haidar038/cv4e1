@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { openTestDocument, resetFormStores, runAxe, teardownFormStores } from '../form/test-utils'
 import { updateBasics, addSectionItem } from '../store/actions'
-import { clearPolishState } from '../store/ai-store'
+import { clearPolishState, resolvePolishRequest, startPolishRequest } from '../store/ai-store'
 import { documentStore } from '../store/document-store'
 import { PolishSuggestionsPanel } from './PolishSuggestionsPanel'
 import type { PolishTarget } from './PolishSuggestionsPanel'
@@ -157,6 +157,48 @@ describe('PolishSuggestionsPanel (Task 20, FR-401/AC-401-a/b)', () => {
     expect(
       screen.getByText('Pertahankan semua angka, nama, dan tanggal persis seperti semula.'),
     ).toBeInTheDocument()
+  })
+
+  it('FR-408: persistent 429 retries the bounded attempts, then names the quota (Task 21)', async () => {
+    let calls = 0
+    // Retry-After: 0 keeps the bounded backoff instant in jsdom.
+    vi.stubGlobal('fetch', async () => {
+      calls += 1
+      return new Response('{}', { status: 429, headers: { 'Retry-After': '0' } })
+    })
+    setSessionCredentials('groq', { apiKey: 'gsk-test' })
+    consentStore.getState().grant('groq')
+    const user = userEvent.setup()
+    renderPanel()
+    const before = JSON.stringify(documentStore.getState().document)
+
+    await user.click(screen.getByRole('button', { name: 'Minta polesan' }))
+    await screen.findByText(
+      'Batas pemakaian AI tercapai — menampilkan panduan manual. Draft Anda tidak berubah; coba lagi nanti.',
+    )
+    // Bounded retry through the real stack: 1 initial + 2 retries, then static.
+    expect(calls).toBe(3)
+    expect(
+      screen.getByText('Pertahankan semua angka, nama, dan tanggal persis seperti semula.'),
+    ).toBeInTheDocument()
+    expect(JSON.stringify(documentStore.getState().document)).toBe(before)
+  })
+
+  it('FR-408: a timeout names the wait instead of the generic error (Task 21)', async () => {
+    renderPanel()
+    const scope = { target: 'bullet:experience:0:1', text: RAW_TEXT }
+    startPolishRequest(scope)
+    resolvePolishRequest(
+      {
+        suggestion: { text: RAW_TEXT, changes: [], warnings: [] },
+        source: 'static',
+        errorCode: 'timeout',
+      },
+      scope,
+    )
+    await screen.findByText(
+      'AI tidak menjawab tepat waktu — menampilkan panduan manual. Draft Anda tidak berubah.',
+    )
   })
 
   it('disables generation for empty input and explains why', async () => {

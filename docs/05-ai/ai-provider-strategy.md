@@ -55,9 +55,9 @@ interface AIProvider {
 - [x] Model bawaan Groq: `openai/gpt-oss-120b` (keputusan Task 18 Q6 — lini stabil); OpenAI-compatible: wajib diisi pengguna
 
 ## 6. Rate limit dan kuota
-- [ ] Tangani 429 dengan baik: pesan yang jelas, fallback ke statis
+- [x] Tangani 429 dengan baik: pesan yang jelas, fallback ke statis (Task 21: nota `rateLimitedNote` FR-408 + `Retry-After` dihormati max 10 dtk, selebihnya fallback)
 - [ ] **Jangan pernah memperlakukan kuota tertentu sebagai requirement produk** — free tier berubah dan sumber publik saling bertentangan
-- [ ] Batasi permintaan di sisi klien untuk melindungi kuota pengguna
+- [x] Batasi permintaan di sisi klien untuk melindungi kuota pengguna (Task 21: maks 3 attempt total, non-retryable tanpa retry, radio mati = berhenti)
 
 ## 7. Aturan CSP
 - [ ] `connect-src` harus menyebutkan domain penyedia secara eksplisit

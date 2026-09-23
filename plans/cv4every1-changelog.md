@@ -1283,3 +1283,28 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 ### Tindak lanjut Task 19/20 — ikon polish + hardening fallback statis (umpan balik maintainer)
 **Status: SELESAI (2026-09-24).** Tiga keluhan maintainer dari sesi dev: (1) dua trigger spark identik berdampingan — trigger polish kini memakai `PencilLineIcon` (aria tidak berubah, e2e hijau); (2) konsep polish-hanya-saran dikonfirmasi benar (constraint §2.13 suggestion-not-mutation, FR-401) — bukan bug; (3) fallback statis menghasilkan duplikasi kata kerja + placeholder ganda + `targetRole` yang terlihat diabaikan — diperbaiki: dedup prefiks bila baris sudah diawali verb itu, placeholder tunggal bila teks sudah membawa span `[...]`, dan catatan FR-408 di bawah kolom peran saat tanpa kunci (kontrak kejujuran: statis mengabaikan peran, dikunci test).
 **Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · format OK · `check:boundaries` OK (228 file / 1018 specifier) · unit 18 statis + 7 panel hijau · build OK · `check:privacy` OK · `check:budget` OK (+5,1%/+9,2% hijau; sisa ruang ratchet jsGzip ±0,8 poin — Task 21 wajib hemat) · e2e ai-bullets + ai-polish Chromium 8/8 production build.
+
+### Task 21 — Retry policy + nota kegagalan per-kode (FR-406/FR-403/FR-408)
+**Requirement:** FR-406 (draft utuh + kegagalan dilaporkan), FR-403 (fallback non-AI), FR-408 (status beralasan); tanpa FR/AC baru — tidak ada requirement retry khusus di SRS; tanpa perubahan `ResumeDocument`
+**Status: SELESAI (2026-09-24).** Keputusan kickoff yang disetujui: K1a (set retryable tak berubah — `timeout`/`network-error`/`rate-limited`), K2a (maks 3 attempt, backoff ~1 dtk → ~2 dtk + jitter, `Retry-After` dihormati max 10 dtk), K3a (retry diam-diam — tanpa state transien/store baru), K4a (lazy-load tunda, ditarik hanya bila budget jebol — tidak jebol), K5 (pemetaan disetujui).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/ai/retry.ts` (+test, 17 test) | **Baru.** `withRetry` + `computeRetryDelayMs` murni: hanya `AIProviderError` retryable yang dicoba ulang; validasi/grounding/auth/consent/program error dilempar langsung; `shouldStop` menghentikan saat radio mati (lapor `offline`); sleep/random injectable |
+| `src/ai/errors.ts` (+test) | Aditif: `retryAfterMs` opsional di `AIProviderError` (hanya 429 ber-header valid) |
+| `src/ai/http.ts` (+test) | Aditif: parse header `Retry-After` (detik atau HTTP-date; sampah/negatif → `undefined`, tanpa jatuh ke `Date.parse` liar) |
+| `src/ai/index.ts` | Aditif: re-export retry |
+| `src/features/ai/bullet-generator.ts` + `polish-text.ts` (+10 test) | Aditif: seam `retry` di options (sleep no-op di test); kedua jalur (seam + produksi) dibungkus `withRetry`; produksi berhenti saat `isOffline()` antar attempt; kandidat gagal validasi/grounding tidak pernah dicoba ulang (1 request) |
+| `src/content/microcopy/id.ts` | Aditif: `rateLimitedNote` + `timeoutNote` di `aiBullets`/`aiPolish` + blanking FR-204; tersapu frasa terlarang otomatis |
+| `BulletSuggestionsPanel.tsx` + `PolishSuggestionsPanel.tsx` (+4 dom test) | Aditif: cabang nota `rate-limited`/`timeout` sebelum `errorNote` generik; render-murni tanpa state baru (pola anti-stale-closure tak tersentuh) |
+| `e2e/ai-retry.spec.ts` | **Baru.** 3 test production build: 429-lalu-sukses bullet (2 saran = retry, bukan 3 statis), 429-persisten (nota kuota + 3 request + draft utuh), 429-lalu-sukses polish (Apply muncul) |
+| Docs | roadmap Fase 2 baris retry → [x]; provider-strategy §6 (429 + batasi permintaan) → [x]; fallback-strategy §2/§5 → [x]; performance-budget entri Task 21 |
+
+**Keputusan implementasi:**
+
+- **Bug parser milik saya (jujur):** `Date.parse('-5')` lolos sebagai tanggal hingga test menangkapnya — parser kini menolak nilai berawalan angka/tanda yang bukan detik-valid sebelum mencoba `Date.parse`.
+- **Kegagalan test milik saya (jujur):** duplikat import `PolishMode` (salah gabung); asersi seed store sinkron jalan sebelum re-render (ganti `findByText`); `it.each` non-retryable mula-mula menghitung `calls` yang tak pernah naik (ganti closure penghitung).
+- **Flake beban-paralel (pola terdokumentasi, bukan defect):** 1 test Firefox gagal `toHaveCount` 5 dtk saat 2 worker paralel, lolos terisolasi (8 dtk) — asersi pasca-retry diberi headroom 15 dtk karena backoff nyata ~1 dtk.
+- **Validasi di dalam attempt:** grounding/malformed dilempar provider di dalam `call()`, tapi karena non-retryable ia langsung keluar tanpa retry — kuota user aman (dikunci test `calls === 1`).
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · `check:boundaries` OK (230 file / 1024 specifier) · **unit 65 file / 570 test** (535 + 35 baru: 20 retry + 1 errors + 2 http + 4 orkestrator bullet + 4 orkestrator polish + 2 panel bullet + 2 panel polish) · build OK (chunk lazy `bullet-generator` 3,0 KB + `polish-text` 4,5 KB gzip, di luar JS awal) · `check:privacy` OK · `check:budget` OK (+5,2%/+9,5% hijau; sisa ruang ratchet jsGzip ±0,5 poin) · `test:e2e` AI **26/26** (ai-retry 3 + ai-bullets 4 + ai-polish 4 + ai-consent 2, × Chromium + Firefox, production build).

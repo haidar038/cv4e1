@@ -159,11 +159,15 @@ export function PolishSuggestionsPanel({
         ? pack.aiPolish.consentNote
         : polishErrorCode === 'provider-unavailable'
           ? pack.aiPolish.unconfiguredNote
-          : polishErrorCode !== null
-            ? pack.aiPolish.errorNote
-            : polishSource === 'static'
-              ? pack.aiPolish.staticNote
-              : pack.aiPolish.readyNote
+          : polishErrorCode === 'rate-limited'
+            ? pack.aiPolish.rateLimitedNote
+            : polishErrorCode === 'timeout'
+              ? pack.aiPolish.timeoutNote
+              : polishErrorCode !== null
+                ? pack.aiPolish.errorNote
+                : polishSource === 'static'
+                  ? pack.aiPolish.staticNote
+                  : pack.aiPolish.readyNote
 
   // Static fallback never rewrites (text is the input verbatim), so its
   // checklist is guidance to apply by hand — no Apply button. Only a live

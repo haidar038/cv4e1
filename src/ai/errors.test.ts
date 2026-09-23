@@ -60,4 +60,12 @@ describe('AIProviderError', () => {
     expect(error.message).toBe('grounding-violation')
     expect(error.details).toEqual(['angka "30%" tidak ada pada input'])
   })
+
+  it('defaults to no server wait hint and accepts one for rate-limited', () => {
+    expect(new AIProviderError('timeout').retryAfterMs).toBeUndefined()
+    const hinted = new AIProviderError('rate-limited', undefined, [], { retryAfterMs: 2000 })
+    expect(hinted.code).toBe('rate-limited')
+    expect(hinted.retryAfterMs).toBe(2000)
+    expect(hinted.retryable).toBe(true)
+  })
 })

@@ -19,14 +19,14 @@
 | Impor OCR | Entri manual | Jalur utama tetap berfungsi |
 
 ## 2. Kapan fallback aktif
-- [ ] Tidak ada API key terpasang
-- [ ] Offline
-- [ ] Rate limit tercapai
-- [ ] Permintaan timeout
-- [ ] Keluaran gagal validasi
-- [ ] Keluaran gagal pemeriksaan grounding
-- [ ] Pengguna menolak persetujuan
-- [ ] Penyedia tidak terjangkau
+- [x] Tidak ada API key terpasang
+- [x] Offline
+- [x] Rate limit tercapai (Task 21: 3 attempt dengan hormat `Retry-After` dulu, baru statis + nota kuota)
+- [x] Permintaan timeout (Task 21: 3 attempt dengan backoff dulu, baru statis + nota tunggu)
+- [x] Keluaran gagal validasi
+- [x] Keluaran gagal pemeriksaan grounding
+- [x] Pengguna menolak persetujuan
+- [x] Penyedia tidak terjangkau
 
 ## 3. Aturan UX
 - [ ] Fallback harus terasa seperti fitur, bukan hukuman
@@ -40,5 +40,5 @@
 - [ ] Kegagalan AI tidak boleh mengunci UI
 
 ## 5. Pengujian
-- [ ] Test untuk setiap pemicu fallback di §2
-- [ ] Test: draft tetap utuh setelah setiap jenis kegagalan
+- [x] Test untuk setiap pemicu fallback di §2 (Task 21 melengkapi pemicu terakhir: retry 429/timeout + nota per-kode; e2e `ai-retry.spec.ts`)
+- [x] Test: draft tetap utuh setelah setiap jenis kegagalan

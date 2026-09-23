@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { openTestDocument, resetFormStores, runAxe, teardownFormStores } from '../form/test-utils'
-import { clearBulletState } from '../store/ai-store'
+import { clearBulletState, resolveBulletRequest, startBulletRequest } from '../store/ai-store'
 import { addSectionItem } from '../store/actions'
 import { documentStore } from '../store/document-store'
 import { BulletSuggestionsPanel } from './BulletSuggestionsPanel'
@@ -50,6 +50,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await teardownFormStores()
+  vi.unstubAllGlobals()
   clearSessionCredentials()
   consentStore.setState({ grants: {} })
   clearBulletState()
@@ -116,6 +117,39 @@ describe('BulletSuggestionsPanel (Task 19, FR-401/AC-401-a/b)', () => {
         'Kolom ini baru dipakai setelah Anda menyimpan kunci AI — saran manual di bawah mengabaikannya.',
       ),
     ).toBeNull()
+  })
+
+  it('FR-408: persistent 429 retries the bounded attempts, then names the quota (Task 21)', async () => {
+    let calls = 0
+    // Retry-After: 0 keeps the bounded backoff instant in jsdom.
+    vi.stubGlobal('fetch', async () => {
+      calls += 1
+      return new Response('{}', { status: 429, headers: { 'Retry-After': '0' } })
+    })
+    setSessionCredentials('groq', { apiKey: 'gsk-test-key' })
+    consentStore.getState().grant('groq')
+    const user = userEvent.setup()
+    renderPanel()
+    const before = JSON.stringify(documentStore.getState().document)
+
+    await user.click(screen.getByRole('button', { name: 'Minta saran' }))
+    await screen.findByText(
+      'Batas pemakaian AI tercapai — menampilkan saran manual. Draft Anda tidak berubah; coba lagi nanti.',
+    )
+    // Bounded retry through the real stack: 1 initial + 2 retries, then static.
+    expect(calls).toBe(3)
+    expect(screen.getAllByRole('button', { name: /Terapkan Saran \d/ })).toHaveLength(3)
+    expect(JSON.stringify(documentStore.getState().document)).toBe(before)
+  })
+
+  it('FR-408: a timeout names the wait instead of the generic error (Task 21)', async () => {
+    renderPanel()
+    const scope = { section: 'experience', itemIndex: 0, position: 1, rawTask: RAW_TASK } as const
+    startBulletRequest(scope)
+    resolveBulletRequest({ suggestions: [], source: 'static', errorCode: 'timeout' }, scope)
+    await screen.findByText(
+      'AI tidak menjawab tepat waktu — menampilkan saran manual. Draft Anda tidak berubah.',
+    )
   })
 
   it('Escape requests close without applying anything', async () => {

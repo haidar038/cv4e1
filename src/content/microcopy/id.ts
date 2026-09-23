@@ -196,6 +196,10 @@ export interface MicrocopyPack {
     consentNote: string
     unconfiguredNote: string
     errorNote: string
+    /** FR-408 reason when the provider quota is exhausted (Task 21). */
+    rateLimitedNote: string
+    /** FR-408 reason when the provider stops answering (Task 21). */
+    timeoutNote: string
   }
   aiPolish: {
     /** Trigger, panel, and mode names — structural, kept for every locale. */
@@ -216,6 +220,10 @@ export interface MicrocopyPack {
     consentNote: string
     unconfiguredNote: string
     errorNote: string
+    /** FR-408 reason when the provider quota is exhausted (Task 21). */
+    rateLimitedNote: string
+    /** FR-408 reason when the provider stops answering (Task 21). */
+    timeoutNote: string
     emptyInputNote: string
     /** Static-fallback checklists per mode — blanked for non-id locales. */
     checklistId: readonly string[]
@@ -635,6 +643,10 @@ export const microcopyId: MicrocopyPack = {
     consentNote: 'Persetujuan ditolak — menampilkan saran manual. Tidak ada data yang dikirim.',
     unconfiguredNote: 'Belum ada kunci — menampilkan saran manual yang tetap bisa dipakai.',
     errorNote: 'AI tidak menjawab — menampilkan saran manual. Draft Anda tidak berubah.',
+    rateLimitedNote:
+      'Batas pemakaian AI tercapai — menampilkan saran manual. Draft Anda tidak berubah; coba lagi nanti.',
+    timeoutNote:
+      'AI tidak menjawab tepat waktu — menampilkan saran manual. Draft Anda tidak berubah.',
   },
   aiPolish: {
     triggerLabel: 'Poles teks dengan AI',
@@ -653,6 +665,10 @@ export const microcopyId: MicrocopyPack = {
     consentNote: 'Persetujuan ditolak — menampilkan panduan manual. Tidak ada data yang dikirim.',
     unconfiguredNote: 'Belum ada kunci — menampilkan panduan manual yang tetap bisa dipakai.',
     errorNote: 'AI tidak menjawab — menampilkan panduan manual. Draft Anda tidak berubah.',
+    rateLimitedNote:
+      'Batas pemakaian AI tercapai — menampilkan panduan manual. Draft Anda tidak berubah; coba lagi nanti.',
+    timeoutNote:
+      'AI tidak menjawab tepat waktu — menampilkan panduan manual. Draft Anda tidak berubah.',
     emptyInputNote: 'Tulis dulu teks pada field ini, lalu panduan akan muncul di sini.',
     checklistId: [
       'Awali dengan kata kerja aksi, misalnya "Mengelola" atau "Menyusun".',
@@ -883,6 +899,8 @@ export const microcopyStructural: MicrocopyPack = {
     consentNote: '',
     unconfiguredNote: '',
     errorNote: '',
+    rateLimitedNote: '',
+    timeoutNote: '',
     targetRoleOfflineNote: '',
   },
   aiPolish: {
@@ -894,6 +912,8 @@ export const microcopyStructural: MicrocopyPack = {
     consentNote: '',
     unconfiguredNote: '',
     errorNote: '',
+    rateLimitedNote: '',
+    timeoutNote: '',
     emptyInputNote: '',
     checklistId: [],
     avoidedId: [],
