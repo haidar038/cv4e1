@@ -28,10 +28,10 @@
 - [x] Fallback: Action Verbs Catalog + pola kalimat
 
 ### C2 — Polish *(Fase 2)*
-- [ ] Hanya memperbaiki: tata bahasa, kejelasan, panjang, konsistensi, kata kerja aksi
-- [ ] **Tidak boleh** menambah fakta, mengubah tanggal, atau menghapus informasi
-- [ ] Mode: Polish (ID), Polish (EN), Terjemahkan ke Inggris
-- [ ] Fallback: panduan statis, contoh frasa yang disarankan dan dihindari
+- [x] Hanya memperbaiki: tata bahasa, kejelasan, panjang, konsistensi, kata kerja aksi
+- [x] **Tidak boleh** menambah fakta, mengubah tanggal, atau menghapus informasi
+- [x] Mode: Polish (ID), Polish (EN), Terjemahkan ke Inggris
+- [x] Fallback: panduan statis, contoh frasa yang disarankan dan dihindari
 
 ### C3 — Penyesuaian dengan deskripsi lowongan *(Fase 3)*
 - [ ] Output: kata kunci yang ditemukan, kata kunci yang belum didukung data, section yang perlu diperkuat, pertanyaan klarifikasi

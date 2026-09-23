@@ -3,6 +3,7 @@ import type { ResumeBasics } from '../../../core/schema'
 import { updateBasics } from '../../store/actions'
 import { documentStore } from '../../store/document-store'
 import { useMicrocopy } from '../useMicrocopy'
+import { PolishTrigger } from '../../ai/PolishTrigger'
 import { FormField } from '../fields/FormField'
 import { LinkListEditor } from '../fields/LinkListEditor'
 import { PhotoUpload } from '../photo/PhotoUpload'
@@ -68,6 +69,14 @@ export function BasicsForm() {
         storeValue={basics.summary ?? ''}
         onCommit={(value) => updateBasics({ summary: value === '' ? undefined : value })}
       />
+      <div className="flex flex-wrap items-center gap-2">
+        <PolishTrigger
+          target={{ kind: 'summary' }}
+          label={pack.fields.summary.label}
+          text={basics.summary ?? ''}
+          onApply={(value) => updateBasics({ summary: value === '' ? undefined : value })}
+        />
+      </div>
       <LinkListEditor
         links={basics.links}
         onCommit={(links) => updateBasics({ links: links.length === 0 ? undefined : links })}

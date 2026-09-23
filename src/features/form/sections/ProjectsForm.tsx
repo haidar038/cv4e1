@@ -5,6 +5,7 @@ import { addSectionItem, removeSectionItem, updateSectionItem } from '../../stor
 import { useMicrocopy } from '../useMicrocopy'
 import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
 import { BulletGenerator } from '../../ai/BulletGenerator'
+import { PolishTrigger } from '../../ai/PolishTrigger'
 import { FormField } from '../fields/FormField'
 import { HighlightsEditor } from '../fields/HighlightsEditor'
 import { PartialDateField } from '../fields/PartialDateField'
@@ -117,6 +118,12 @@ function ProjectItemEditor({ index, item }: { index: number; item: ProjectItem }
               rawTask={item.highlights?.[position - 1] ?? ''}
               itemIndex={index}
               position={position}
+              onApply={replaceRow}
+            />
+            <PolishTrigger
+              target={{ kind: 'bullet', section: 'projects', itemIndex: index, position }}
+              label={`${pack.fields.highlights.label} ${position}`}
+              text={item.highlights?.[position - 1] ?? ''}
               onApply={replaceRow}
             />
           </>

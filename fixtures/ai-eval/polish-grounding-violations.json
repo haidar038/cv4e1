@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv4every1/fixtures/polish-grounding-violations.v1.json",
+  "title": "Polish grounding violations v1",
+  "description": "Permanent regression fixtures (evaluation-dataset.md §4): every grounding violation found becomes a case here. Each output MUST be rejected by validatePolishOutput with grounding-violation. Polish rewrites existing text (C2), so added facts are the strict class under test. Fake data only.",
+  "cases": [
+    {
+      "name": "added-number",
+      "mode": "id",
+      "text": "membantu acara kampus",
+      "output": {
+        "text": "Memimpin 50 panitia acara kampus.",
+        "changes": ["Menambahkan detail."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "added-company",
+      "mode": "id",
+      "text": "membantu menyusun laporan penjualan mingguan",
+      "output": {
+        "text": "Membantu menyusun laporan penjualan mingguan di PT Maju Jaya.",
+        "changes": ["Menambahkan nama perusahaan."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "changed-date",
+      "mode": "id",
+      "text": "magang sebagai staf administrasi pada 2023",
+      "output": {
+        "text": "Magang sebagai staf administrasi pada 2024.",
+        "changes": ["Memperbarui tahun."],
+        "warnings": []
+      }
+    },
+    {
+      "name": "added-entity-en",
+      "mode": "en",
+      "text": "help campus event",
+      "output": {
+        "text": "Led 50 committee members at the campus event.",
+        "changes": ["Added details."],
+        "warnings": []
+      }
+    }
+  ]
+}

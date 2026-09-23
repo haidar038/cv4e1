@@ -1,5 +1,5 @@
 import { createStore } from 'zustand/vanilla'
-import type { AIErrorCode, BulletSuggestion } from '../../ai'
+import type { AIErrorCode, BulletSuggestion, PolishSuggestion } from '../../ai'
 import type { BulletSectionKey } from '../ai/bullet-generator'
 
 /**
@@ -25,12 +25,30 @@ export interface BulletScope {
 
 export type BulletSource = 'ai' | 'static'
 
+/**
+ * Polish scope (Task 20, C2). One request, one target: either the summary
+ * field (`summary`) or a single bullet row (`section:item:position`). The
+ * source-text snapshot guards against stale responses like the bullet
+ * scope does.
+ */
+export interface PolishScope {
+  readonly target: string
+  readonly text: string
+}
+
+export type PolishStatus = 'idle' | 'loading' | 'ready'
+
 export interface AiState {
   readonly bulletScope: BulletScope | null
   readonly bulletStatus: BulletStatus
   readonly bulletSuggestions: readonly BulletSuggestion[]
   readonly bulletSource: BulletSource | null
   readonly bulletErrorCode: AIErrorCode | null
+  readonly polishScope: PolishScope | null
+  readonly polishStatus: PolishStatus
+  readonly polishSuggestion: PolishSuggestion | null
+  readonly polishSource: BulletSource | null
+  readonly polishErrorCode: AIErrorCode | null
 }
 
 const initialAiState: AiState = {
@@ -39,6 +57,11 @@ const initialAiState: AiState = {
   bulletSuggestions: [],
   bulletSource: null,
   bulletErrorCode: null,
+  polishScope: null,
+  polishStatus: 'idle',
+  polishSuggestion: null,
+  polishSource: null,
+  polishErrorCode: null,
 }
 
 export const aiStore = createStore<AiState>()(() => ({ ...initialAiState }))
@@ -82,4 +105,44 @@ export function resolveBulletRequest(outcome: BulletOutcome, scope: BulletScope)
 
 export function clearBulletState(): void {
   aiStore.setState({ ...initialAiState })
+}
+
+export function startPolishRequest(scope: PolishScope): void {
+  aiStore.setState({
+    polishScope: scope,
+    polishStatus: 'loading',
+    polishSuggestion: null,
+    polishSource: null,
+    polishErrorCode: null,
+  })
+}
+
+export interface PolishOutcome {
+  readonly suggestion: PolishSuggestion
+  readonly source: BulletSource
+  readonly errorCode: AIErrorCode | null
+}
+
+/** Records a result unless a newer request has superseded its scope. */
+export function resolvePolishRequest(outcome: PolishOutcome, scope: PolishScope): void {
+  const current = aiStore.getState().polishScope
+  if (current === null || current.target !== scope.target || current.text !== scope.text) {
+    return
+  }
+  aiStore.setState({
+    polishStatus: 'ready',
+    polishSuggestion: outcome.suggestion,
+    polishSource: outcome.source,
+    polishErrorCode: outcome.errorCode,
+  })
+}
+
+export function clearPolishState(): void {
+  aiStore.setState({
+    polishScope: null,
+    polishStatus: 'idle',
+    polishSuggestion: null,
+    polishSource: null,
+    polishErrorCode: null,
+  })
 }

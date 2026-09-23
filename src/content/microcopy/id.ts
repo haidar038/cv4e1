@@ -173,6 +173,8 @@ export interface MicrocopyPack {
     consequenceText: string
     /** DF-6 field list for the bullet capability (Task 19 refines per capability). */
     dataFieldsList: string
+    /** DF-6 field list for the polish capability (Task 20). */
+    dataFieldsListPolish: string
   }
   aiBullets: {
     /** Trigger and panel names — structural, kept for every locale. */
@@ -192,6 +194,34 @@ export interface MicrocopyPack {
     consentNote: string
     unconfiguredNote: string
     errorNote: string
+  }
+  aiPolish: {
+    /** Trigger, panel, and mode names — structural, kept for every locale. */
+    triggerLabel: string
+    panelTitle: string
+    modeLabel: string
+    modeIdLabel: string
+    modeEnLabel: string
+    modeTranslateLabel: string
+    generateAction: string
+    applyAction: string
+    closeAction: string
+    /** Guidance prose — blanked for non-id locales. */
+    hint: string
+    loadingNote: string
+    readyNote: string
+    staticNote: string
+    consentNote: string
+    unconfiguredNote: string
+    errorNote: string
+    emptyInputNote: string
+    /** Static-fallback checklists per mode — blanked for non-id locales. */
+    checklistId: readonly string[]
+    avoidedId: readonly string[]
+    checklistEn: readonly string[]
+    avoidedEn: readonly string[]
+    checklistTranslate: readonly string[]
+    avoidedTranslate: readonly string[]
   }
   preview: {
     /** Accessible name of the preview region (Task 10 gate; Task 12 reuses it). */
@@ -583,6 +613,7 @@ export const microcopyId: MicrocopyPack = {
     consequenceText:
       'Data di atas diproses oleh penyedia sesuai kebijakannya — kebijakan itu bisa berubah dan di luar kendali kami.',
     dataFieldsList: 'Deskripsi tugas mentah, konteks bagian, bahasa, fakta yang boleh dipakai',
+    dataFieldsListPolish: 'Teks yang dipilih dan mode poles (ID/EN/terjemahan)',
   },
   aiBullets: {
     triggerLabel: 'Saran bullet AI',
@@ -600,6 +631,55 @@ export const microcopyId: MicrocopyPack = {
     consentNote: 'Persetujuan ditolak — menampilkan saran manual. Tidak ada data yang dikirim.',
     unconfiguredNote: 'Belum ada kunci — menampilkan saran manual yang tetap bisa dipakai.',
     errorNote: 'AI tidak menjawab — menampilkan saran manual. Draft Anda tidak berubah.',
+  },
+  aiPolish: {
+    triggerLabel: 'Poles teks dengan AI',
+    panelTitle: 'Poles teks',
+    modeLabel: 'Mode',
+    modeIdLabel: 'Polish (ID)',
+    modeEnLabel: 'Polish (EN)',
+    modeTranslateLabel: 'Terjemahkan ke Inggris',
+    generateAction: 'Minta polesan',
+    applyAction: 'Terapkan',
+    closeAction: 'Tutup',
+    hint: 'Polesan hanya kandidat — tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    loadingNote: 'Memoles teks…',
+    readyNote: 'Polesan siap. Tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    staticNote: 'Menampilkan panduan manual yang tetap bisa dipakai.',
+    consentNote: 'Persetujuan ditolak — menampilkan panduan manual. Tidak ada data yang dikirim.',
+    unconfiguredNote: 'Belum ada kunci — menampilkan panduan manual yang tetap bisa dipakai.',
+    errorNote: 'AI tidak menjawab — menampilkan panduan manual. Draft Anda tidak berubah.',
+    emptyInputNote: 'Tulis dulu teks pada field ini, lalu panduan akan muncul di sini.',
+    checklistId: [
+      'Awali dengan kata kerja aksi, misalnya "Mengelola" atau "Menyusun".',
+      'Satu kalimat, satu gagasan — pangkas kata pengisi seperti "melakukan".',
+      'Pertahankan semua angka, nama, dan tanggal persis seperti semula.',
+      'Akhiri dengan tanda baca dan pastikan ejaan konsisten.',
+    ],
+    avoidedId: [
+      'Hindari "Bertanggung jawab atas…" — tulis aksinya, misalnya "Mengelola jadwal piket 30 anggota."',
+      'Hindari singkatan yang tidak umum tanpa kepanjangannya.',
+    ],
+    checklistEn: [
+      'Open with an action verb, e.g. "Managed" or "Compiled".',
+      'One sentence, one idea — cut filler words.',
+      'Keep every number, name, and date exactly as written.',
+      'Check verb tense consistency and final punctuation.',
+    ],
+    avoidedEn: [
+      'Avoid "Responsible for…" — write the action instead, e.g. "Managed a duty roster of 30 members."',
+      'Avoid uncommon abbreviations without their full form.',
+    ],
+    checklistTranslate: [
+      'Tulis kalimat pendek yang setara — satu kalimat sumber, satu kalimat Inggris.',
+      'Pertahankan angka, nama, dan tanggal persis seperti teks sumber.',
+      'Jangan menaikkan peran menjadi pengalaman profesional yang tidak diklaim.',
+      'Awali dengan kata kerja aksi Bahasa Inggris bila cocok.',
+    ],
+    avoidedTranslate: [
+      'Hindari menerjemahkan kata per kata — utamakan kalimat yang wajar.',
+      'Hindari menambah gelar atau jabatan yang tidak ada di teks sumber.',
+    ],
   },
   preview: {
     regionLabel: 'Pratinjau CV',
@@ -783,7 +863,13 @@ export const microcopyStructural: MicrocopyPack = {
     grantedNote: '',
     incompleteNote: '',
   },
-  aiConsent: { ...microcopyId.aiConsent, intro: '', consequenceText: '', dataFieldsList: '' },
+  aiConsent: {
+    ...microcopyId.aiConsent,
+    intro: '',
+    consequenceText: '',
+    dataFieldsList: '',
+    dataFieldsListPolish: '',
+  },
   aiBullets: {
     ...microcopyId.aiBullets,
     hint: '',
@@ -793,6 +879,23 @@ export const microcopyStructural: MicrocopyPack = {
     consentNote: '',
     unconfiguredNote: '',
     errorNote: '',
+  },
+  aiPolish: {
+    ...microcopyId.aiPolish,
+    hint: '',
+    loadingNote: '',
+    readyNote: '',
+    staticNote: '',
+    consentNote: '',
+    unconfiguredNote: '',
+    errorNote: '',
+    emptyInputNote: '',
+    checklistId: [],
+    avoidedId: [],
+    checklistEn: [],
+    avoidedEn: [],
+    checklistTranslate: [],
+    avoidedTranslate: [],
   },
   fields: {
     ...microcopyId.fields,

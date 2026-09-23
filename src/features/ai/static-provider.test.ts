@@ -119,12 +119,51 @@ describe('StaticSuggestionProvider.generateBullets', () => {
   })
 })
 
-describe('StaticSuggestionProvider unimplemented capabilities', () => {
-  it('rejects polish and tailoring with capability-not-implemented', async () => {
+describe('StaticSuggestionProvider polish fallback (Task 20, FR-403)', () => {
+  it('returns the input verbatim with a per-mode checklist and avoided phrases', async () => {
     const provider = new StaticSuggestionProvider()
-    await expect(
-      provider.polishText({ text: 'Contoh kalimat.', mode: 'id' }),
-    ).rejects.toMatchObject({ code: 'capability-not-implemented' })
+    const input = 'membantu menyusun laporan mingguan'
+    for (const mode of ['id', 'en', 'translate-en'] as const) {
+      const result = await provider.polishText({ text: input, mode })
+      // Grounded by construction: no rewrite offline, guidance only.
+      expect(result.text).toBe(input)
+      expect(result.changes.length).toBeGreaterThan(0)
+      expect(result.warnings.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('serves a distinct checklist per mode', async () => {
+    const provider = new StaticSuggestionProvider()
+    const text = 'membantu acara kampus'
+    const id = await provider.polishText({ text, mode: 'id' })
+    const en = await provider.polishText({ text, mode: 'en' })
+    const translate = await provider.polishText({ text, mode: 'translate-en' })
+    expect(id.changes).not.toEqual(en.changes)
+    expect(en.changes).not.toEqual(translate.changes)
+    expect(id.changes).not.toEqual(translate.changes)
+  })
+
+  it('returns empty text with the empty-input note for empty input', async () => {
+    const provider = new StaticSuggestionProvider()
+    const result = await provider.polishText({ text: '   ', mode: 'id' })
+    expect(result.text).toBe('')
+    expect(result.changes).toEqual([])
+    expect(result.warnings.length).toBeGreaterThan(0)
+  })
+
+  it('grounding invariant: static polish never invents numbers or entities', async () => {
+    const provider = new StaticSuggestionProvider()
+    const result = await provider.polishText({
+      text: 'Mengelola tim 5 orang selama 2 tahun.',
+      mode: 'id',
+    })
+    expect(result.text).toBe('Mengelola tim 5 orang selama 2 tahun.')
+  })
+})
+
+describe('StaticSuggestionProvider unimplemented capabilities', () => {
+  it('rejects tailoring with capability-not-implemented (Fase 3)', async () => {
+    const provider = new StaticSuggestionProvider()
     await expect(
       provider.tailorToJob({
         jobDescription: 'Contoh lowongan.',

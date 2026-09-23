@@ -131,6 +131,14 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   css/font datar; `transferGzip` 331,1 → 339,8 KB (+3,5% ✅). Baseline JSON **tidak** diubah.
   Kandidat penurun tetap sama (lazy-load seksi pengaturan + panel AI) — ditunda sadar ke
   Task 21 saat retry policy menambah permukaan AI terakhir.
+- **Task 20 (2026-09-24):** trigger + panel polish eager di ringkasan dan tiap baris bullet
+  (`PolishTrigger`, `PolishSuggestionsPanel`, slice polish `ai-store`, microcopy `aiPolish`
+  + `dataFieldsListPolish`, ikon Sparkle dipakai ulang), transport + prompt + validasi di
+  chunk lazy `polish-text` (11,4 KB / ~4,5 KB gzip, di luar JS awal — pola Task 19 ditiru):
+  `initialJsGzip` 206,6 → **208,2 KB** (+0,8% ✅, garis absolut 200 KB tetap dilewati —
+  utang advisory yang sama, bukan utang baru); `jsGzip` 217,7 → **224,5 KB** (+3,1% ✅,
+  sisa ruang ratchet ±1,1 poin — Task 21 wajib hemat); css/font datar;
+  `transferGzip` 339,8 → 346,8 KB (+2,1% ✅). Baseline JSON **tidak** diubah.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

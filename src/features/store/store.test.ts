@@ -10,7 +10,15 @@ import {
   type DraftRecord,
 } from '../../storage'
 import { exportResume } from '../../storage/export-import'
-import { aiStore, clearBulletState, resolveBulletRequest, startBulletRequest } from './ai-store'
+import {
+  aiStore,
+  clearBulletState,
+  clearPolishState,
+  resolveBulletRequest,
+  resolvePolishRequest,
+  startBulletRequest,
+  startPolishRequest,
+} from './ai-store'
 import {
   addSectionItem,
   createDraft,
@@ -491,7 +499,66 @@ describe('AI store (Task 19, FR-401)', () => {
       bulletSuggestions: [],
       bulletSource: null,
       bulletErrorCode: null,
+      polishScope: null,
+      polishStatus: 'idle',
+      polishSuggestion: null,
+      polishSource: null,
+      polishErrorCode: null,
     })
+  })
+})
+
+describe('AI store polish slice (Task 20, FR-401)', () => {
+  const scope = { target: 'experience:0:1', text: 'membantu acara kampus' }
+
+  beforeEach(() => {
+    clearPolishState()
+  })
+
+  it('starts empty and records a loading request', () => {
+    expect(aiStore.getState().polishStatus).toBe('idle')
+    startPolishRequest(scope)
+    expect(aiStore.getState().polishStatus).toBe('loading')
+    expect(aiStore.getState().polishScope).toEqual(scope)
+    expect(aiStore.getState().polishSuggestion).toBeNull()
+  })
+
+  it('resolves the outcome for the current scope only (stale responses dropped)', () => {
+    startPolishRequest(scope)
+    resolvePolishRequest(
+      {
+        suggestion: {
+          text: 'Membantu acara kampus.',
+          changes: ['Menambahkan tanda baca akhir.'],
+          warnings: [],
+        },
+        source: 'ai',
+        errorCode: null,
+      },
+      scope,
+    )
+    expect(aiStore.getState().polishStatus).toBe('ready')
+    expect(aiStore.getState().polishSuggestion?.text).toBe('Membantu acara kampus.')
+
+    // A late response for an older scope must not overwrite the current one.
+    startPolishRequest({ ...scope, text: 'teks baru' })
+    resolvePolishRequest(
+      {
+        suggestion: { text: 'Lama.', changes: [], warnings: [] },
+        source: 'ai',
+        errorCode: null,
+      },
+      scope,
+    )
+    expect(aiStore.getState().polishStatus).toBe('loading')
+  })
+
+  it('clears back to idle without touching the bullet slice', () => {
+    startPolishRequest(scope)
+    clearPolishState()
+    expect(aiStore.getState().polishStatus).toBe('idle')
+    expect(aiStore.getState().polishScope).toBeNull()
+    expect(aiStore.getState().bulletStatus).toBe('idle')
   })
 })
 

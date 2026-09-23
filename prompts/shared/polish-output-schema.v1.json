@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv4every1/output-schema/polish.v1.json",
+  "title": "PolishOutput v1",
+  "description": "Canonical output shape for the C2 polish operation (Task 20). Runtime validation is hand-written in src/ai/validation.ts (isPolishSuggestionJSON); this file is the versioned contract the prompt points at.",
+  "type": "object",
+  "required": ["text", "changes", "warnings"],
+  "properties": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "Polished text in the requested mode. Same facts as the input, never more, never fewer."
+    },
+    "changes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Human-readable list of what changed, shown as a preview before Apply."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Input facts left out or uncertain, or empty."
+    }
+  }
+}

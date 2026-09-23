@@ -76,9 +76,35 @@ export class StaticSuggestionProvider implements AIProvider {
     }))
   }
 
-  /** Static polish guidance arrives in Task 20. */
-  async polishText(_input: PolishInput): Promise<PolishSuggestion> {
-    throw new AIProviderError('capability-not-implemented')
+  /**
+   * Static polish guidance (Task 20, FR-403, ai-product-spec.md §C2).
+   *
+   * No model is available offline, so there is no automatic rewrite: the
+   * returned `text` is the input verbatim (grounded by construction — Apply
+   * is a harmless no-op), while `changes` carries a per-mode checklist the
+   * user applies by hand and `warnings` carries example phrases to avoid.
+   * Empty input yields empty text with the empty-input note as the warning,
+   * so the panel can show guidance instead of an Apply button.
+   */
+  async polishText(input: PolishInput): Promise<PolishSuggestion> {
+    const text = input.text.trim()
+    if (text === '') {
+      return { text: '', changes: [], warnings: [microcopyId.aiPolish.emptyInputNote] }
+    }
+    const pack = microcopyId.aiPolish
+    const checklist =
+      input.mode === 'en'
+        ? pack.checklistEn
+        : input.mode === 'translate-en'
+          ? pack.checklistTranslate
+          : pack.checklistId
+    const avoided =
+      input.mode === 'en'
+        ? pack.avoidedEn
+        : input.mode === 'translate-en'
+          ? pack.avoidedTranslate
+          : pack.avoidedId
+    return { text, changes: [...checklist], warnings: [...avoided] }
   }
 
   /** Job tailoring is Fase 3 (C3). */

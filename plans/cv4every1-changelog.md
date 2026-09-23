@@ -1249,3 +1249,33 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Batas token DF-6 terkunci (Q4/Q5 yang disetujui):** `targetRole` = input teks opsional per operasi di panel (bukan dari schema); `allowedFacts` = rawTask + targetRole; truncation `[dipotong]` di dalam span `[...]` sehingga tak dihitung pelanggaran grounding.
 
 **Verifikasi:** `typecheck` bersih · `check:boundaries` OK (220 file / 957 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **60 file / 486 test unit** (451 + 35 baru: 8 prompts + 15 orkestrator + 3 ai-store + 5 panel + 5 eval − 1 inert) · build OK (chunk lazy `bullet-generator` ~3,5 KB gzip di luar JS awal) · `check:privacy` OK · `check:budget` OK (ratchet +4,1%/+5,6% semua hijau; `initialJsGzip` 206,6 KB — utang advisory yang sama, terdokumentasi di performance-budget) · `test:e2e` **66 lulus + 2 skip kapabilitas** (Chromium + Firefox; 4 test baru × 2 browser; skip `page.pdf` Firefox utuh).
+
+### Task 20 -- Polish C2 + prompt berversi ID/EN + panel pratinjau `changes` + Apply
+**Requirement:** FR-401 (AC-401-a/b), FR-404 (AC-404-a), FR-405 (AC-405-a), FR-403 (AC-403-a), FR-402/FR-407/FR-408; tanpa perubahan `ResumeDocument`
+**Status: SELESAI (2026-09-24).** Kapabilitas C2 terkabel penuh: prompt berversi disuntikkan sebagai `systemPrompt` per mode, orkestrator DF-6 memanggil provider lalu selalu jatuh ke panduan statis saat gagal, kandidat hidup di slice polish `ai-store` dan masuk dokumen hanya via Apply eksplisit, trigger inline di ringkasan + tiap baris bullet memakai consent gate yang sudah ada.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `prompts/id/polish.v1.md`, `prompts/en/polish.v1.md` (+`shared/polish-output-schema.v1.json`) | **Baru.** System prompt C2 berversi: tujuan, input/tipe (`text` + `mode`), schema ref, grounding mirror, contoh valid + tidak valid dua arah (fakta-baru DAN fakta-hilang — C2-strict), batas token (input 2000 char, output 800 token), fallback caller-side, changelog versi |
+| `src/features/ai/polish-prompts.ts` (+test, 9 test) | **Baru.** Loader prompt (single import point, `?raw`) + budget token + `truncatePolishText`; ID untuk mode `id`, EN untuk `en`/`translate-en`; drift guard mirror-vs-kanonik; tanpa inline prompt di komponen |
+| `src/features/ai/polish-text.ts` (+test, 15 test) | **Baru.** Orkestrator: `buildPolishInput` DF-6 allowlist (teks terpilih + mode saja) → pilih provider vault (Groq diutamakan) → consent fail-closed → panggil → fallback statis tiap gagal; draft tak pernah disentuh |
+| `src/features/ai/static-provider.ts` (+test, 4 test) | **Diisi.** `polishText` statis: teks = input verbatim (tanpa tulis-ulang offline) + checklist per mode di `changes` + frasa dihindari di `warnings`; kosong → nota input-kosong |
+| `src/features/store/ai-store.ts` (+test di `store.test.ts`, 3 test) | **Aditif.** Slice polish terpisah (`polishScope`/`Status`/`Suggestion`/`Source`/`ErrorCode`, stale-scope guard, `clearPolishState`) — slice bullet tak tersentuh |
+| `src/features/ai/PolishSuggestionsPanel.tsx` + `PolishTrigger.tsx` (+dom test, 7 test, axe) | **Baru.** Trigger inline (ikon Sparkle, Collapsible) + panel: radio mode (default ID), pratinjau `changes`/`warnings`, Apply hanya untuk kandidat AI (statis = panduan tanpa Apply), ConsentDialog reuse; `'use no memo'` + baca store/ref saat event (kelas insiden Task 18) |
+| `src/features/form/sections/ExperienceForm.tsx`, `ProjectsForm.tsx` | Aditif: trigger polish di slot tiap baris (Organizations otomatis via `ExperienceItemEditor`) |
+| `src/features/form/sections/BasicsForm.tsx` | Aditif: trigger polish di bawah field ringkasan (`updateBasics` sebagai Apply) |
+| `src/content/microcopy/id.ts` | Aditif: grup `aiPolish` + `dataFieldsListPolish` di `aiConsent` + blanking FR-204; tersapu frasa terlarang otomatis |
+| `fixtures/ai-eval/polish-grounding-violations.json` (+test, 5 test) | **Baru.** 4 fixture pelanggaran permanen (angka-baru, perusahaan-baru, tanggal-berubah, entitas-EN) — set hanya bertambah |
+| `e2e/ai-polish.spec.ts` | **Baru.** 4 test production build: jalur AI (consent gate + Apply), fallback tanpa kunci (tanpa Apply), tolak consent = 0 request, keyboard Enter/Escape |
+| Docs | roadmap Fase 2 "Polish (ID/EN)" → [x]; ai-product-spec C2 → [x]; performance-budget entri Task 20 |
+
+**Keputusan implementasi:**
+
+- **Statis tanpa Apply (temuan desain, bukan bug):** fallback polish tidak menulis ulang — `text` = input verbatim sehingga Apply adalah no-op. Panel statis menampilkan checklist + frasa dihindari TANPA tombol Apply; kunci sukses-vs-fallback e2e adalah ada/tidaknya Apply (preseden konvensi §12 kickoff).
+- **Validasi tak berubah:** `validatePolishOutput` sudah meng-ground `text` ke teks sumber (Task 17) — fakta *hilang* tak terdeteksi containment check, sehingga ia tetap aturan prompt-level (`warnings`) + protokol eval manual, didokumentasikan di header test fixture.
+- **Kegagalan test milik saya (jujur):** `getByLabel('Ringkasan')` cocok trigger + textarea di e2e (ganti `getByRole('textbox')`); asersi mode via substring gagal karena escaping JSON (ganti parse payload); status tanpa kunci adalah `unconfiguredNote` FR-408 bukan `staticNote`.
+- **Batas token DF-6 (keputusan kickoff yang disetujui):** samakan bullet — input 2000 char, output 800 token, truncasi `… [dipotong]`; payload allowlist = teks + mode.
+
+**Verifikasi:** `typecheck` bersih · `check:boundaries` OK (228 file / 1017 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **64 file / 529 test unit** (486 + 43 baru: 9 prompts + 15 orkestrator + 3 ai-store + 7 panel + 5 eval + 4 statis) · build OK (chunk lazy `polish-text` ~4,5 KB gzip di luar JS awal) · `check:privacy` OK · `check:budget` OK (ratchet +4,9%/+8,9% semua hijau; `initialJsGzip` 208,2 KB — utang advisory yang sama, terdokumentasi di performance-budget; sisa ruang ratchet jsGzip ±1,1 poin) · `test:e2e` **8/8 polish lulus** (Chromium + Firefox, 4 test × 2 browser).
+
+**Temuan di luar scope (dilaporkan, tidak diperbaiki di task ini):** 12 kegagalan `color-contrast` e2e (a11y 10 + ats-print 2) pra-ada di tree bersih — penyebab terbukti restyle `StorageNotice` maintainer (`99bbf33`, token `text-info`/`bg-info/10`), BUKAN Task 20 (probe axe: satu-satunya pelanggar adalah teks StorageNotice; trigger polish nol pelanggaran). Perlu keputusan maintainer: perbaiki token vs toleransi. Flake beban-paralel sesekali (1 test/run berbeda, lulus saat diisolasi) — pola yang sudah didokumentasikan.
