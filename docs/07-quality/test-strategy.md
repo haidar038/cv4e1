@@ -123,3 +123,20 @@ serta CI — tidak ada test yang di-skip (`AGENTS.md` §8).
   Insiden Task 18 (`AiSettings`: handler save membaca state basi di build produksi, hijau di jsdom)
   hanya tertangkap e2e pada production build. Preseden perbaikan: `'use no memo'` per file/komponen
   dengan alasan terdokumentasi; e2e build produksi adalah gerbang untuk kelas bug ini.
+- **Spike F1 (2026-09-23): status `'use no memo'` setelah bundling.** String direktif tidak ditemukan
+  di `dist/assets/*.js` mana pun (grep 0 hasil) — rolldown menghapusnya dari output, sesuai warning
+  `MODULE_LEVEL_DIRECTIVE` saat build. Interpretasi jujur: direktif dikonsumsi saat transform babel
+  (pra-bundle), sehingga efek opt-out kemungkinan sudah terjadi sebelum direktif dibuang; tetapi ini
+  tidak dapat dibuktikan dari artefak akhir. **Keputusan: direktif bukan pertahanan yang diandalkan.**
+  Aturan wajib penggantinya untuk setiap UI stateful baru: handler async/event harus membaca nilai
+  **saat event** — via ref yang ditulis di event-time, atau baca store modul langsung — bukan dari
+  prop/state tangkapan render. Preseden: `BulletSuggestionsPanel` (Task 19, kasus jalur AI 0 request
+  di production) membaca teks baris dari DocumentStore dan `targetRole`/consent dari ref.
+
+## 8. Konvensi asersi e2e (temuan F2, 2026-09-23)
+
+Bila jalur sukses dan jalur fallback merender UI yang mirip, asersi visibilitas semata bisa lolos
+dari hasil yang salah — preseden: `toBeVisible` pada saran lolos dari fallback statis pra-grant
+sebelum retry pasca-grant selesai. Aturannya: **asersi harus mengunci state pasca-operasi** dengan
+ciri yang hanya dimiliki hasil yang benar — jumlah (mock AI = 2 saran vs statis = 3), nilai teks
+persis dari mock yang di-grounding, atau counter route — bukan sekadar "ada saran terlihat".
