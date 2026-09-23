@@ -46,6 +46,14 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
     pattern: /\bsk-ant-[A-Za-z0-9-]{20,}\b/,
   },
   {
+    // The provider used by default in Phase 2 (ADR-0006). Without this pattern
+    // a bundled Groq key would only be caught by the generic secret-assignment
+    // rule, which a minifier can defeat by inlining the literal.
+    id: 'groq-key',
+    description: 'Groq API key (gsk_…)',
+    pattern: /\bgsk_[A-Za-z0-9]{20,}\b/,
+  },
+  {
     id: 'google-api-key',
     description: 'Google-style API key (AIza…)',
     pattern: /\bAIza[0-9A-Za-z_-]{35}\b/,

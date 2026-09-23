@@ -1209,3 +1209,16 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Harness:** webServer e2e timeout 120 dtk saat mesin berat -- build manual + preview persisten + reuseExistingServer sebagai pola kerja.
 
 **Verifikasi:** `typecheck` bersih · `check:boundaries` OK (212 file / 897 specifier) · lint 0 error (24 warning pre-existing, nol dari file baru) · format OK · **56 file / 451 test unit** · build OK · `check:privacy` OK · `check:budget` OK (ratchet +1,4% semua hijau; `initialJsGzip` 201,4 KB melewati garis absolut 200 KB — utang advisory baru, terdokumentasi di performance-budget) · `test:e2e` **58 lulus + 2 skip kapabilitas** (Chromium + Firefox; skip `page.pdf` Firefox utuh). +1,4% JS awal berasal dari seksi pengaturan eager + microcopy; modul `src/ai` (provider + validasi) belum diimpor App sehingga siap lazy penuh di Task 19. Matrix FR-401..408/NFR-004 tetap Fase 2: AC-402-a terbukti di gate + browser, pengiriman nyata (Task 19) belum ada sehingga belum diklaim.
+
+### Housekeeping -- Gerbang NFR-006 mengenali kunci Groq + koreksi indeks ADR
+**Requirement:** NFR-006 (`check:privacy`); tanpa perubahan `ResumeDocument`
+**Status: SELESAI (2026-09-23).** Celah ditemukan saat meninjau ulang kebijakan key AI (BYO-key vs kunci default): prefiks `gsk_` (kunci Groq) tidak ada di `SECRET_PATTERNS`, sehingga kunci Groq di bundel hanya bergantung pada pola generik `secret-assignment` — yang bisa dilewati minifier dengan meng-inline literal tanpa nama variabel sensitif. Kini kunci Groq tertangkap pola khusus, sehingga aturan "tanpa kunci di bundel" (C-T2) dijaga mesin, bukan disiplin.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `scripts/privacy-rules.ts` | Aditif: pola `groq-key` (`\bgsk_[A-Za-z0-9]{20,}\b`) setelah blok anthropic |
+| `scripts/privacy-rules.test.ts` | Kasus `gsk_…` ditambahkan ke test format kredensial + `'groq-key'` di daftar id |
+| `docs/06-security/privacy-and-data-handling.md` §5a | Daftar pola yang dijaga `check:privacy` diperbarui |
+| `docs/adr/README.md` | Drift: status ADR-0006 → Accepted (Opsi 4, 2026-09-23); baris ADR-0007 ditambahkan; kandidat "Pipeline PDF" dihapus (sudah diputuskan di ADR-0007) |
+
+**Verifikasi:** `scripts/privacy-rules.test.ts` 13/13 hijau · `typecheck` bersih · lint 0 error (24 warning pre-existing, tidak bertambah) · `format:check` OK · `check:privacy` penuh OK pada `dist/` yang ada (nol positif palsu dari pola baru).

@@ -18,13 +18,13 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | [0003](0003-json-as-portable-format.md) | JSON sebagai format portabel | Accepted |
 | [0004](0004-two-rendering-engines.md) | Dua renderer dari satu model kanonik | Accepted |
 | [0005](0005-ai-as-optional-capability.md) | AI sebagai kapabilitas opsional | Accepted |
-| [0006](0006-byo-key-or-server-proxy.md) | BYO-key versus proxy server | **Proposed** |
+| [0006](0006-byo-key-or-server-proxy.md) | BYO-key versus proxy server | Accepted (Opsi 4, 2026-09-23) |
+| [0007](0007-pdf-export-pipeline.md) | Pipeline ekspor PDF untuk mode ATS dan Creative | Accepted (2026-09-20) |
 
 ## Kandidat ADR berikutnya
 
 | Topik | Pemicu |
 | :-- | :-- |
-| Pipeline PDF (cetak versus renderer terprogram) | Setelah spike S1 — **prioritas tertinggi** |
 | Font bundel versus font sistem | Sebelum Fase 1 |
 | Analytics atau tanpa analytics | Sebelum rilis publik (usulan: tanpa) |
 | Lisensi proyek | Sebelum rilis publik (pertanyaan terbuka Q1) |

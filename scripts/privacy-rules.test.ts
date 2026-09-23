@@ -14,6 +14,7 @@ describe('findSecretViolations (NFR-006)', () => {
       [
         'const key = "sk-proj-abcdefghij0123456789"',
         'const at = "sk-ant-api03-abcdefghij0123456789"',
+        'const q = "gsk_abcdefghijklmnopqrstuvwx0123456789"',
         'const g = "AIzaSyA1234567890abcdefghijklmnopqrstuv"',
         'const t = "ghp_abcdefghijklmnopqrstuvwx0123456789ABCD"',
         'const s = "xoxb-123456789012-abcdefghijklmnop"',
@@ -26,6 +27,7 @@ describe('findSecretViolations (NFR-006)', () => {
       expect.arrayContaining([
         'openai-key',
         'anthropic-key',
+        'groq-key',
         'google-api-key',
         'github-token',
         'slack-token',
