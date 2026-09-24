@@ -6,8 +6,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | Draft v0.1 |
-| Last updated | 2026-09-15 |
+| Status | Draft v0.2 |
+| Last updated | 2026-09-23 |
 | Applies to | All AI agents and all contributors |
 | Authority | This file is subordinate to `docs/00-project-context/vision.md`. If they conflict, vision.md wins and this file is a bug. |
 
@@ -356,3 +356,33 @@ cv4every1/
 ```
 
 > The `src/` layout is proposed, not yet fixed. Confirm against `docs/03-architecture/architecture-overview.md` before relying on it.
+
+---
+
+## 16. Agent report format
+
+When reporting task completion to the user, use this two-layer format. Report body is in Bahasa Indonesia; this specification stays in English per §12.
+
+1. **Separate summary from log.** Start with `Ringkasan` (one short paragraph: status + what changed). Put raw output (git log, test output, build stats) in a fenced `code block`, never mixed into prose.
+2. **Use a table for verification.** Test counts, build status, and file changes go in a Markdown table with columns `Komponen | Hasil | Keterangan`. Do not merge multiple metrics into one dense bullet. Keep prose scannable: one fact per line, no telegraphic terminal-log style.
+3. **Separate decisions.** If user input is needed, add a `Keputusan Diperlukan` section with only the action points, each as one short option. If nothing is needed, omit the section.
+
+Template:
+
+````markdown
+## Ringkasan
+<status: Selesai / Gagal> — <one sentence>
+
+## Verifikasi
+| Komponen | Hasil | Keterangan |
+| :-- | :-- | :-- |
+| <unit / build / e2e / DoD> | <pass / fail> | <one short note> |
+
+## Keputusan Diperlukan
+- <action point, only if needed>
+
+## Detail
+```text
+<raw log here>
+```
+````
