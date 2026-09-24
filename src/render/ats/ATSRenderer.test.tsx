@@ -136,6 +136,10 @@ describe('ATSRenderer stylesheet gates (a template cannot override mode rules, F
     expect(css).toMatch(/break-inside\s*:\s*avoid/i)
     expect(css).toMatch(/@media\s+print/i)
   })
+
+  it('restores disc markers on item lists (preview bullets stay visible)', () => {
+    expect(css).toMatch(/\.cv-ats-item\s+ul\s*\{[^}]*list-style-type\s*:\s*disc/i)
+  })
 })
 
 describe('ATSRenderer markup baselines (regresi visual — committed snapshots)', () => {

@@ -145,6 +145,8 @@
 .item ul {
   margin: 3pt 0 0;
   padding-left: 14pt;
+  /* Same preflight reset as the ATS renderer — restore the disc marker. */
+  list-style-type: disc;
 }
 
 .item li {

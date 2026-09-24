@@ -12,10 +12,13 @@ import {
 import { exportResume } from '../../storage/export-import'
 import {
   aiStore,
+  clearAchievementState,
   clearBulletState,
   clearPolishState,
+  resolveAchievementRequest,
   resolveBulletRequest,
   resolvePolishRequest,
+  startAchievementRequest,
   startBulletRequest,
   startPolishRequest,
 } from './ai-store'
@@ -504,6 +507,11 @@ describe('AI store (Task 19, FR-401)', () => {
       polishSuggestion: null,
       polishSource: null,
       polishErrorCode: null,
+      achievementScope: null,
+      achievementStatus: 'idle',
+      achievementSuggestions: [],
+      achievementSource: null,
+      achievementErrorCode: null,
     })
   })
 })
@@ -559,6 +567,62 @@ describe('AI store polish slice (Task 20, FR-401)', () => {
     expect(aiStore.getState().polishStatus).toBe('idle')
     expect(aiStore.getState().polishScope).toBeNull()
     expect(aiStore.getState().bulletStatus).toBe('idle')
+  })
+})
+
+describe('AI store achievement slice (unified flow, FR-401)', () => {
+  const scope = {
+    section: 'experience' as const,
+    itemIndex: 0,
+    description: 'membuat PRD dan SRS',
+  }
+
+  beforeEach(() => {
+    clearAchievementState()
+  })
+
+  it('starts empty and records a loading request', () => {
+    expect(aiStore.getState().achievementStatus).toBe('idle')
+    startAchievementRequest(scope)
+    expect(aiStore.getState().achievementStatus).toBe('loading')
+    expect(aiStore.getState().achievementScope).toEqual(scope)
+    expect(aiStore.getState().achievementSuggestions).toEqual([])
+  })
+
+  it('resolves the outcome for the current scope only (stale responses dropped)', () => {
+    startAchievementRequest(scope)
+    resolveAchievementRequest(
+      {
+        suggestions: [
+          {
+            text: 'Menyusun PRD dan SRS.',
+            actionVerb: 'Menyusun',
+            usesPlaceholder: false,
+            rationale: 'Merumuskan dokumentasi.',
+            warnings: [],
+          },
+        ],
+        source: 'ai',
+        errorCode: null,
+      },
+      scope,
+    )
+    expect(aiStore.getState().achievementStatus).toBe('ready')
+    expect(aiStore.getState().achievementSuggestions).toHaveLength(1)
+
+    // A late response for an older scope must not overwrite the current one.
+    startAchievementRequest({ ...scope, description: 'deskripsi baru' })
+    resolveAchievementRequest({ suggestions: [], source: 'ai', errorCode: null }, scope)
+    expect(aiStore.getState().achievementStatus).toBe('loading')
+  })
+
+  it('clears back to idle without touching the bullet and polish slices', () => {
+    startAchievementRequest(scope)
+    clearAchievementState()
+    expect(aiStore.getState().achievementStatus).toBe('idle')
+    expect(aiStore.getState().achievementScope).toBeNull()
+    expect(aiStore.getState().bulletStatus).toBe('idle')
+    expect(aiStore.getState().polishStatus).toBe('idle')
   })
 })
 

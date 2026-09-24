@@ -1,5 +1,6 @@
 import { createStore } from 'zustand/vanilla'
 import type { AIErrorCode, BulletSuggestion, PolishSuggestion } from '../../ai'
+import type { AchievementSectionKey } from '../ai/achievement-generator'
 import type { BulletSectionKey } from '../ai/bullet-generator'
 
 /**
@@ -38,6 +39,19 @@ export interface PolishScope {
 
 export type PolishStatus = 'idle' | 'loading' | 'ready'
 
+/**
+ * Achievement scope (unified flow, C1b). One request per item: the section
+ * plus item index locate the owner, and the description snapshot guards
+ * against stale responses like the bullet scope does.
+ */
+export interface AchievementScope {
+  readonly section: AchievementSectionKey
+  readonly itemIndex: number
+  readonly description: string
+}
+
+export type AchievementStatus = 'idle' | 'loading' | 'ready'
+
 export interface AiState {
   readonly bulletScope: BulletScope | null
   readonly bulletStatus: BulletStatus
@@ -49,6 +63,11 @@ export interface AiState {
   readonly polishSuggestion: PolishSuggestion | null
   readonly polishSource: BulletSource | null
   readonly polishErrorCode: AIErrorCode | null
+  readonly achievementScope: AchievementScope | null
+  readonly achievementStatus: AchievementStatus
+  readonly achievementSuggestions: readonly BulletSuggestion[]
+  readonly achievementSource: BulletSource | null
+  readonly achievementErrorCode: AIErrorCode | null
 }
 
 const initialAiState: AiState = {
@@ -62,6 +81,11 @@ const initialAiState: AiState = {
   polishSuggestion: null,
   polishSource: null,
   polishErrorCode: null,
+  achievementScope: null,
+  achievementStatus: 'idle',
+  achievementSuggestions: [],
+  achievementSource: null,
+  achievementErrorCode: null,
 }
 
 export const aiStore = createStore<AiState>()(() => ({ ...initialAiState }))
@@ -144,5 +168,54 @@ export function clearPolishState(): void {
     polishSuggestion: null,
     polishSource: null,
     polishErrorCode: null,
+  })
+}
+
+export function startAchievementRequest(scope: AchievementScope): void {
+  aiStore.setState({
+    achievementScope: scope,
+    achievementStatus: 'loading',
+    achievementSuggestions: [],
+    achievementSource: null,
+    achievementErrorCode: null,
+  })
+}
+
+export interface AchievementOutcome {
+  readonly suggestions: readonly BulletSuggestion[]
+  readonly source: BulletSource
+  readonly errorCode: AIErrorCode | null
+}
+
+function sameAchievementScope(left: AchievementScope, right: AchievementScope): boolean {
+  return (
+    left.section === right.section &&
+    left.itemIndex === right.itemIndex &&
+    left.description === right.description
+  )
+}
+
+/** Records a result unless a newer request has superseded its scope. */
+export function resolveAchievementRequest(
+  outcome: AchievementOutcome,
+  scope: AchievementScope,
+): void {
+  const current = aiStore.getState().achievementScope
+  if (current === null || !sameAchievementScope(current, scope)) return
+  aiStore.setState({
+    achievementStatus: 'ready',
+    achievementSuggestions: outcome.suggestions,
+    achievementSource: outcome.source,
+    achievementErrorCode: outcome.errorCode,
+  })
+}
+
+export function clearAchievementState(): void {
+  aiStore.setState({
+    achievementScope: null,
+    achievementStatus: 'idle',
+    achievementSuggestions: [],
+    achievementSource: null,
+    achievementErrorCode: null,
   })
 }

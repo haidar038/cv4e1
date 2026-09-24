@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { addSectionItem, removeSectionItem, updateSectionItem } from '../../store/actions'
 import { useMicrocopy } from '../useMicrocopy'
 import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
+import { AchievementTrigger } from '../../ai/AchievementTrigger'
 import { BulletGenerator } from '../../ai/BulletGenerator'
 import { PolishTrigger } from '../../ai/PolishTrigger'
 import { FormField } from '../fields/FormField'
@@ -147,6 +148,12 @@ export function ExperienceItemEditor({
             />
           </>
         )}
+      />
+      <AchievementTrigger
+        section={section}
+        sectionLabel={sectionLabel}
+        itemIndex={index}
+        onCommitHighlights={(highlights) => commit({ highlights })}
       />
     </fieldset>
   )

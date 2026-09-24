@@ -68,13 +68,29 @@ export class StaticSuggestionProvider implements AIProvider {
     const raw = input.rawTask.trim()
     if (raw === '') return []
 
-    // Never prefix a verb the raw task already opens with ("Mengelola
-    // Mengelola ..."): the next eligible catalog verbs fill the slots, so
-    // the count stays stable while the duplication disappears.
+    // The raw task already opens with a catalog verb ("Membuat PRD ..."):
+    // prefixing another one stacks verbs ("Mengelola Membuat ..."). Return
+    // the raw task as-is with the matched verb as its label. This covers the
+    // old same-verb guard, so no separate prefix filter is needed below.
+    // Excluded starters included: labeling the user's own verb is truthful,
+    // only prefixing it was unnatural.
     const leading = firstWord(raw)
-    const verbs = getVerbsForSection(input.section)
+    const sectionVerbs = getVerbsForSection(input.section)
+    const leadingEntry = sectionVerbs.find((entry) => entry.verb.toLowerCase() === leading)
+    if (leadingEntry !== undefined) {
+      return [
+        {
+          text: withPlaceholder(raw),
+          actionVerb: leadingEntry.verb,
+          usesPlaceholder: true,
+          rationale: microcopyId.aiStatic.rationaleTemplate.replace('{verb}', leadingEntry.verb),
+          warnings: [],
+        },
+      ]
+    }
+
+    const verbs = sectionVerbs
       .filter((entry) => !EXCLUDED_STARTER_VERBS.includes(entry.verb))
-      .filter((entry) => entry.verb.toLowerCase() !== leading)
       .slice(0, MAX_STATIC_SUGGESTIONS)
     if (verbs.length === 0) {
       return [

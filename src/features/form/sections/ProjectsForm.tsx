@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { addSectionItem, removeSectionItem, updateSectionItem } from '../../store/actions'
 import { useMicrocopy } from '../useMicrocopy'
 import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
+import { AchievementTrigger } from '../../ai/AchievementTrigger'
 import { BulletGenerator } from '../../ai/BulletGenerator'
 import { PolishTrigger } from '../../ai/PolishTrigger'
 import { FormField } from '../fields/FormField'
@@ -128,6 +129,12 @@ function ProjectItemEditor({ index, item }: { index: number; item: ProjectItem }
             />
           </>
         )}
+      />
+      <AchievementTrigger
+        section="projects"
+        sectionLabel={pack.sections.projects}
+        itemIndex={index}
+        onCommitHighlights={(highlights) => commit({ highlights })}
       />
     </fieldset>
   )

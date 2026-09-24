@@ -33,6 +33,15 @@
 - [x] Mode: Polish (ID), Polish (EN), Terjemahkan ke Inggris
 - [x] Fallback: panduan statis, contoh frasa yang disarankan dan dihindari
 
+### C1b — Achievement bullets, aliran terpadu *(review maintainer, di luar Fase 2)*
+- [x] Input: deskripsi pencapaian bebas 1–2 paragraf (bukan satu baris tugas)
+- [x] Output: 1–3 bullet poles (maks 3 di prompt dan di kode), tiap bullet kalimat runut tanpa verb-stacking
+- [x] Satu aksi: textarea → generate → Apply per-item menempel sebagai baris baru; trigger per-baris C1/C2 tidak tersentuh (aditif)
+- [x] Banner sesi "hasil AI, tinjau kembali" — tidak disimpan (tanpa perubahan schema)
+- [x] Tooltip trigger: hover + fokus keyboard + long-press 500 ms mobile
+- [x] Fallback: StaticSuggestionProvider yang sama (tanpa logika statis baru); dedup verb katalog apa pun ("Mengelola Membuat ..." hilang)
+- [x] Prompt: `prompts/id/achievement-bullets.v1.md` (append-only); orkestrator memakai kontrak `generateBullets` yang sama tanpa perubahan interface
+
 ### C3 — Penyesuaian dengan deskripsi lowongan *(Fase 3)*
 - [ ] Output: kata kunci yang ditemukan, kata kunci yang belum didukung data, section yang perlu diperkuat, pertanyaan klarifikasi
 - [ ] **Tidak pernah mengklaim skill baru untuk pengguna**

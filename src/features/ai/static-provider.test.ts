@@ -118,16 +118,34 @@ describe('StaticSuggestionProvider.generateBullets', () => {
     }
   })
 
-  it('never prefixes a verb the raw task already opens with', async () => {
+  it('returns the raw task unprefixed when it already opens with a catalog verb', async () => {
     const provider = new StaticSuggestionProvider()
-    const raw = 'Mengelola tim kecil dan menyusun jadwal'
+    // The maintainer's screenshot case: prefixing stacked a second verb.
+    const raw = 'Membuat PRD, SRS, dan PDD.'
     const suggestions = await provider.generateBullets({ ...input, rawTask: raw })
-    expect(suggestions).toHaveLength(3)
-    for (const suggestion of suggestions) {
-      expect(suggestion.text.toLowerCase()).not.toMatch(/^mengelola mengelola\b/)
-      expect(suggestion.actionVerb.toLowerCase()).not.toBe('mengelola')
-      expect(suggestion.text).toContain(raw)
-    }
+    expect(suggestions).toHaveLength(1)
+    const [suggestion] = suggestions
+    expect(suggestion?.text).toBe('Membuat PRD, SRS, dan PDD. [dampak yang dapat diukur]')
+    expect(suggestion?.text.toLowerCase()).not.toMatch(/^(mengelola|membuat) membuat\b/)
+    expect(suggestion?.actionVerb).toBe('Membuat')
+    expect(suggestion?.rationale).toContain('Membuat')
+    expect(suggestion?.usesPlaceholder).toBe(true)
+    expect(suggestion?.warnings).toEqual([])
+  })
+
+  it('matches the leading verb case-insensitively and labels excluded starters truthfully', async () => {
+    const provider = new StaticSuggestionProvider()
+    const lower = await provider.generateBullets({ ...input, rawTask: 'membuat PRD.' })
+    expect(lower).toHaveLength(1)
+    expect(lower[0]?.actionVerb).toBe('Membuat')
+    expect(lower[0]?.text).toBe('membuat PRD. [dampak yang dapat diukur]')
+
+    // Labeling the user's own verb is truthful — only prefixing it was
+    // excluded as unnatural.
+    const excluded = await provider.generateBullets({ ...input, rawTask: 'Memimpin tim kecil' })
+    expect(excluded).toHaveLength(1)
+    expect(excluded[0]?.actionVerb).toBe('Memimpin')
+    expect(excluded[0]?.text).toBe('Memimpin tim kecil [dampak yang dapat diukur]')
   })
 
   it('never doubles a placeholder the raw task already carries', async () => {

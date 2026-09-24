@@ -201,6 +201,10 @@ describe('CreativeRenderer stylesheet gates (a template cannot override mode rul
     expect(css).toMatch(/@media\s+print/i)
     expect(css).toMatch(/:global\(body \*\)/i)
   })
+
+  it('restores disc markers on item lists (preview bullets stay visible)', () => {
+    expect(css).toMatch(/\.item\s+ul\s*\{[^}]*list-style-type\s*:\s*disc/i)
+  })
 })
 
 describe('CreativeRenderer markup baselines (regresi visual — committed snapshots)', () => {

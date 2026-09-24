@@ -155,6 +155,21 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
 - **Task 22 (2026-09-24):** tanpa kode produksi (fixture JSON + test vitest + docs saja) —
   bundle identik, `check:budget` tak perlu diulang; metrik acuan tetap Task 21
   (`initialJsGzip` 208,9 KB, `jsGzip` 225,8 KB, ratchet +5,2%/+9,5% ✅).
+- **Aliran terpadu C1b (2026-09-24, review maintainer):** prompt v1 baru
+  (5,8 KB / ~2,5 KB gzip — teks yang wajib dibaca model), orkestrator
+  `achievement-generator` di chunk lazy sendiri (~3,3 KB gzip), panel +
+  trigger + microcopy `aiAchievement` di JS awal (+2,3 KB):
+  `initialJsGzip` 208,9 → **211,2 KB** (+6,4% ratchet ✅);
+  `jsGzip` 225,8 → **231,4 KB** (+12,2% ratchet ❌ **FAIL** — butuh keputusan
+  sadar, lihat bawah); css/font datar; `transferGzip` 348,0 → 353,6 KB
+  (+7,8% ✅). Baseline JSON **tidak** diubah sepihak.
+  **Koreksi preseden:** opsi lazy-load tunda (seksi pengaturan + panel AI)
+  HANYA menolong `initialJsGzip` (sudah hijau) — `jsGzip` menghitung semua
+  chunk sehingga split tak menguranginya. Opsi nyata: (a) re-baseline sadar
+  (fitur sah, kunjungan pertama +2,3 KB saja); (b) pangkas scope (pakai
+  prompt C1 — mengorbankan larangan verb-stacking yang diminta review);
+  (c) paket diet (inti orkestrator bersama + komposisi prompt + reuse
+  microcopy ≈ 3,4 KB — tak sampai ambang, berisiko regresi jalur T19/20).
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

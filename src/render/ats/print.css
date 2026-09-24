@@ -98,6 +98,10 @@
 .cv-ats-item ul {
   margin: 3pt 0 0;
   padding-left: 14pt;
+  /* Tailwind preflight resets list-style globally — restore the disc marker
+   * explicitly so preview bullets are visible. Markers are CSS-generated and
+   * never enter the extracted PDF text. */
+  list-style-type: disc;
 }
 
 .cv-ats-item li {

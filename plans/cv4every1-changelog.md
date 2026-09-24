@@ -1328,3 +1328,28 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Kegagalan test milik saya (jujur):** `as const` scope vs `BulletScope`? — lolos; tidak ada; runner hijau percobaan pertama kecuali penambahan asersi `actionVerb` susulan (tetap hijau).
 
 **Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · format OK · `check:boundaries` OK · **unit 67 file / 586 test** (570 + 16 baru: 10 accept bullet + 6 accept polish) · tanpa kode produksi (build/budget/e2e tak terdampak — e2e AI 26/26 warisan tetap acuan).
+
+### Aliran terpadu C1b + marker preview (review maintainer, 2026-09-24)
+**Requirement:** FR generik 401/402/403/404/405/406/408 (tanpa FR baru — tidak ada FR "N bullet dari deskripsi" di SRS); tanpa perubahan `ResumeDocument`; di luar Fase 2 tertutup (enhancement, tanpa klaim fase)
+**Status: IMPLEMENTASI SELESAI, GERBANG BUDGET FAIL — butuh keputusan maintainer (lihat bawah).** Keputusan Plan yang disetujui: aditif (trigger lama utuh), banner sesi tanpa schema, maks 3 bullet, dedup verb katalog apa pun.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `prompts/id/achievement-bullets.v1.md` (baru) | Prompt C1b: 1–3 bullet dari deskripsi bebas, larangan verb-stacking, contoh dua-sudut |
+| `src/features/ai/achievement-prompts.ts` (+test, 9 test) | Loader versi + budget + truncate + drift guard mirror (pola T19) |
+| `src/features/ai/achievement-generator.ts` (+test, 15 test) | Orkestrator: DF-6 deskripsi + retry T21 + slice maks 3 + fallback statis; kontrak `generateBullets` dipakai ulang tanpa ubah interface |
+| `src/features/ai/AchievementPanel.tsx` + `AchievementTrigger.tsx` (+dom test, 12 test) | Trigger item-level + tooltip (hover/fokus/long-press 500 ms, hand-rolled tanpa positioning engine) + textarea + Apply append + banner sesi AI; mount di ExperienceItemEditor (otomatis Organizations) + ProjectsForm |
+| `src/features/store/ai-store.ts` (+test, 3 test) | Slice achievement (scope/status/source/error + stale guard); clear slice-only |
+| `src/content/microcopy/id.ts` | Grup `aiAchievement` (20 string) + blanking FR-204; sapu frasa terlarang otomatis |
+| `src/features/ai/static-provider.ts` (+test, 2 test) | Dedup verb katalog apa pun: raw berverb → 1 saran tanpa prefix ("Mengelola Membuat ..." hilang) |
+| `src/render/ats/print.css` + creative `styles.module.css` (+2 gate test) | `list-style-type: disc` (preflight me-reset marker); markup tak berubah (snapshot utuh) |
+| `e2e/ai-achievement.spec.ts` (baru, 4 test) | Production build: AI path + Apply append, fallback + T-C, tolak consent, keyboard |
+| Docs | ai-product-spec C1b; glossary `requestAchievementBullets`; performance-budget entri + koreksi preseden lazy-load; changelog ini |
+
+**Keputusan implementasi:**
+
+- **Tooltip hand-rolled (bukan base-ui):** modul Tooltip base-ui + positioning engine terbukti +19 KB di JS awal (diukur buang-pasang). Pengganti ~30 baris: hover/fokus/long-press + `role="tooltip"` + `aria-describedby` + Escape. Keputusan sadar: hemat puluhan KB, perilaku teruji axe + e2e.
+- **Kegagalan test milik saya (jujur):** mock rationale memakai kata di luar input (aturan T22 berlaku untuk mock saya sendiri); `name: 'Susun bullet'` cocok substring di Playwright (ganti `exact: true`); keyboard e2e fokus ke tombol disabled (isi textarea dulu); warning lint `set-state-in-effect` (pindah ke event handler); format mangled 1 baris (kembalikan).
+- **Pelanggaran produk:** tidak ada. Semua kegagalan di atas milik harness/test, bukan produk.
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing, sempat 25 dari effect saya — diperbaiki) · format OK · `check:boundaries` OK (239 file / 1095 specifier) · **unit 70 file / 628 test** (586 + 42: 9 prompts + 15 orkestrator + 12 dom + 3 store + 2 gate CSS + 1 statis net) · build OK (chunk lazy `achievement-generator` 3,3 KB gzip) · `check:privacy` OK · `test:e2e` AI **32/32** (achievement 4 + bullets 4 + polish 4 + consent 2, × Chromium + Firefox) · **`check:budget` FAIL: `jsGzip` +12,2% (batas +10%)** — `initialJsGzip` +6,4% ✅, lainnya ✅. Opsi di performance-budget entri; tanpa keputusan, task ini tidak diklaim Done (§8).

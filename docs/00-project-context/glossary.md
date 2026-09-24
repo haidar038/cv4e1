@@ -73,6 +73,7 @@
 | **Structured output** | — | Keluaran AI yang wajib berbentuk JSON sesuai schema. Teks bebas ditolak. |
 | **Metric placeholder** | `[X]`, `[jumlah]` | Penanda untuk angka yang belum diberikan pengguna. AI wajib memakai ini alih-alih mengarang angka. |
 | **Fallback** | — | Jalur non-AI yang tetap memberi nilai ketika AI tidak tersedia, gagal, atau ditolak. Wajib untuk setiap fitur AI. |
+| **Achievement bullets** | `requestAchievementBullets` | Aliran terpadu: deskripsi pencapaian bebas menjadi 1–3 bullet poles; tiap kandidat ditempel sebagai baris baru lewat Apply. |
 | **Prompt injection** | — | Teks berbahaya di dalam input pengguna (misalnya deskripsi lowongan yang ditempel) yang berusaha membajak instruksi model. Diperlakukan sebagai kasus penyalahgunaan yang harus diuji. |
 
 ## 5. Istilah kualitas dan proses

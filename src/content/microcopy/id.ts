@@ -201,6 +201,32 @@ export interface MicrocopyPack {
     /** FR-408 reason when the provider stops answering (Task 21). */
     timeoutNote: string
   }
+  aiAchievement: {
+    /** Trigger and panel names — structural, kept for every locale. */
+    triggerLabel: string
+    /** Hover/long-press explanation for the unified trigger. */
+    triggerTooltip: string
+    panelTitle: string
+    descriptionLabel: string
+    descriptionPlaceholder: string
+    generateAction: string
+    applyAction: string
+    closeAction: string
+    suggestionLabel: string
+    /** Guidance prose — blanked for non-id locales. */
+    hint: string
+    emptyInputNote: string
+    loadingNote: string
+    readyNote: string
+    staticNote: string
+    consentNote: string
+    unconfiguredNote: string
+    errorNote: string
+    rateLimitedNote: string
+    timeoutNote: string
+    /** Session banner above AI-generated candidates — review before applying. */
+    aiGeneratedNote: string
+  }
   aiPolish: {
     /** Trigger, panel, and mode names — structural, kept for every locale. */
     triggerLabel: string
@@ -648,6 +674,32 @@ export const microcopyId: MicrocopyPack = {
     timeoutNote:
       'AI tidak menjawab tepat waktu — menampilkan saran manual. Draft Anda tidak berubah.',
   },
+  aiAchievement: {
+    triggerLabel: 'Susun bullet dengan AI',
+    triggerTooltip: 'Tulis deskripsi pencapaian — AI menyusun 1–3 bullet poles yang bisa ditinjau.',
+    panelTitle: 'Susun bullet dengan AI',
+    descriptionLabel: 'Deskripsi pencapaian',
+    descriptionPlaceholder:
+      'mis. Membuat PRD dan SRS untuk aplikasi kasir bersama 2 teman selama magang',
+    generateAction: 'Susun bullet',
+    applyAction: 'Terapkan',
+    closeAction: 'Tutup',
+    suggestionLabel: 'Saran',
+    hint: 'Tulis pencapaian dalam 1–2 paragraf, lalu minta AI menyusunnya jadi bullet. Saran hanya kandidat — tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    emptyInputNote: 'Tulis dulu deskripsi pencapaian Anda, lalu bullet akan muncul di sini.',
+    loadingNote: 'Menyusun bullet…',
+    readyNote: 'Bullet siap. Tidak ada yang berubah sebelum Anda menekan Terapkan.',
+    staticNote: 'Menampilkan saran manual yang tetap bisa dipakai.',
+    consentNote: 'Persetujuan ditolak — menampilkan saran manual. Tidak ada data yang dikirim.',
+    unconfiguredNote: 'Belum ada kunci — menampilkan saran manual yang tetap bisa dipakai.',
+    errorNote: 'AI tidak menjawab — menampilkan saran manual. Draft Anda tidak berubah.',
+    rateLimitedNote:
+      'Batas pemakaian AI tercapai — menampilkan saran manual. Draft Anda tidak berubah; coba lagi nanti.',
+    timeoutNote:
+      'AI tidak menjawab tepat waktu — menampilkan saran manual. Draft Anda tidak berubah.',
+    aiGeneratedNote:
+      'Daftar ini dibuat AI — tinjau kembali sebelum menerapkan. AI dapat membuat kesalahan.',
+  },
   aiPolish: {
     triggerLabel: 'Poles teks dengan AI',
     panelTitle: 'Poles teks',
@@ -902,6 +954,22 @@ export const microcopyStructural: MicrocopyPack = {
     rateLimitedNote: '',
     timeoutNote: '',
     targetRoleOfflineNote: '',
+  },
+  aiAchievement: {
+    ...microcopyId.aiAchievement,
+    triggerTooltip: '',
+    descriptionPlaceholder: '',
+    hint: '',
+    emptyInputNote: '',
+    loadingNote: '',
+    readyNote: '',
+    staticNote: '',
+    consentNote: '',
+    unconfiguredNote: '',
+    errorNote: '',
+    rateLimitedNote: '',
+    timeoutNote: '',
+    aiGeneratedNote: '',
   },
   aiPolish: {
     ...microcopyId.aiPolish,
