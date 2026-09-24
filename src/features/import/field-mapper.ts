@@ -9,7 +9,11 @@
  * Prompt-injection text inside a CV (AB-4) is inert by construction:
  * there is no instruction-follower here, only pattern matching.
  */
-import { createEmptyResumeDocument, type ResumeSections, type ValidatedResumeDocument } from '../../core/schema'
+import {
+  createEmptyResumeDocument,
+  type ResumeSections,
+  type ValidatedResumeDocument,
+} from '../../core/schema'
 
 export type CandidateSource = 'text-layer' | 'ocr'
 export type ConfidenceLevel = 'high' | 'medium' | 'low'
@@ -31,16 +35,68 @@ export interface MappedCandidate {
   readonly unmappedTotal: number
 }
 
-type SectionName = 'summary' | 'education' | 'experience' | 'organizations' | 'projects' | 'skills' | 'certifications'
+type SectionName =
+  | 'summary'
+  | 'education'
+  | 'experience'
+  | 'organizations'
+  | 'projects'
+  | 'skills'
+  | 'certifications'
 
 const HEADER_SYNONYMS: Readonly<Record<SectionName, readonly string[]>> = {
-  summary: ['tentang saya', 'ringkasan', 'profil', 'tentang', 'profile', 'summary', 'about', 'objective', 'tujuan karir'],
-  education: ['pendidikan', 'education', 'riwayat pendidikan', 'educational background', 'latar pendidikan'],
-  experience: ['pengalaman kerja', 'pengalaman', 'experience', 'work experience', 'employment history', 'riwayat pekerjaan'],
-  organizations: ['organisasi', 'pengalaman organisasi', 'organizations', 'organisation', 'community', 'volunteer experience'],
+  summary: [
+    'tentang saya',
+    'ringkasan',
+    'profil',
+    'tentang',
+    'profile',
+    'summary',
+    'about',
+    'objective',
+    'tujuan karir',
+  ],
+  education: [
+    'pendidikan',
+    'education',
+    'riwayat pendidikan',
+    'educational background',
+    'latar pendidikan',
+  ],
+  experience: [
+    'pengalaman kerja',
+    'pengalaman',
+    'experience',
+    'work experience',
+    'employment history',
+    'riwayat pekerjaan',
+  ],
+  organizations: [
+    'organisasi',
+    'pengalaman organisasi',
+    'organizations',
+    'organisation',
+    'community',
+    'volunteer experience',
+  ],
   projects: ['proyek', 'projects', 'project', 'portofolio', 'portfolio', 'karya'],
-  skills: ['keahlian', 'keterampilan', 'skills', 'skill', 'kemampuan', 'technical skills', 'kompetensi'],
-  certifications: ['sertifikasi', 'sertifikat', 'certifications', 'certification', 'lisensi', 'licenses'],
+  skills: [
+    'keahlian',
+    'keterampilan',
+    'skills',
+    'skill',
+    'kemampuan',
+    'technical skills',
+    'kompetensi',
+  ],
+  certifications: [
+    'sertifikasi',
+    'sertifikat',
+    'certifications',
+    'certification',
+    'lisensi',
+    'licenses',
+  ],
 }
 
 const MAX_LINES = 500
@@ -59,27 +115,57 @@ const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.]+/
 const URL_RE = /https?:\/\/[^\s)]+/
 const PHONE_RE = /\+?\d[\d\s\-().]{5,}\d/
 const MONTHS_ID: Record<string, string> = {
-  januari: '01', februari: '02', maret: '03', april: '04', mei: '05', juni: '06',
-  juli: '07', agustus: '08', september: '09', oktober: '10', november: '11', desember: '12',
+  januari: '01',
+  februari: '02',
+  maret: '03',
+  april: '04',
+  mei: '05',
+  juni: '06',
+  juli: '07',
+  agustus: '08',
+  september: '09',
+  oktober: '10',
+  november: '11',
+  desember: '12',
 }
 const MONTHS_EN: Record<string, string> = {
-  january: '01', february: '02', march: '03', april: '04', may: '05', june: '06',
-  july: '07', august: '08', september: '09', october: '10', november: '11', december: '12',
+  january: '01',
+  february: '02',
+  march: '03',
+  april: '04',
+  may: '05',
+  june: '06',
+  july: '07',
+  august: '08',
+  september: '09',
+  october: '10',
+  november: '11',
+  december: '12',
 }
 const CURRENT_WORDS = ['sekarang', 'saat ini', 'present', 'current', 'now', 'ongoing']
 
 function normalize(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim()
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /** Exact header hit first, then contains-hit; null when the line is content. */
 function detectHeader(line: string): { section: SectionName; exact: boolean } | null {
   const norm = normalize(line)
   if (norm === '' || norm.length > 40) return null
-  for (const [section, synonyms] of Object.entries(HEADER_SYNONYMS) as [SectionName, readonly string[]][]) {
+  for (const [section, synonyms] of Object.entries(HEADER_SYNONYMS) as [
+    SectionName,
+    readonly string[],
+  ][]) {
     if (synonyms.some((s) => normalize(s) === norm)) return { section, exact: true }
   }
-  for (const [section, synonyms] of Object.entries(HEADER_SYNONYMS) as [SectionName, readonly string[]][]) {
+  for (const [section, synonyms] of Object.entries(HEADER_SYNONYMS) as [
+    SectionName,
+    readonly string[],
+  ][]) {
     if (synonyms.some((s) => norm.includes(normalize(s)))) return { section, exact: false }
   }
   return null
@@ -139,7 +225,10 @@ export function splitTrailingRange(line: string): TrailingRange | null {
   const tailLower = tail.toLowerCase()
   if (CURRENT_WORDS.some((w) => tailLower.includes(w))) {
     const peeled = peelTrailingYear(head)
-    return { head: peeled.head, range: { ...(peeled.year !== null ? { start: peeled.year } : {}), current: true } }
+    return {
+      head: peeled.head,
+      range: { ...(peeled.year !== null ? { start: peeled.year } : {}), current: true },
+    }
   }
   const end = parsePartialDate(tail)
   if (end === null) return null
@@ -163,8 +252,7 @@ function peelTrailingYear(head: string): { head: string; year: string | null } {
     const year = Number(match[2])
     if (validYear(year)) {
       const rest = match[1].trim()
-      const restMonth =
-        MONTHS_ID[rest.toLowerCase()] ?? MONTHS_EN[rest.toLowerCase()]
+      const restMonth = MONTHS_ID[rest.toLowerCase()] ?? MONTHS_EN[rest.toLowerCase()]
       if (restMonth !== undefined) return { head: '', year: `${match[2]}-${restMonth}` }
       return { head: rest, year: match[2] }
     }
@@ -211,12 +299,19 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
     if (unmapped.length < MAX_UNMAPPED_STORED) unmapped.push(line)
   }
   const pushField = (
-    field: string, value: string, confidence: ConfidenceLevel, note: string,
+    field: string,
+    value: string,
+    confidence: ConfidenceLevel,
+    note: string,
   ): void => {
     fields.push({ field, value, source, confidence, note })
   }
 
-  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l !== '').slice(0, MAX_LINES)
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l !== '')
+    .slice(0, MAX_LINES)
 
   // Pass 1 — contacts anywhere (first hit wins; email is the reliable one).
   let emailTaken = false
@@ -235,7 +330,9 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
       // Dates are digit-dense; a phone needs enough digits beyond a date —
       // and anything that parses as a bare date range is a date, not a phone.
       if (
-        phone !== undefined && digitCount(phone) >= 7 && phone.length <= 40 &&
+        phone !== undefined &&
+        digitCount(phone) >= 7 &&
+        phone.length <= 40 &&
         splitTrailingRange(phone)?.head !== ''
       ) {
         document.basics.phone = phone.trim()
@@ -258,13 +355,9 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
   // `as` defeats initializer narrowing: every write happens inside the
   // closures below, so the loop body must see the declared (wide) type.
   let currentItem: ItemDraft | null = null as ItemDraft | null
-  let currentItemSection: 'education' | 'experience' | 'organizations' | 'projects' | 'certifications' | null = null as
-    | 'education'
-    | 'experience'
-    | 'organizations'
-    | 'projects'
-    | 'certifications'
-    | null
+  let currentItemSection:
+    'education' | 'experience' | 'organizations' | 'projects' | 'certifications' | null = null as
+    'education' | 'experience' | 'organizations' | 'projects' | 'certifications' | null
   const skillLines: string[] = []
 
   const flushItem = (): void => {
@@ -286,7 +379,12 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
           : {}),
       })
       document.sections.education = items
-      pushField(`education[${items.length - 1}].institution`, head, draft.start !== undefined ? 'medium' : 'low', 'baris berheader pendidikan')
+      pushField(
+        `education[${items.length - 1}].institution`,
+        head,
+        draft.start !== undefined ? 'medium' : 'low',
+        'baris berheader pendidikan',
+      )
     } else if (sectionKey === 'experience' || sectionKey === 'organizations') {
       const key = sectionKey
       // Both sections share the experience item shape; the explicit element
@@ -307,7 +405,12 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
           : {}),
       })
       document.sections[key] = items
-      pushField(`${key}[${items.length - 1}].organization`, head, draft.start !== undefined ? 'medium' : 'low', 'baris berheader pengalaman')
+      pushField(
+        `${key}[${items.length - 1}].organization`,
+        head,
+        draft.start !== undefined ? 'medium' : 'low',
+        'baris berheader pengalaman',
+      )
     } else if (sectionKey === 'projects') {
       const items = [...(document.sections.projects ?? [])]
       items.push({
@@ -320,7 +423,12 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
           : {}),
       })
       document.sections.projects = items
-      pushField(`projects[${items.length - 1}].name`, head, draft.start !== undefined ? 'medium' : 'low', 'baris berheader proyek')
+      pushField(
+        `projects[${items.length - 1}].name`,
+        head,
+        draft.start !== undefined ? 'medium' : 'low',
+        'baris berheader proyek',
+      )
     } else {
       const items = [...(document.sections.certifications ?? [])]
       items.push({
@@ -328,7 +436,12 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
         ...(tail !== '' ? { issuer: tail } : {}),
       })
       document.sections.certifications = items
-      pushField(`certifications[${items.length - 1}].name`, head, 'low', 'baris berheader sertifikasi')
+      pushField(
+        `certifications[${items.length - 1}].name`,
+        head,
+        'low',
+        'baris berheader sertifikasi',
+      )
     }
   }
 
@@ -356,7 +469,14 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
       pushUnmapped(line)
       return
     }
-    currentItem = { head, tail, ...(start !== undefined ? { start } : {}), current, ...(end !== undefined ? { end } : {}), highlights: [] }
+    currentItem = {
+      head,
+      tail,
+      ...(start !== undefined ? { start } : {}),
+      current,
+      ...(end !== undefined ? { end } : {}),
+      highlights: [],
+    }
     currentItemSection = target
   }
 
@@ -390,8 +510,11 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
       continue
     }
     if (
-      section === 'education' || section === 'experience' || section === 'organizations' ||
-      section === 'projects' || section === 'certifications'
+      section === 'education' ||
+      section === 'experience' ||
+      section === 'organizations' ||
+      section === 'projects' ||
+      section === 'certifications'
     ) {
       const trailing = splitTrailingRange(line)
       const split = splitHeadline(line)
@@ -403,7 +526,11 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
             if (currentItem.start === undefined && trailing.range.start !== undefined) {
               currentItem.start = trailing.range.start
             }
-            if (!currentItem.current && currentItem.end === undefined && trailing.range.end !== undefined) {
+            if (
+              !currentItem.current &&
+              currentItem.end === undefined &&
+              trailing.range.end !== undefined
+            ) {
               currentItem.end = trailing.range.end
             }
             if (trailing.range.current) currentItem.current = true
@@ -448,7 +575,8 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
   // Pre-header: first digit-free line is the name, the next is the headline.
   // Contact-looking lines never qualify (an email is not a headline).
   const nameLines = preHeaderLines.filter(
-    (l) => digitCount(l) === 0 && !l.includes('@') && !l.includes('://') && l.length <= MAX_BASICS_LINE,
+    (l) =>
+      digitCount(l) === 0 && !l.includes('@') && !l.includes('://') && l.length <= MAX_BASICS_LINE,
   )
   if (nameLines[0] !== undefined && document.basics.name === '') {
     document.basics.name = nameLines[0]
@@ -465,9 +593,13 @@ export function mapTextToCandidate(text: string, source: CandidateSource): Mappe
   // Skills: split delimited lines into items.
   const skillItems: string[] = []
   for (const line of skillLines) {
-    const parts = line.split(/[,;•|/]/).map((p) => p.replace(/^[•\-*]\s*/, '').trim()).filter((p) => p !== '')
+    const parts = line
+      .split(/[,;•|/]/)
+      .map((p) => p.replace(/^[•\-*]\s*/, '').trim())
+      .filter((p) => p !== '')
     for (const part of parts) {
-      if (part.length <= MAX_SKILL_ITEM && skillItems.length < MAX_SKILL_ITEMS) skillItems.push(part)
+      if (part.length <= MAX_SKILL_ITEM && skillItems.length < MAX_SKILL_ITEMS)
+        skillItems.push(part)
       else pushUnmapped(part)
     }
   }

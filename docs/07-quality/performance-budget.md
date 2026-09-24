@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.12 — Re-baseline sadar pasca-C1b atas persetujuan maintainer (2026-09-25). Semua ratchet +0,0%; utang absolut jsGzip >200 KB tetap tercatat** |
-| Terakhir diperbarui | 2026-09-25 |
+| Status | **v0.13 — Re-baseline sadar pasca-T3a atas persetujuan maintainer (2026-09-26). Semua ratchet +0,0%; utang absolut initialJsGzip/jsGzip/transferGzip tetap tercatat** |
+| Terakhir diperbarui | 2026-09-26 |
 
 > Pengguna sasaran memakai ponsel kelas menengah dengan koneksi terbatas. Anggaran ini adalah requirement (NFR-008), bukan target.
 
@@ -191,7 +191,19 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   angka; ratchet tetap bermakna di level baru); (b) pdf.js via CDN
   seperti ADR-0010 (nol delta dist, tetapi impor digital butuh internet
   sekali + skrip main-thread remote); (c) pangkas scope impor PDF.
-  Tanpa keputusan, T3a tidak diklaim Done (§8).
+  Keputusan (2026-09-26): opsi (a) re-baseline sadar atas persetujuan maintainer — T3a diklaim Done (lihat entri di bawah) (§8).
+- **Re-baseline sadar pasca-T3a (2026-09-26, opsi (a) atas persetujuan
+  maintainer):** pertumbuhan berasal dari fitur sah T3a (FR-501/FR-502:
+  worker + inti pdf.js lazy, wrapper tesseract, dialog + pipeline +
+  microcopy `importPdf`), bukan regresi — kunjungan pertama hanya
+  +6,1 KB (`initialJsGzip` 211,2 → 217,3 KB). Build produksi diulang
+  dari HEAD (`bun run build` hijau) lalu `check-bundle-size --update`:
+  `initialJsGzip` 217.279 B (217,3 KB) · `jsGzip` 909.344 B (909,3 KB) ·
+  `cssGzip` 27.521 B (27,5 KB) · `fontsRaw` 88.848 B (88,8 KB) ·
+  `transferGzip` 1.031.704 B (1031,7 KB) — semua ratchet +0,0%.
+  Utang absolut (JS awal, semua-JS, transfer di atas target) tetap
+  tercatat sebagai advisory, bukan gerbang. Aset OCR (±6,7 MB) tetap
+  on-demand + ter-cache, nol di metrik.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

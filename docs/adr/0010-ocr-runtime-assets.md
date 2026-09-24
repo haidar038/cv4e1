@@ -1,6 +1,6 @@
 # ADR-0010: Aset runtime OCR dari CDN berversi + Cache Storage
 
-- **Status:** Proposed (2026-09-26 — T3a menunggu Accepted bersama implementasi)
+- **Status:** Accepted (2026-09-26 — re-baseline T3a)
 - **Date:** 2026-09-26
 - **Decision owner:** Maintainer proyek
 - **Related:** ADR-0008 (dipersupersede parsial: klausa hosting aset), ADR-0001, NFR-008, C-T3, C-T10, spike T3a (`experiments/import-spike/`, `plans/cv4every1-changelog.md`)

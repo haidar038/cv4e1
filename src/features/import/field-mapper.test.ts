@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  mapTextToCandidate,
-  parseDateRange,
-  parsePartialDate,
-} from './field-mapper'
+import { mapTextToCandidate, parseDateRange, parsePartialDate } from './field-mapper'
 
 const SAMPLE = `Contoh Nama Fiktif
 Insinyur Perangkat Lunak

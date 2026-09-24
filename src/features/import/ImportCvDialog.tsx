@@ -233,7 +233,10 @@ export function ImportCvDialog({
                 </p>
                 <ul className="flex max-h-24 flex-col gap-0.5 overflow-y-auto">
                   {shownUnmapped.map((line, index) => (
-                    <li key={`${index}-${line.slice(0, 20)}`} className="text-[11px] text-muted-foreground">
+                    <li
+                      key={`${index}-${line.slice(0, 20)}`}
+                      className="text-[11px] text-muted-foreground"
+                    >
                       {line}
                     </li>
                   ))}

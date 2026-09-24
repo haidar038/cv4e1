@@ -12,7 +12,7 @@ Universitas Contoh Bangsa
 2019 – 2023
 
 KEAHLIAN
-JavaScript, TypeScript`;
+JavaScript, TypeScript`
 
 function fakeFile(name: string, type: string, size: number, bytes: Uint8Array): File {
   const file = new File([bytes as unknown as BlobPart], name, { type })

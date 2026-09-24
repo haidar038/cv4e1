@@ -50,7 +50,11 @@ async function loadPdfJs(): Promise<PdfJsApi> {
     try {
       const workerSrc = (await import('pdfjs-dist/legacy/build/pdf.worker.mjs?url'))
         .default as string
-      if (workerSrc.startsWith('http') || workerSrc.startsWith('/') || workerSrc.startsWith('blob:')) {
+      if (
+        workerSrc.startsWith('http') ||
+        workerSrc.startsWith('/') ||
+        workerSrc.startsWith('blob:')
+      ) {
         mod.GlobalWorkerOptions.workerSrc = workerSrc
       }
     } catch {

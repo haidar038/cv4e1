@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  extractPdfText,
-  joinTextItems,
-  PdfTextError,
-  type PdfJsApi,
-} from './pdf-text'
+import { extractPdfText, joinTextItems, PdfTextError, type PdfJsApi } from './pdf-text'
 
 /**
  * Builds a minimal valid PDF in memory (no fixture file): objects are
@@ -70,7 +65,9 @@ function buildPdf(pages: { text: string | null }[]): Uint8Array {
   pushStr(`xref\n0 ${maxObj + 1}\n0000000000 65535 f \n`)
   for (let num = 1; num <= maxObj; num += 1) {
     const at = offsets.get(num)
-    pushStr(at === undefined ? '0000000000 00000 f \n' : `${String(at).padStart(10, '0')} 00000 n \n`)
+    pushStr(
+      at === undefined ? '0000000000 00000 f \n' : `${String(at).padStart(10, '0')} 00000 n \n`,
+    )
   }
   pushStr(`trailer\n<< /Size ${maxObj + 1} /Root 2 0 R >>\nstartxref\n${xrefAt}\n%%EOF`)
   return new Uint8Array(out)
@@ -97,8 +94,9 @@ function fakeLoader(pages: { text: string | null }[]): () => Promise<PdfJsApi> {
 
 describe('extractPdfText (T3a)', () => {
   it('empty bytes throw EMPTY_FILE without touching the engine', async () => {
-    await expect(extractPdfText(new Uint8Array(0), { loader: fakeLoader([{ text: 'x' }]) }))
-      .rejects.toMatchObject({ reason: 'EMPTY_FILE' })
+    await expect(
+      extractPdfText(new Uint8Array(0), { loader: fakeLoader([{ text: 'x' }]) }),
+    ).rejects.toMatchObject({ reason: 'EMPTY_FILE' })
   })
 
   it('real engine: hand-built PDF parses without seams', async () => {
@@ -154,7 +152,10 @@ describe('extractPdfText (T3a)', () => {
   })
 
   it('PdfTextError carries its reason', () => {
-    expect(new PdfTextError('EMPTY_FILE')).toMatchObject({ name: 'PdfTextError', reason: 'EMPTY_FILE' })
+    expect(new PdfTextError('EMPTY_FILE')).toMatchObject({
+      name: 'PdfTextError',
+      reason: 'EMPTY_FILE',
+    })
   })
 
   it('joinTextItems restores line breaks from hasEOL geometry', () => {

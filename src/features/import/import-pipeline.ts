@@ -10,15 +10,8 @@
  * Failure taxonomy maps to FR-408 notes in microcopy; the UI never sees
  * raw engine errors.
  */
-import {
-  validateResumeDocument,
-  type ValidatedResumeDocument,
-} from '../../core/schema'
-import {
-  mapTextToCandidate,
-  type CandidateSource,
-  type FieldCandidate,
-} from './field-mapper'
+import { validateResumeDocument, type ValidatedResumeDocument } from '../../core/schema'
+import { mapTextToCandidate, type CandidateSource, type FieldCandidate } from './field-mapper'
 import { OcrError, recognizeImage, type OcrImage } from './ocr-text'
 import {
   joinTextItems,
@@ -88,12 +81,18 @@ async function defaultRecognize(
   return recognizeImage(
     image,
     onProgress !== undefined || signal !== undefined
-      ? { ...(onProgress !== undefined ? { onProgress } : {}), ...(signal !== undefined ? { signal } : {}) }
+      ? {
+          ...(onProgress !== undefined ? { onProgress } : {}),
+          ...(signal !== undefined ? { signal } : {}),
+        }
       : undefined,
   )
 }
 
-function buildDocumentForReview(mapped: ValidatedResumeDocument, fileName: string): ValidatedResumeDocument {
+function buildDocumentForReview(
+  mapped: ValidatedResumeDocument,
+  fileName: string,
+): ValidatedResumeDocument {
   const title = fileName.replace(/\.pdf$/i, '').slice(0, 80) || 'Impor CV'
   return {
     ...mapped,

@@ -892,7 +892,8 @@ export const microcopyId: MicrocopyPack = {
     reviewTitle: 'Tinjau hasil impor',
     unmappedNote: '{count} baris tidak terpeta — periksa dan salin manual bila perlu.',
     sourceTextNote: 'Sumber: teks digital PDF.',
-    sourceOcrNote: 'Sumber: baca-gambar (OCR). Ketelitiannya di bawah teks digital — periksa tiap kolom.',
+    sourceOcrNote:
+      'Sumber: baca-gambar (OCR). Ketelitiannya di bawah teks digital — periksa tiap kolom.',
     confidenceHigh: 'Pola jelas',
     confidenceMedium: 'Perlu ditinjau',
     confidenceLow: 'Tebakan lemah — wajib cek',

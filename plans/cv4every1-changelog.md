@@ -1440,7 +1440,7 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 
 ### T3a — Impor CV PDF: lapisan teks → OCR fallback → tinjauan → CV baru (FR-501/FR-502)
 **Requirement:** FR-501 (AC-501-a), FR-502 (AC-502-a); ADR-0008/0009 Accepted, ADR-0010 Proposed (mekanisme CDN-nya diimplementasikan; penerimaan ADR diminta bersama review ini); tanpa perubahan `ResumeDocument`
-**Status: IMPLEMENTASI SELESAI, GERBANG BUDGET FAIL — butuh keputusan maintainer (seperti C1b).** Opsi di `performance-budget.md` entri T3a; rekomendasi: (a) re-baseline sadar.
+**Status: SELESAI (Done) — re-baseline sadar opsi (a) dieksekusi 2026-09-26 (lihat sub-entri di bawah); ADR-0010 Accepted.**
 
 | Berkas | Peran |
 | :-- | :-- |
@@ -1464,6 +1464,19 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Jebakan e2e milik harness:** `openImportDialog` ganda perlu varian tanpa "Buat CV pertama" (draft sudah ada).
 - **Flake beban-paralel (pola terdokumentasi, bukan defect):** 1 PreviewPane Creative gagal di run penuh, hijau terisolasi; run awal import sempat exit 1 dengan 37/37 hijau lalu hijau bersih.
 
-**Angka bundle (keputusan diminta):** `initialJsGzip` +2,9% ✅; `jsGzip` 231,4 → 909,3 KB (+293% ❌: worker 515,5 + inti 148,3 + wrapper 7,3 + dialog ≈6); `transferGzip` +192% ❌. Baseline JSON TIDAK diubah sepihak.
+**Angka bundle (saat implementasi, sebelum re-baseline):** `initialJsGzip` +2,9% ✅; `jsGzip` 231,4 → 909,3 KB (+293% ❌: worker 515,5 + inti 148,3 + wrapper 7,3 + dialog ≈6); `transferGzip` +192% ❌. Baseline JSON TIDAK diubah sepihak saat itu.
 
-**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · `check:boundaries` OK · format OK · **unit 75 file / 673 test** (70/628 + 45 baru: 9 pdf + 6 ocr + 17 mapper + 7 pipeline + 6 dialog; 1 flake PreviewPane pra-ada, hijau terisolasi) · build OK (chunk lazy `pdf` 148,3 KB + `pdf.worker` 515,5 KB + tesseract 7,3 KB gzip) · `check:privacy` OK · **`check:budget` FAIL** (di atas — menunggu (a)/(b)/(c)) · `test:e2e` impor **6/6** (Chromium + Firefox, production build, pdf.js asli).
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · `check:boundaries` OK · format OK · **unit 75 file / 673 test** (70/628 + 45 baru: 9 pdf + 6 ocr + 17 mapper + 7 pipeline + 6 dialog; 1 flake PreviewPane pra-ada, hijau terisolasi) · build OK (chunk lazy `pdf` 148,3 KB + `pdf.worker` 515,5 KB + tesseract 7,3 KB gzip) · `check:privacy` OK · **`check:budget` FAIL** saat implementasi (menunggu keputusan; ditutup oleh re-baseline di bawah) · `test:e2e` impor **6/6** (Chromium + Firefox, production build, pdf.js asli).
+
+### Re-baseline T3a + penerimaan ADR-0010 (2026-09-26)
+**Requirement:** NFR-008; FR-501/FR-502; tanpa perubahan `ResumeDocument`; tanpa dependensi baru
+**Status: SELESAI — T3a diklaim Done.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `scripts/bundle-baseline.json` | Di-record ulang via `check-bundle-size --update` pasca-`build` dari HEAD: `initialJsGzip` 217.279 B · `jsGzip` 909.344 B · `cssGzip` 27.521 B · `fontsRaw` 88.848 B · `transferGzip` 1.031.704 B |
+| `docs/adr/0010-ocr-runtime-assets.md` + `docs/adr/README.md` | Status `Proposed` → Accepted (mekanisme CDN-nya sudah di-ship di `ocr-text.ts`) |
+| `docs/07-quality/performance-budget.md` | Status v0.13 + entri re-baseline T3a; utang absolut tetap advisory |
+| `docs/01-product/roadmap.md` | Baris impor Fase 3 → [x] |
+
+**Verifikasi:** `bun run build` hijau · `bun run check:budget` hijau semua +0,0% (peringatan absolut = utang berdokumen, bukan gerbang) · `verify` hijau: lint 0 error, format ✅ (8 berkas T3a sesi lalu belum lolos prettier — diperbaiki mekanis `prettier --write`, murni wrapping tanpa perubahan semantik), typecheck ✅, boundaries ✅, **unit 75 file / 673 test hijau** (paralel: 1 unhandled flake pra-ada `App.dom.test.tsx` teardown; hijau bersih `--pool=forks --maxWorkers=1`), build ✅, privacy ✅, budget ✅ · `e2e/import-pdf.spec.ts` **6/6** Chromium + Firefox via `node` (paralel: 1 flake upload Firefox; hijau bersih `--workers=1`, pdf.js asli tanpa mock).
