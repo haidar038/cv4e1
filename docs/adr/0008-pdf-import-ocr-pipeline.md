@@ -1,6 +1,6 @@
 # ADR-0008: Pipeline impor PDF — lapisan teks dulu, OCR sebagai fallback
 
-- **Status:** Proposed (2026-09-25 — menunggu penerimaan maintainer; T3a dilarang mulai sebelum Accepted)
+- **Status:** Accepted (diterima maintainer 2026-09-26; spike T3a pengukuran diizinkan, implementasi mengikuti angka spike)
 - **Date:** 2026-09-25
 - **Decision owner:** Maintainer proyek
 - **Related:** ADR-0001 (local-first), ADR-0003 (JSON portabel), ADR-0004 (dua renderer), ADR-0005 (AI opsional), ADR-0006 (BYO-key Opsi 4), ADR-0007 (ekspor PDF), `docs/04-data/import-export-spec.md` §4–§6, `docs/05-ai/ai-product-spec.md` §C4, FR-501/FR-502

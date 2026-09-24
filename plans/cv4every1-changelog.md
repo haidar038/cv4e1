@@ -1384,6 +1384,8 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 **Requirement:** FR-501/FR-502 (impor); tanpa perubahan `ResumeDocument`; tanpa kode produksi (docs saja)
 **Status: PROPOSED — menunggu penerimaan maintainer; T3a dilarang mulai sebelum Accepted.**
 
+**Penerimaan (2026-09-26):** maintainer menerima ADR-0008 + ADR-0009 (status → Accepted di berkas + indeks); spike T3a pengukuran diizinkan dimulai.
+
 | Berkas | Peran |
 | :-- | :-- |
 | `docs/adr/0008-pdf-import-ocr-pipeline.md` (baru) | Pipeline impor: lapisan teks pdf.js dulu → OCR Tesseract WASM (`ind`+`eng`) fallback → kandidat heuristik deterministik + keyakinan → tinjauan manusia; LLM eksplisit di luar scope T3a; batas provisional (PDF ≤ 10 MB, OCR ≤ 200 DPI, ≤ 5 halaman); chunk lazy, aset on-demand ter-cache; syarat mulai T3a = angka bundle terukur dari spike |
@@ -1397,3 +1399,41 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Foto CV lama tidak diekstrak di T3a:** kandidat tanpa foto; slot diisi lewat alur foto yang ada.
 
 **Verifikasi:** format OK (di bawah) · tanpa kode produksi (build/budget/e2e tak terdampak) · tanpa PII · frasa terlarang nihil.
+
+### Spike T3a — pengukuran + bukti pipeline (2026-09-26)
+**Requirement:** FR-501/FR-502; syarat ukur ADR-0008 ("angka, bukan perkiraan"); tanpa perubahan `ResumeDocument`; artefak di `experiments/import-spike/` (bukan `src/`)
+**Status: SELESAI — T3a boleh lanjut ke implementasi.** Data 100% fiktif (`Contoh Nama Fiktif`).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `experiments/import-spike/cv-sample.html` (baru) | Sampel CV fiktif 1 halaman (pendidikan, pengalaman, proyek, keahlian, 13 string probe) |
+| `experiments/import-spike/spike-t3a.mjs` (baru) | Chromium → PDF digital + PNG pindaian-simulasi → ekstrak pdf.js (13 string) → OCR tesseract `ind`+`eng` (13 string) |
+| `experiments/import-spike/measure-bundle.mjs` (baru) | Probe Bun.build minify + gzip per entry; ukuran worker; deps transitif |
+| `package.json` + `bun.lock` | Aditif: `pdfjs-dist@6.3.289` + `tesseract.js@7.0.0` (keduanya Apache-2.0, terverifikasi dari package; justifikasi penuh di bawah) |
+
+**Hasil bukti (node; lihat jebakan harness):**
+
+- Lapisan teks pdf.js: **13/13 pulih** (nol hilang) — keputusan "teks dulu" terbukti.
+- OCR tesseract `ind`: **12/13**; `eng`: **12/13** — yang hilang sama: baris email (salah baca karakter kecil `@`/`.` pada screenshot bersih). Bukan karangan: tanpa angka/entitas baru. Konfirmasi pola ADR-0008: field berkadar rendah wajib diketik ulang di UI tinjauan.
+- Waktu OCR ~3 dtk/bahasa pasca-unduh (sekali unduh, selanjutnya cache).
+
+**Angka bundle terukur (keputusan ADR-0008 terpenuhi):**
+
+| Komponen | Ukuran transfer | Nasib shipped |
+| :-- | :-- | :-- |
+| pdf.js inti (chunk lazy, main-thread, tanpa worker) | **129,6 KB gzip** (probe esbuild; final diukur ulang chunk Vite saat T3a) | ✅ lazy saat buka impor |
+| pdf.js worker file | 469 KB gzip | ❌ tidak di-ship (main-thread + progres UI cukup untuk ≤5 halaman) |
+| tesseract.js wrapper | **7,6 KB gzip** | ✅ lazy |
+| tesseract core (1× unduh, lalu cache) | wasm.js 1,57 MB + wasm 1,21 MB ≈ **2,78 MB** | ✅ on-demand + Cache Storage, host sama (bukan CDN di shipped) |
+| traineddata (1× unduh per bahasa, lalu cache) | `ind` **1,14 MB** · `eng` **2,82 MB** | ✅ on-demand; OCR pertama ≈ 6,7 MB dengan dua bahasa |
+| Kunjungan pertama NFR-008 | **tak tersentuh** (nol byte impor di JS awal) | ✅ |
+
+**Justifikasi dependensi (`dependency-policy.md`):**
+
+- `pdfjs-dist` (Mozilla, aktif): menulis parser PDF sendiri tidak wajar; 0 deps transitif; bila ditinggalkan → versi di-pin, impor JSON + manual tak terpengaruh.
+- `tesseract.js` (Naptha, aktif): menulis OCR sendiri tidak wajar; 9 deps langsung tetapi bundle browser terukur 17,4 KB raw (tree-shaken); postinstall terblokir = nag donasi (`opencollective-postinstall || true`), bukan downloader — aman; bila ditinggalkan → jalur OCR degradasi ke manual, jalur teks tak tersentuh.
+- Batas provisional ADR-0008 (10 MB / 200 DPI / 5 halaman) **bertahan** — konsisten dengan biaya OCR di atas.
+
+**Jebakan harness baru (dicatat agar tidak mengulang):** script spike/tooling yang memakai Playwright atau worker tesseract **wajib jalan di `node`, bukan `bun`** — launch Chromium timeout 180 dtk di bun; worker tesseract `DataCloneError` di bun. Shipped code (browser) tak terpengaruh.
+
+**Verifikasi:** `bun install` bersih (16 paket) · spike node exit sesuai harapan (pdf 13/13) · format OK (di bawah) · tanpa PII (data fiktif) · tanpa perubahan `src/`.

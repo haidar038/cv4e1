@@ -37,3 +37,14 @@ playwright/.cache
 additional
 # Vendor AI docs (referensi lokal maintainer, bukan milik repo)
 docs/groq-docs/
+
+# Artefak spike T3a (output ter-generate; script + sampel tetap ter-commit)
+experiments/import-spike/dist-probe/
+experiments/import-spike/_*.entry.mjs
+experiments/import-spike/sample-digital.pdf
+experiments/import-spike/sample-scan.png
+experiments/import-spike/spike-result.txt
+
+# Cache traineddata tesseract.js saat spike Node (terunduh ulang otomatis)
+*.traineddata
+*.traineddata.gz

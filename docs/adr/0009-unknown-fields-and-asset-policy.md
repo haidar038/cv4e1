@@ -1,6 +1,6 @@
 # ADR-0009: Field tak dikenal dipertahankan; aset disematkan di backup saja
 
-- **Status:** Proposed (2026-09-25 — menunggu penerimaan maintainer; menutup TODO `import-export-spec.md` §4–§5)
+- **Status:** Accepted (diterima maintainer 2026-09-26)
 - **Date:** 2026-09-25
 - **Decision owner:** Maintainer proyek
 - **Related:** ADR-0002 (IndexedDB), ADR-0003 (JSON portabel), ADR-0008 (pipeline impor), `docs/04-data/import-export-spec.md`, `docs/04-data/migration-policy.md`, C-T7, C-T9

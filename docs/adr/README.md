@@ -20,8 +20,8 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | [0005](0005-ai-as-optional-capability.md) | AI sebagai kapabilitas opsional | Accepted |
 | [0006](0006-byo-key-or-server-proxy.md) | BYO-key versus proxy server | Accepted (Opsi 4, 2026-09-23) |
 | [0007](0007-pdf-export-pipeline.md) | Pipeline ekspor PDF untuk mode ATS dan Creative | Accepted (2026-09-20) |
-| [0008](0008-pdf-import-ocr-pipeline.md) | Pipeline impor PDF: lapisan teks dulu, OCR fallback | Proposed (2026-09-25) |
-| [0009](0009-unknown-fields-and-asset-policy.md) | Field tak dikenal + kebijakan aset ekspor | Proposed (2026-09-25) |
+| [0008](0008-pdf-import-ocr-pipeline.md) | Pipeline impor PDF: lapisan teks dulu, OCR fallback | Accepted (2026-09-26) |
+| [0009](0009-unknown-fields-and-asset-policy.md) | Field tak dikenal + kebijakan aset ekspor | Accepted (2026-09-26) |
 
 ## Kandidat ADR berikutnya
 
