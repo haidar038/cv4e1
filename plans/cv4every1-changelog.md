@@ -1379,3 +1379,21 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 | Fase 3 disetujui | Rencana `plans/cv4every1-fase-3-eksperimental.md` berlaku; langkah pertama = ADR pipeline impor-OCR + kebijakan field tak-dikenal (AGENTS.md §9, sebelum kode apa pun) |
 
 **Kontras StorageNotice:** syarat (3) direklasifikasi — 12 `color-contrast` pra-ada bukan kriteria gerbang AI (grounding + fallback hijau) melainkan utang audit aksesibilitas Fase 4. `docs/01-product/roadmap.md` gerbang Fase 2 dianotasi LULUS di sesi ini.
+
+### ADR-0008 + ADR-0009 — kick-off Fase 3 (2026-09-25)
+**Requirement:** FR-501/FR-502 (impor); tanpa perubahan `ResumeDocument`; tanpa kode produksi (docs saja)
+**Status: PROPOSED — menunggu penerimaan maintainer; T3a dilarang mulai sebelum Accepted.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `docs/adr/0008-pdf-import-ocr-pipeline.md` (baru) | Pipeline impor: lapisan teks pdf.js dulu → OCR Tesseract WASM (`ind`+`eng`) fallback → kandidat heuristik deterministik + keyakinan → tinjauan manusia; LLM eksplisit di luar scope T3a; batas provisional (PDF ≤ 10 MB, OCR ≤ 200 DPI, ≤ 5 halaman); chunk lazy, aset on-demand ter-cache; syarat mulai T3a = angka bundle terukur dari spike |
+| `docs/adr/0009-unknown-fields-and-asset-policy.md` (baru) | Field asing dipertahankan round-trip via `_unknownFields` + catatan UI; pagar OCR (tebakan dilarang masuk `_unknownFields`); aset hibrida (semat di `backup`, kecualikan di `resume` + catatan); batas provisional (1 aset ≤ 2 MB, total ≤ 5 MB); definisi "setara semantik" untuk test round-trip; FR-110 diperluas ke semua rahasia |
+| `docs/adr/README.md` | Indeks +0008/+0009 Proposed; kandidat field-policy dipindah ke tailoring/locale |
+
+**Keputusan implementasi:**
+
+- **Batas angka provisional, bukan final:** 10 MB / 200 DPI / 5 halaman / 2 MB / 5 MB adalah titik mulai beralasan yang wajib dikonfirmasi pengukuran spike T3a — `dependency-policy.md` menuntut angka, bukan perkiraan.
+- **LLM ditunda dua kali sadar:** pemetaan field LLM keluar T3a (ADR-0008), varian LLM-opsional digabung ke ADR tailoring T3b — permukaan injection + grounding dwibahasa layak satu ADR tersendiri.
+- **Foto CV lama tidak diekstrak di T3a:** kandidat tanpa foto; slot diisi lewat alur foto yang ada.
+
+**Verifikasi:** format OK (di bawah) · tanpa kode produksi (build/budget/e2e tak terdampak) · tanpa PII · frasa terlarang nihil.

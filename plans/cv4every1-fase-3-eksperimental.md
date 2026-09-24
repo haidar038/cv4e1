@@ -181,8 +181,8 @@ Pengguna mengganti bahasa antarmuka ID↔EN dengan fallback aman bila kunci terj
 
 ## ADR yang dibutuhkan sebelum implementasi (AGENTS.md §9)
 
-1. **Pipeline impor PDF/OCR** — text-layer vs Tesseract WASM vs LLM; bundle/offline (C-T10), egress (C-T3), batas ukuran, perlakuan foto/aset, alternatif ditolak + konsekuensi negatif.
+1. **Pipeline impor PDF/OCR** — ✅ drafted `docs/adr/0008-pdf-import-ocr-pipeline.md` (Proposed 2026-09-25, justifikasi dependensi digabung); T3a menunggu Accepted.
 2. **Tailoring lowongan** — schema input/output, minimisasi data, sanitasi injection, grounding-sebagai-kode, fallback keyword-matcher, consent per operasi, kenapa bukan skor (§6).
 3. **Locale EN / i18n** — struktur `src/content/locales/`, fallback kunci hilang, cakupan terjemah vs khusus-`id`, tanggal/plural, strategi Action Verbs EN, lint dwibahasa.
-4. **Kebijakan field tak dikenal + aset base64** (kandidat di `docs/adr/README.md`, TODO `import-export-spec.md` §4) — wajib sebelum hasil OCR dinormalisasi; field baru → bump versi + migrasi (C-T9).
-5. **Justifikasi dependensi runtime baru** (pdf.js, tesseract.js bila dipilih) per `dependency-policy.md` — boleh gabung ke ADR nomor 1.
+4. **Kebijakan field tak dikenal + aset base64** — ✅ drafted `docs/adr/0009-unknown-fields-and-asset-policy.md` (Proposed 2026-09-25); menutup TODO `import-export-spec.md` §4–§5.
+5. **Justifikasi dependensi runtime baru** — ✅ digabung ke ADR-0008 (pdfjs-dist + tesseract.js, angka final via spike T3a).
