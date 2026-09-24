@@ -389,6 +389,30 @@ export async function importDraftAction(json: string): Promise<ImportDraftResult
   }
 }
 
+/**
+ * Approves a reviewed PDF-import candidate as a NEW draft and opens it
+ * (T3a, AC-501-a/AC-502-a). The open document is untouched until this
+ * explicit approval — the pipeline never saves. Defensive re-validation:
+ * the candidate was validated at mapping time, but storage only ever
+ * receives a freshly validated document.
+ */
+export async function importPdfCandidateAction(
+  candidate: ValidatedResumeDocument,
+): Promise<ImportDraftResult> {
+  const validation = validateResumeDocument(candidate)
+  if (!validation.success) return { ok: false, reason: 'VALIDATION_FAILED' }
+  try {
+    const record = await saveDraft(validation.data)
+    notifyTabs('draft_updated', record.id)
+    await refreshDrafts()
+    await loadDraftAction(record.id)
+    return { ok: true, draftId: record.id }
+  } catch (error) {
+    reportStorageFailure(error)
+    return { ok: false, reason: 'STORAGE' }
+  }
+}
+
 // --- Document editing actions ---
 
 export function updateBasics(patch: Partial<ResumeBasics>): void {

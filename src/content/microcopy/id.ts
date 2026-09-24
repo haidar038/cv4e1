@@ -35,6 +35,16 @@ export type ImportErrorReasonKey =
   | 'MIGRATION_FAILED'
   | 'VALIDATION_FAILED'
 
+/** Mirrors `ImportPdfErrorReason` (src/features/import/import-pipeline.ts). */
+export type ImportPdfErrorReasonKey =
+  | 'NOT_PDF'
+  | 'TOO_LARGE'
+  | 'UNREADABLE'
+  | 'NO_TEXT_NO_OCR'
+  | 'OCR_UNAVAILABLE'
+  | 'MAPPING_EMPTY'
+  | 'VALIDATION_FAILED'
+
 /** Label plus optional example placeholder and guidance for one form field. */
 export interface FieldCopy {
   label: string
@@ -348,6 +358,32 @@ export interface MicrocopyPack {
     saved: string
   }
   importErrors: Record<ImportErrorReasonKey, string>
+  importPdf: {
+    /** Trigger, dialog, and file input — structural, kept for every locale. */
+    button: string
+    dialogTitle: string
+    fileLabel: string
+    approveAction: string
+    cancelAction: string
+    retryAction: string
+    /** Guidance prose — blanked for non-id locales (FR-204). */
+    hint: string
+    extractingNote: string
+    ocrNote: string
+    ocrDownloadNote: string
+    mappingNote: string
+    readyNote: string
+    reviewTitle: string
+    /** `{count}` is replaced with the unmapped-line count. */
+    unmappedNote: string
+    sourceTextNote: string
+    sourceOcrNote: string
+    confidenceHigh: string
+    confidenceMedium: string
+    confidenceLow: string
+    fieldCountNote: string
+    errors: Record<ImportPdfErrorReasonKey, string>
+  }
   emptyState: {
     title: string
     description: string
@@ -839,6 +875,44 @@ export const microcopyId: MicrocopyPack = {
     VALIDATION_FAILED:
       'Isi berkas tidak lengkap sehingga tidak bisa dibuka. CV Anda saat ini tetap aman.',
   },
+  importPdf: {
+    button: 'Impor PDF',
+    dialogTitle: 'Impor CV dari PDF',
+    fileLabel: 'Pilih berkas PDF',
+    approveAction: 'Simpan sebagai CV baru',
+    cancelAction: 'Batal',
+    retryAction: 'Coba lagi',
+    hint: 'Hasil ekstraksi hanya kandidat — tinjau dulu, lalu simpan sebagai CV baru bila sudah benar. CV yang sedang terbuka tidak berubah sebelum Anda menekan Simpan.',
+    extractingNote: 'Membaca lapisan teks PDF…',
+    ocrNote: 'Teks digital tidak ditemukan — membaca gambar halaman…',
+    ocrDownloadNote:
+      'Pemakaian pertama mengunduh model baca-gambar (beberapa MB) lalu menyimpannya di perangkat. Butuh internet sekali ini saja.',
+    mappingNote: 'Memetakan teks ke kolom CV…',
+    readyNote: 'Hasil siap ditinjau. Tidak ada yang tersimpan sebelum Anda menekan Simpan.',
+    reviewTitle: 'Tinjau hasil impor',
+    unmappedNote: '{count} baris tidak terpeta — periksa dan salin manual bila perlu.',
+    sourceTextNote: 'Sumber: teks digital PDF.',
+    sourceOcrNote: 'Sumber: baca-gambar (OCR). Ketelitiannya di bawah teks digital — periksa tiap kolom.',
+    confidenceHigh: 'Pola jelas',
+    confidenceMedium: 'Perlu ditinjau',
+    confidenceLow: 'Tebakan lemah — wajib cek',
+    fieldCountNote: 'kolom terpeta',
+    errors: {
+      NOT_PDF: 'Berkas ini bukan PDF. Pilih CV lama Anda yang berformat PDF.',
+      TOO_LARGE:
+        'Berkas melebihi 10 MB sehingga tidak dibaca. Pilih berkas yang lebih kecil, atau isi manual.',
+      UNREADABLE:
+        'Berkas PDF tidak dapat dibaca (rusak atau halamannya terlalu banyak). CV Anda saat ini tetap aman.',
+      NO_TEXT_NO_OCR:
+        'Tidak ada teks yang bisa dibaca dari berkas ini. Coba PDF lain, atau isi manual.',
+      OCR_UNAVAILABLE:
+        'Model baca-gambar belum tersedia (perlu internet sekali untuk mengunduhnya). PDF digital tetap bisa dibaca; atau isi manual.',
+      MAPPING_EMPTY:
+        'Tidak ada kolom yang bisa dipetakan dari berkas ini. Coba PDF lain, atau isi manual.',
+      VALIDATION_FAILED:
+        'Hasil ekstraksi tidak lengkap sehingga tidak bisa disimpan. CV Anda saat ini tetap aman.',
+    },
+  },
   emptyState: {
     title: 'Mulai dari halaman kosong',
     description:
@@ -899,6 +973,23 @@ export const microcopyStructural: MicrocopyPack = {
     remainderCache: '',
   },
   storageNotice: { ...microcopyId.storageNotice, notice: '' },
+  importPdf: {
+    ...microcopyId.importPdf,
+    hint: '',
+    extractingNote: '',
+    ocrNote: '',
+    ocrDownloadNote: '',
+    mappingNote: '',
+    readyNote: '',
+    reviewTitle: '',
+    unmappedNote: '',
+    sourceTextNote: '',
+    sourceOcrNote: '',
+    confidenceHigh: '',
+    confidenceMedium: '',
+    confidenceLow: '',
+    fieldCountNote: '',
+  },
   print: {
     ...microcopyId.print,
     intro: '',

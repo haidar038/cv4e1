@@ -23,6 +23,7 @@ import {
 } from '../store/actions'
 import { DataManagement } from '../settings/DataManagement'
 import { AiSettings } from '../ai/AiSettings'
+import { ImportCvDialog } from '../import/ImportCvDialog'
 import { documentStore } from '../store/document-store'
 import { draftStore } from '../store/draft-store'
 import { useMicrocopy } from '../form/useMicrocopy'
@@ -66,6 +67,7 @@ export function DraftPanel() {
   const [renameTarget, setRenameTarget] = useState<DraftSummary | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DraftSummary | null>(null)
   const [importMessage, setImportMessage] = useState<string | null>(null)
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleExport = () => {
@@ -99,7 +101,7 @@ export function DraftPanel() {
         </p>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" onClick={handleExport} disabled={document === null}>
           {pack.drafts.export}
         </Button>
@@ -113,6 +115,10 @@ export function DraftPanel() {
         >
           {pack.drafts.import}
         </Button>
+        {/* T3a (FR-501/FR-502): PDF import with mandatory human review. */}
+        <Button variant="outline" size="sm" onClick={() => setPdfDialogOpen(true)}>
+          {pack.importPdf.button}
+        </Button>
         <input
           ref={fileInputRef}
           type="file"
@@ -125,6 +131,7 @@ export function DraftPanel() {
           }}
         />
       </div>
+      <ImportCvDialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen} />
 
       {summaries.length === 0 ? (
         <p className="text-xs text-muted-foreground">{pack.drafts.empty}</p>

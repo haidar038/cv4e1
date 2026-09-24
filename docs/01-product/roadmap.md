@@ -62,7 +62,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 ## Fase 3 — Eksperimental
 
-- [ ] Impor CV: ekstraksi lapisan teks PDF → fallback OCR → ekstraksi field → UI tinjauan
+- [ ] Impor CV: ekstraksi lapisan teks PDF → fallback OCR → ekstraksi field → UI tinjauan (T3a terimplementasi + teruji; belum dicentang — `check:budget` menunggu keputusan re-baseline)
 - [ ] Pencocokan deskripsi lowongan (menyorot celah, tidak pernah mengarang skill)
 - [ ] Locale Bahasa Inggris
 

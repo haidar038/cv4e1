@@ -1437,3 +1437,33 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 **Jebakan harness baru (dicatat agar tidak mengulang):** script spike/tooling yang memakai Playwright atau worker tesseract **wajib jalan di `node`, bukan `bun`** — launch Chromium timeout 180 dtk di bun; worker tesseract `DataCloneError` di bun. Shipped code (browser) tak terpengaruh.
 
 **Verifikasi:** `bun install` bersih (16 paket) · spike node exit sesuai harapan (pdf 13/13) · format OK (di bawah) · tanpa PII (data fiktif) · tanpa perubahan `src/`.
+
+### T3a — Impor CV PDF: lapisan teks → OCR fallback → tinjauan → CV baru (FR-501/FR-502)
+**Requirement:** FR-501 (AC-501-a), FR-502 (AC-502-a); ADR-0008/0009 Accepted, ADR-0010 Proposed (mekanisme CDN-nya diimplementasikan; penerimaan ADR diminta bersama review ini); tanpa perubahan `ResumeDocument`
+**Status: IMPLEMENTASI SELESAI, GERBANG BUDGET FAIL — butuh keputusan maintainer (seperti C1b).** Opsi di `performance-budget.md` entri T3a; rekomendasi: (a) re-baseline sadar.
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/features/import/pdf-text.ts` (+test, 9 test) | **Baru.** Loader lazy pdf.js (single import point, `?url` worker, `GlobalWorkerOptions.workerSrc`, `disableWorker` + real Worker); `openPdfDocument` (cap 5 halaman), `extractPdfText`, `renderPdfPage` (≤200 DPI), `joinTextItems` (`hasEOL`) |
+| `src/features/import/ocr-text.ts` (+test, 6 test) | **Baru.** Loader lazy tesseract.js; URL pin `tesseract.js@7.0.0` + traineddata `ind`/`eng` `4.0.0_best_int` (diuji HEAD 200 saat spike); progres + `AbortSignal`; Cache Storage setelah unduh; tanpa egress data CV |
+| `src/features/import/field-mapper.ts` (+test, 17 test) | **Baru.** Heuristik murni: header ID/EN, kontak (email/telepon/tautan), tanggal ID/EN, item + highlights, skills; confidence per field; tak-terpetakan → `unmapped` (tak pernah `_unknownFields`, tak pernah dipotong diam-diam) |
+| `src/features/import/import-pipeline.ts` (+test, 7 test) | **Baru.** Validasi pre-parse (PDF, ≤10 MB) → teks → OCR bila tipis (<50 char) → map → validasi schema → kandidat; tak menyentuh store apa pun; `signal` batal antar-halaman |
+| `src/features/import/ImportCvDialog.tsx` (+dom test, 6 test, axe) | **Baru.** Dialog: pilih berkas → progres → tinjauan (sumber, confidence, unmapped) → Simpan sebagai CV baru / Batal; `'use no memo'` + baca event-time; STORAGE gagal = dialog tetap terbuka (tak ada diam-diam) |
+| `src/features/store/actions.ts` | Aditif: `importPdfCandidateAction` (validasi ulang defensif → draft BARU → buka; cermin `importDraftAction`) |
+| `src/features/drafts/DraftPanel.tsx` | Aditif: tombol `Impor PDF` + mount dialog (JS awal +6,1 KB) |
+| `src/content/microcopy/id.ts` | Aditif: grup `importPdf` (22 string) + `ImportPdfErrorReasonKey` + blanking FR-204; tersapu frasa terlarang otomatis |
+| `docs/adr/0010-ocr-runtime-assets.md` (baru, Proposed) | CDN berversi + Cache Storage; supersede parsial klausa hosting ADR-0008; SRI + evaluasi self-host sebagai tindak lanjut |
+| `e2e/import-pdf.spec.ts` (baru, 3 test) | Production build + pdf.js ASLI (tanpa mock): tinjau→setuju→draft baru; Batal/Escape→utuh; non-PDF→nota; PDF hand-built 1 halaman inline |
+| Docs | ai-product-spec C4 dicentang yang terimplementasi; roadmap Fase 3 baris impor dicatat (belum [x] — budget); performance-budget entri T3a |
+
+**Keputusan implementasi:**
+
+- **Koreksi spike (jujur, temuan e2e):** asumsi "worker tak perlu di-ship" SALAH di browser — pdf.js v6 butuh kode worker bahkan untuk parse main-thread (Node lolos karena berkas repo-lokal). Solusi: worker asli via `?url` (bukan fake-worker): +515,5 KB gzip lazy, tanpa jank main-thread. Angka 130 KB spike hanya inti.
+- **`hasEOL` menyelamatkan baris:** gabung item pdf.js dengan spasi meruntuhkan CV multi-baris jadi satu baris (header tak terdeteksi, tanggal jadi "telepon"). `joinTextItems` memakai geometri pdf.js; plus pagar: kandidat telepon yang parse sebagai tanggal murni ditolak.
+- **Kegagalan test milik saya (jujur):** `parseDateRange` serakah di dash pertama (diperbaiki: split di separator TERKANAN + kupas tahun); fake loader kurang `render`/`getViewport`; `current: boolean` wajib di item experience; sinyal abort dibaca via helper (narrowing TS); `new File([Uint8Array])` butuh cast BlobPart; judul review tak tampil (aria saja); Batal tak menutup dialog; `user.upload` menegakkan `accept` (fireEvent untuk jalur NOT_PDF); Basics tertutup pasca-ganti-draft (klik Data Diri); dialog modal membuat background inert (bukti AC-502-a pra-Approve pindah ke dom test).
+- **Jebakan e2e milik harness:** `openImportDialog` ganda perlu varian tanpa "Buat CV pertama" (draft sudah ada).
+- **Flake beban-paralel (pola terdokumentasi, bukan defect):** 1 PreviewPane Creative gagal di run penuh, hijau terisolasi; run awal import sempat exit 1 dengan 37/37 hijau lalu hijau bersih.
+
+**Angka bundle (keputusan diminta):** `initialJsGzip` +2,9% ✅; `jsGzip` 231,4 → 909,3 KB (+293% ❌: worker 515,5 + inti 148,3 + wrapper 7,3 + dialog ≈6); `transferGzip` +192% ❌. Baseline JSON TIDAK diubah sepihak.
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing) · `check:boundaries` OK · format OK · **unit 75 file / 673 test** (70/628 + 45 baru: 9 pdf + 6 ocr + 17 mapper + 7 pipeline + 6 dialog; 1 flake PreviewPane pra-ada, hijau terisolasi) · build OK (chunk lazy `pdf` 148,3 KB + `pdf.worker` 515,5 KB + tesseract 7,3 KB gzip) · `check:privacy` OK · **`check:budget` FAIL** (di atas — menunggu (a)/(b)/(c)) · `test:e2e` impor **6/6** (Chromium + Firefox, production build, pdf.js asli).

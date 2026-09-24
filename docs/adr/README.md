@@ -22,6 +22,7 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | [0007](0007-pdf-export-pipeline.md) | Pipeline ekspor PDF untuk mode ATS dan Creative | Accepted (2026-09-20) |
 | [0008](0008-pdf-import-ocr-pipeline.md) | Pipeline impor PDF: lapisan teks dulu, OCR fallback | Accepted (2026-09-26) |
 | [0009](0009-unknown-fields-and-asset-policy.md) | Field tak dikenal + kebijakan aset ekspor | Accepted (2026-09-26) |
+| [0010](0010-ocr-runtime-assets.md) | Aset runtime OCR: CDN berversi + Cache Storage | Proposed (2026-09-26) |
 
 ## Kandidat ADR berikutnya
 

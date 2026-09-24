@@ -177,6 +177,21 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   `initialJsGzip` 211,2 · `jsGzip` 231,4 · `cssGzip` 27,5 · `fontsRaw` 88,8 ·
   `transferGzip` 353,6 KB — semua ratchet +0,0%. Utang absolut >200 KB
   (JS awal + semua-JS) tetap tercatat sebagai advisory, bukan gerbang.
+- **T3a impor PDF (2026-09-26, MENUNGGU keputusan re-baseline — baseline
+  JSON TIDAK diubah sepihak):** `initialJsGzip` 211,2 → **217,3 KB**
+  (+2,9% ✅ — dialog + pipeline + mapper + microcopy di JS awal);
+  `jsGzip` 231,4 → **909,3 KB** (+293% ❌); `transferGzip` 353,6 →
+  **1031,7 KB** (+192% ❌). Rincian: worker pdf.js **515,5 KB** gzip
+  (wajib — pdf.js v6 butuh kode worker bahkan untuk parse main-thread;
+  asumsi spike "tanpa worker" terbukti salah di browser),
+  inti pdf.js 148,3 KB, wrapper tesseract 7,3 KB, sisanya dialog/pipeline.
+  Kunjungan pertama hanya +6,1 KB; Aset OCR (inti + traineddata ±6,7 MB)
+  tetap on-demand + ter-cache, nol di metrik. Opsi: (a) re-baseline
+  sadar (direkomendasikan — local-first ADR-0001 lebih penting dari
+  angka; ratchet tetap bermakna di level baru); (b) pdf.js via CDN
+  seperti ADR-0010 (nol delta dist, tetapi impor digital butuh internet
+  sekali + skrip main-thread remote); (c) pangkas scope impor PDF.
+  Tanpa keputusan, T3a tidak diklaim Done (§8).
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

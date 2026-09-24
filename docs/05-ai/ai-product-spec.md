@@ -53,11 +53,11 @@
 Unggah → ekstraksi lapisan teks PDF → fallback OCR → ekstraksi field kandidat
   → validasi schema → tampilan keyakinan → tinjauan manusia → simpan
 ```
-- [ ] **Coba ekstraksi lapisan teks lebih dulu** — sebagian besar CV digital tidak butuh OCR sama sekali
-- [ ] OCR lokal (Tesseract WASM) menjaga data di perangkat; LLM lebih akurat tetapi mengirim data keluar
-- [ ] Hasil ekstraksi **tidak pernah** langsung masuk ke CV final
-- [ ] Tampilkan keyakinan per field
-- [ ] Fallback: entri manual (yang memang jalur utama)
+- [x] **Coba ekstraksi lapisan teks lebih dulu** — sebagian besar CV digital tidak butuh OCR sama sekali (T3a: `pdf-text.ts`, ambang <50 char, e2e impor 6/6)
+- [x] OCR lokal (Tesseract WASM) menjaga data di perangkat; LLM lebih akurat tetapi mengirim data keluar (T3a: `ocr-text.ts` lazy + CDN pin ADR-0010 + Cache Storage; LLM eksplisit di luar scope — ADR-0008)
+- [x] Hasil ekstraksi **tidak pernah** langsung masuk ke CV final (T3a: kandidat → `ImportCvDialog` → `importPdfCandidateAction` hanya saat Setuju; AC-501-a/502-a hijau)
+- [x] Tampilkan keyakinan per field (T3a: `confidence` high/medium/low per `FieldCandidate`)
+- [x] Fallback: entri manual (yang memang jalur utama) (T3a: tiap kegagalan menjawab nota FR-408 + arahan manual; OCR-offline → `OCR_UNAVAILABLE`)
 
 ## 3. Titik masuk UX
 - [ ] Di mana AI muncul di antarmuka
