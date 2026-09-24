@@ -1353,3 +1353,16 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 - **Pelanggaran produk:** tidak ada. Semua kegagalan di atas milik harness/test, bukan produk.
 
 **Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pre-existing, sempat 25 dari effect saya — diperbaiki) · format OK · `check:boundaries` OK (239 file / 1095 specifier) · **unit 70 file / 628 test** (586 + 42: 9 prompts + 15 orkestrator + 12 dom + 3 store + 2 gate CSS + 1 statis net) · build OK (chunk lazy `achievement-generator` 3,3 KB gzip) · `check:privacy` OK · `test:e2e` AI **32/32** (achievement 4 + bullets 4 + polish 4 + consent 2, × Chromium + Firefox) · **`check:budget` FAIL: `jsGzip` +12,2% (batas +10%)** — `initialJsGzip` +6,4% ✅, lainnya ✅. Opsi di performance-budget entri; tanpa keputusan, task ini tidak diklaim Done (§8).
+
+### Gerbang Fase 2 — DITUNDA, bukan ditutup (sesi kickoff 2026-09-24)
+**Requirement:** gerbang keluar Fase 2 di `docs/01-product/roadmap.md` ("nol pelanggaran grounding pada set evaluasi; seluruh fitur AI punya fallback yang lulus test"); tanpa perubahan `ResumeDocument`; tanpa kode produksi (docs saja)
+**Status: DITUNDA.** Verifikasi read-only sesi ini menemukan baseline kickoff kedaluwarsa: HEAD kini `9901ba6` (aliran terpadu C1b + marker preview, 1 commit di depan `origin/main` — push = keputusan maintainer, tidak di-push), bukan `36baf3e`. Working tree bersih.
+
+| Penahan gerbang | Bukti |
+| :-- | :-- |
+| Budget FAIL | `check:budget` ❌ `jsGzip` 225,8 → 231,4 KB (+12,2% ratchet, batas +10%); opsi (a) re-baseline sadar / (b) pangkas scope / (c) paket diet di `docs/07-quality/performance-budget.md` entri C1b; `scripts/bundle-baseline.json` tidak diubah sepihak |
+| Eval manual ber-key tanpa bukti | `docs/05-ai/manual-eval-protocol.md` §5 menuntut tabel per versi prompt (tanggal, konteks model, lulus/gagal per kasus) — tidak ditemukan di tree/log; `testing-result/`, `verify-results/` kosong; `docs/08-delivery/production-checklist.md` AI masih `[ ]`; D5 Task 22 ("lanjut tanpa menunggu eval manual") belum di-waive formal |
+| Klaim aksi mandiri tak terkonfirmasi | Log/tree tidak memuat commit fix-kontras pasca-`99bbf33` (12 `color-contrast` pra-ada tetap milik restyle StorageNotice) maupun catatan eval ber-key; dilaporkan sebagai diskrepansi, bukan fakta |
+| Sisi yang lulus | Mock + invariant + fallback + runner per-versi-prompt di CI (unit 70 file / 628 test per entri C1b; e2e AI 32/32); `translate-en` dikecualikan by-design; allowlist kurasi statis eksplisit |
+
+**Syarat penutupan:** (1) keputusan sadar opsi budget C1b + `check:budget` hijau; (2) bukti eval ber-key dilampirkan ATAU waiver D5 tertulis; (3) keputusan kontras StorageNotice. `docs/01-product/roadmap.md` gerbang Fase 2 dianotasi DITUNDA di sesi ini.

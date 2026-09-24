@@ -58,6 +58,8 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 **Gerbang keluar:** nol pelanggaran grounding pada set evaluasi; seluruh fitur AI punya fallback yang lulus test.
 
+**Status gerbang (2026-09-24): DITUNDA — belum layak ditutup.** Dua penahan: (1) `check:budget` FAIL pasca-aliran C1b (`9901ba6`): `jsGzip` +12,2% melewati ratchet +10% — lihat `docs/07-quality/performance-budget.md` entri C1b untuk opsi (a/b/c); (2) evaluasi manual ber-key per `docs/05-ai/manual-eval-protocol.md` §5 belum ada buktinya (jalur mock/statis di CI lulus; model live belum). Branches: `main` 1 commit di depan `origin/main` (push = keputusan maintainer).
+
 ## Fase 3 — Eksperimental
 
 - [ ] Impor CV: ekstraksi lapisan teks PDF → fallback OCR → ekstraksi field → UI tinjauan
