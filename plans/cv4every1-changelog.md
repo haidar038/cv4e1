@@ -1366,3 +1366,16 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 | Sisi yang lulus | Mock + invariant + fallback + runner per-versi-prompt di CI (unit 70 file / 628 test per entri C1b; e2e AI 32/32); `translate-en` dikecualikan by-design; allowlist kurasi statis eksplisit |
 
 **Syarat penutupan:** (1) keputusan sadar opsi budget C1b + `check:budget` hijau; (2) bukti eval ber-key dilampirkan ATAU waiver D5 tertulis; (3) keputusan kontras StorageNotice. `docs/01-product/roadmap.md` gerbang Fase 2 dianotasi DITUNDA di sesi ini.
+
+### Gerbang Fase 2 — DITUTUP (2026-09-25, keputusan maintainer)
+**Requirement:** gerbang keluar Fase 2 di `docs/01-product/roadmap.md`; tanpa perubahan `ResumeDocument`; tanpa kode produksi selain baseline sadar
+**Status: LULUS.** Keempat respons maintainer dieksekusi:
+
+| Keputusan | Eksekusi |
+| :-- | :-- |
+| (a) re-baseline sadar | `bun run build` hijau dari HEAD lalu `check-bundle-size --update`: `initialJsGzip` 211,2 · `jsGzip` 231,4 · `cssGzip` 27,5 · `fontsRaw` 88,8 · `transferGzip` 353,6 KB — semua ratchet +0,0% ✅; entri + status v0.12 di `docs/07-quality/performance-budget.md`; utang absolut >200 KB tetap advisory |
+| Bukti eval ber-key | Atestasi maintainer 2026-09-25 dicatat di `docs/05-ai/manual-eval-protocol.md` §5.1 (Groq `openai/gpt-oss-120b`, kunci sesi + consent, bullet + polish sesuai ekspektasi, nol pelanggaran grounding teramati; tabel per-kasus formal belum diisi — diterima sebagai bukti atas keputusan maintainer) |
+| Commit | `f11c70d` memuat perubahan sesi 2026-09-24 dan sudah di-push (`main` selaras `origin/main`); perubahan sesi ini belum di-commit (keputusan maintainer) |
+| Fase 3 disetujui | Rencana `plans/cv4every1-fase-3-eksperimental.md` berlaku; langkah pertama = ADR pipeline impor-OCR + kebijakan field tak-dikenal (AGENTS.md §9, sebelum kode apa pun) |
+
+**Kontras StorageNotice:** syarat (3) direklasifikasi — 12 `color-contrast` pra-ada bukan kriteria gerbang AI (grounding + fallback hijau) melainkan utang audit aksesibilitas Fase 4. `docs/01-product/roadmap.md` gerbang Fase 2 dianotasi LULUS di sesi ini.

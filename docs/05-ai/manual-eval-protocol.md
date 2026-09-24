@@ -46,6 +46,20 @@ tempat, lalu ulangi protokol penuh.
 - Setiap pelanggaran grounding yang ditemukan menjadi **fixture permanen**
   di `fixtures/ai-eval/` — set hanya bertambah, tidak pernah menyusut.
 
+### 5.1 Hasil run ber-key v1 (2026-09-25, atestasi maintainer)
+
+- **Konteks §2:** penyedia Groq, model `openai/gpt-oss-120b`, kunci sesi-memori
+  + consent per-penyedia-per-sesi; dijalankan via UI di server dev;
+  input fixture fiktif (tanpa data pribadi asli di repo).
+- **Cakupan:** generator bullet (C1/C1b prompt v1) + polish (C2 prompt v1 ID/EN).
+- **Hasil:** keduanya berjalan sesuai ekspektasi; **nol pelanggaran grounding
+  teramati** — saran memakai placeholder `[dampak yang dapat diukur]`
+  untuk angka yang tidak ada di input, Apply per-item tidak mengubah draft
+  sebelum diklik.
+- **Batas catatan:** atestasi kualitatif + tangkapan layar sesi (tidak
+  di-commit); tabel lulus/gagal per-kasus formal belum diisi. Diterima
+  sebagai bukti penutupan gerbang Fase 2 atas keputusan maintainer.
+
 ## 6. Keterbatasan yang diketahui (ditunda ke eval akhir)
 
 - **Redundansi awalan (temuan 2026-09-23):** input `Mengelola Membuat

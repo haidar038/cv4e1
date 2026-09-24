@@ -2,8 +2,8 @@
 
 | Field | Value |
 | :-- | :-- |
-| Status | **v0.11 — Gerbang Fase 1: re-baseline sadar dieksekusi atas persetujuan maintainer (2026-09-22). Semua ratchet +0,0%; utang absolut jsGzip >200 KB tetap tercatat** |
-| Terakhir diperbarui | 2026-09-21 |
+| Status | **v0.12 — Re-baseline sadar pasca-C1b atas persetujuan maintainer (2026-09-25). Semua ratchet +0,0%; utang absolut jsGzip >200 KB tetap tercatat** |
+| Terakhir diperbarui | 2026-09-25 |
 
 > Pengguna sasaran memakai ponsel kelas menengah dengan koneksi terbatas. Anggaran ini adalah requirement (NFR-008), bukan target.
 
@@ -168,8 +168,15 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   chunk sehingga split tak menguranginya. Opsi nyata: (a) re-baseline sadar
   (fitur sah, kunjungan pertama +2,3 KB saja); (b) pangkas scope (pakai
   prompt C1 — mengorbankan larangan verb-stacking yang diminta review);
-  (c) paket diet (inti orkestrator bersama + komposisi prompt + reuse
-  microcopy ≈ 3,4 KB — tak sampai ambang, berisiko regresi jalur T19/20).
+  (c) paket diet tidak diambil (tak sampai ambang, berisiko regresi jalur T19/20).
+- **Re-baseline sadar pasca-C1b (2026-09-25, opsi (a) atas persetujuan
+  maintainer):** pertumbuhan berasal dari fitur sah yang diminta review
+  (prompt C1b + panel/trigger + microcopy `aiAchievement`), bukan regresi —
+  kunjungan pertama hanya +2,3 KB. Build produksi diulang dari HEAD
+  (`bun run build` hijau) lalu `check-bundle-size --update`:
+  `initialJsGzip` 211,2 · `jsGzip` 231,4 · `cssGzip` 27,5 · `fontsRaw` 88,8 ·
+  `transferGzip` 353,6 KB — semua ratchet +0,0%. Utang absolut >200 KB
+  (JS awal + semua-JS) tetap tercatat sebagai advisory, bukan gerbang.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`
