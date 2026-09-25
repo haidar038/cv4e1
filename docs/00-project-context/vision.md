@@ -216,7 +216,7 @@ Butuh keputusan sebelum atau selama Horizon 1.
 
 | # | Pertanyaan | Dibutuhkan pada |
 | :-- | :-- | :-- |
-| Q1 | Lisensi: MIT (adopsi maksimal) atau AGPL-3.0 (mencegah SaaS tertutup tanpa kontribusi)? | Sebelum rilis publik pertama |
+| Q1 | ✅ Diputus: AGPL-3.0 (ADR-0013, 2026-09-26). MIT ditolak karena mengizinkan SaaS tertutup tanpa kontribusi. | Diputus 2026-09-26 |
 | Q2 | Apakah nama domain dan identitas visual sudah ditetapkan? | Sebelum Horizon 1 |
 | Q3 | Apakah Horizon 2 memakai BYO-key saja, atau menyediakan proxy server opsional yang dihosting sendiri? | ADR-0006 |
 | Q4 | Berapa banyak template Creative yang layak dipelihara di MVP? Usulan: dua. | Horizon 1 |

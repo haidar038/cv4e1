@@ -25,6 +25,7 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | [0010](0010-ocr-runtime-assets.md) | Aset runtime OCR: CDN berversi + Cache Storage | Accepted (2026-09-26) |
 | [0011](0011-job-tailoring-grounding.md) | Penyesuaian lowongan T3b: celah kata kunci + grounding + sanitasi injection | Accepted (2026-09-25) |
 | [0012](0012-locale-en-i18n.md) | Pengalih bahasa ID/EN: pack bertipe + fallback aman + lint dwibahasa | Accepted (2026-09-25) |
+| [0013](0013-project-license-agpl-3-0.md) | Lisensi proyek: AGPL-3.0 | Accepted (2026-09-26) |
 
 ## Kandidat ADR berikutnya
 
@@ -32,6 +33,5 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | :-- | :-- |
 | Font bundel versus font sistem | Sebelum Fase 1 |
 | Analytics atau tanpa analytics | Sebelum rilis publik (usulan: tanpa) |
-| Lisensi proyek | Sebelum rilis publik (pertanyaan terbuka Q1) |
 | Strategi multi-tab | Sebelum Fase 1 |
 | Kebijakan dependensi pihak ketiga | Berkelanjutan |

@@ -135,9 +135,10 @@ behavior, or AI boundaries needs a discussion before code.
 
 ## License
 
-**Not decided yet** (open question Q1 in `vision.md` §12: MIT for maximum adoption vs AGPL-3.0 to
-prevent closed SaaS reuse). There is no `LICENSE` file in this repository yet, so no license is
-granted while the decision is pending.
+**AGPL-3.0-only** — see [`LICENSE`](LICENSE) and ADR-0013
+(`docs/adr/0013-project-license-agpl-3-0.md`, decided 2026-09-26). You may use, modify, and share
+this project under those terms; if you run a modified version on a network server, you must offer
+its source code to your users (§13 of the license).
 
 ---
 
@@ -179,5 +180,6 @@ Dokumentasi lengkap berbahasa Indonesia ada di [`docs/README.md`](docs/README.md
 konteks per topik di [`docs/context-map.md`](docs/context-map.md). Aturan operasional (termasuk
 untuk agen AI) ada di [`AGENTS.md`](AGENTS.md).
 
-**Lisensi belum ditentukan** (Q1: MIT vs AGPL-3.0), sehingga belum ada berkas `LICENSE` di repositori
-ini dan belum ada lisensi yang diberikan.
+**Lisensi: AGPL-3.0** — lihat [`LICENSE`](LICENSE) dan ADR-0013 (diputus 2026-09-26). Anda boleh
+memakai, mengubah, dan membagikan proyek ini di bawah ketentuan tersebut; bila menjalankan versi
+modifikasi di server jaringan, source code-nya wajib ditawarkan ke pengguna (§13 lisensi).

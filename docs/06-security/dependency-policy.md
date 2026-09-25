@@ -28,7 +28,7 @@
 
 ## 3. Lisensi yang diizinkan
 - [ ] MIT, Apache-2.0, BSD, ISC
-- [ ] TODO: finalkan setelah lisensi proyek diputuskan (pertanyaan terbuka Q1)
+- [ ] Proyek berlisensi AGPL-3.0 (ADR-0013, Q1 diputus 2026-09-26): lisensi inbound harus kompatibel — permisif (MIT/Apache-2.0/BSD/ISC, OFL-1.1 untuk font) atau copyleft yang kompatibel-GPL (mis. MPL-2.0). Audit 2026-09-26: 758 paket terpasang, nol konflik (lihat ADR-0013).
 - [ ] Pemeriksaan lisensi otomatis di CI
 
 ## 4. Pemeliharaan

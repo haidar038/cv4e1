@@ -75,7 +75,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 - [ ] Tinjauan keamanan dan privasi
 - [ ] Proses rilis, rollback, runbook
 - [ ] Dokumentasi publik dan halaman pendaratan
-- [ ] Keputusan lisensi (Q1)
+- [x] Keputusan lisensi (Q1) — AGPL-3.0, ADR-0013 (2026-09-26)
 
 ## Yang secara sengaja tidak dijadwalkan
 - Akun dan sinkronisasi cloud
