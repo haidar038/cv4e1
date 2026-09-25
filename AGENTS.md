@@ -359,30 +359,300 @@ cv4every1/
 
 ---
 
-## 16. Agent report format
+## 16. Agent response and report format
 
-When reporting task completion to the user, use this two-layer format. Report body is in Bahasa Indonesia; this specification stays in English per §12.
+When responding to the user after completing, attempting, or investigating a task, optimize the response for **human understanding first and technical precision second**.
 
-1. **Separate summary from log.** Start with `Ringkasan` (one short paragraph: status + what changed). Put raw output (git log, test output, build stats) in a fenced `code block`, never mixed into prose.
-2. **Use a table for verification.** Test counts, build status, and file changes go in a Markdown table with columns `Komponen | Hasil | Keterangan`. Do not merge multiple metrics into one dense bullet. Keep prose scannable: one fact per line, no telegraphic terminal-log style.
-3. **Separate decisions.** If user input is needed, add a `Keputusan Diperlukan` section with only the action points, each as one short option. If nothing is needed, omit the section.
+The reader may be the project maintainer, not the original implementer. Assume they understand software development, but do not assume they know the exact implementation details, internal abstractions, or reasoning used in this task.
 
-Template:
+The response must be written in **clear Bahasa Indonesia**. English may be used for code symbols, file paths, commands, API names, requirement IDs, and established technical terms.
 
-````markdown
+### 16.1 Explain the result before the implementation
+
+The first explanation must answer:
+
+1. **Apa yang terjadi?**
+2. **Apa yang berubah?**
+3. **Apa dampaknya bagi project atau user?**
+4. **Apakah semuanya sudah berhasil?**
+
+Do not begin with internal implementation details.
+
+Prefer:
+
+> Fitur import sekarang tetap mempertahankan draft ketika file JSON yang dimasukkan tidak valid. Sebelumnya, proses import dapat menghapus draft aktif sebelum validasi selesai.
+
+Over:
+
+> Refactored the import pipeline to validate the payload before committing state mutations.
+
+The second statement may be technically accurate, but it is too implementation-focused for the main explanation.
+
+### 16.2 Use concrete language
+
+Prefer concrete descriptions of behaviour, actions, and outcomes.
+
+Avoid vague phrases such as:
+
+* "improved the architecture"
+* "enhanced the flow"
+* "refined the implementation"
+* "optimized the handling"
+* "strengthened the logic"
+* "updated the abstraction"
+* "improved state management"
+* "made the system more robust"
+
+Unless the response immediately explains **what specifically changed**.
+
+Instead, describe the observable result:
+
+* "Validasi sekarang dijalankan sebelum data disimpan."
+* "Draft tidak lagi dihapus ketika file import gagal."
+* "Mode ATS sekarang selalu menggunakan satu kolom."
+* "Foto tetap tersimpan di data CV, tetapi tidak dirender pada template ATS."
+
+### 16.3 Translate technical changes into developer-understandable language
+
+Technical terms are allowed, but the agent must explain their meaning when they are important to understanding the change.
+
+Prefer:
+
+> Mengubah `ResumeDocument` menjadi schema version 3. Artinya, data CV lama masih bisa dibuka karena tersedia migration dari version 2 ke version 3.
+
+Over:
+
+> Bumped `ResumeDocument` schema to v3 and added a backward migration path.
+
+Do not unnecessarily translate common developer terms such as `component`, `function`, `hook`, `test`, `build`, `migration`, or `API` when their meaning is already clear from context.
+
+### 16.4 Do not assume the reader knows why a change matters
+
+When describing an internal change, state its practical consequence.
+
+Use this pattern when relevant:
+
+> **Perubahan:** <what changed>
+> **Alasan:** <why it was needed>
+> **Dampak:** <what this changes for the user/system>
+
+Example:
+
+> **Perubahan:** Validasi schema dipindahkan sebelum proses penyimpanan.
+> **Alasan:** File import yang rusak sebelumnya berpotensi memengaruhi draft yang sedang aktif.
+> **Dampak:** Draft aktif tetap aman ketika import gagal.
+
+Do not explain implementation details that have no meaningful consequence for the maintainer.
+
+### 16.5 One sentence must communicate one main idea
+
+Avoid dense sentences containing multiple implementation details, assumptions, and consequences.
+
+Bad:
+
+> Updated the storage adapter to normalize IndexedDB errors, preserve transaction boundaries, and prevent mutation during quota handling, ensuring draft integrity across fallback paths.
+
+Better:
+
+> Adapter storage sekarang menangani error IndexedDB secara eksplisit.
+> Ketika storage penuh, draft tidak diubah atau dihapus.
+> Perubahan ini menjaga draft tetap utuh ketika proses penyimpanan gagal.
+
+### 16.6 Avoid unexplained abstractions
+
+Do not use internal terminology, acronyms, design-pattern names, or architectural labels as the main explanation unless they are necessary.
+
+For example, do not say only:
+
+> Added a view-model boundary.
+
+Explain it:
+
+> Aturan khusus mode ATS sekarang diproses sebelum data diberikan ke renderer. Dengan begitu, aturan seperti "tanpa foto" dan "satu kolom" tidak perlu ditentukan ulang di setiap komponen UI.
+
+Technical terminology can follow the explanation when useful:
+
+> Lapisan tersebut digunakan sebagai `view-model`.
+
+### 16.7 Distinguish facts from interpretation
+
+Clearly separate:
+
+* **What was changed**
+* **What was tested**
+* **What was observed**
+* **What is still uncertain**
+
+Never use confident wording for something that was not verified.
+
+Use:
+
+> Build berhasil dijalankan.
+
+Not:
+
+> Perubahan ini sudah aman untuk production.
+
+unless production readiness was actually verified according to the project requirements.
+
+When verification is incomplete, state it directly:
+
+> Unit test berhasil, tetapi E2E offline belum dijalankan. Karena itu, perilaku offline belum dapat dianggap terverifikasi.
+
+### 16.8 Report failures in plain language
+
+When something fails, explain the failure before showing technical output.
+
+Use this order:
+
+1. What failed.
+2. What the failure means.
+3. What is affected.
+4. Relevant technical detail.
+5. What decision or action is required, if any.
+
+Example:
+
+> **Status: Selesai sebagian.**
+> Implementasi sudah selesai, tetapi 2 E2E test masih gagal. Keduanya terkait import file dengan schema version lama. Fitur utama tetap dapat digunakan, tetapi backward compatibility belum dapat dianggap selesai.
+
+Then, if needed:
+
+```text
+Command: npm run test:e2e
+
+2 failed, 18 passed
+```
+
+Do not start with the raw error and expect the reader to interpret it.
+
+### 16.9 Do not over-compress important information
+
+A short response is good. An overly compressed response is not.
+
+The agent must not remove important context merely to keep the response short.
+
+Bad:
+
+> Fixed import validation. Tests pass.
+
+Better:
+
+> Validasi import sekarang dijalankan sebelum data menggantikan draft aktif. Jika file tidak valid, draft lama tetap dipertahankan. Unit test untuk kasus tersebut sudah ditambahkan dan seluruh test terkait berhasil.
+
+### 16.10 Do not narrate every action
+
+Do not report every command, file inspection, search, or intermediate step unless it is relevant to the result.
+
+Avoid:
+
+> I opened `storage.ts`, then checked `schema.ts`, then searched for `saveDraft`, then inspected the test fixture...
+
+Instead, summarize the outcome:
+
+> Perubahan mencakup adapter storage dan test fixture untuk skenario storage penuh.
+
+The report describes **what was accomplished**, not a transcript of the agent's thought process.
+
+### 16.11 Standard response structure
+
+Unless the task is trivial, use the following structure:
+
+```markdown
 ## Ringkasan
-<status: Selesai / Gagal> — <one sentence>
+
+<Selesai / Selesai sebagian / Gagal> — <jelaskan hasil dengan bahasa sederhana>
+
+## Apa yang berubah
+
+<jelaskan perubahan utama dan dampaknya>
 
 ## Verifikasi
-| Komponen | Hasil | Keterangan |
+
+| Pemeriksaan | Status | Hasil |
 | :-- | :-- | :-- |
-| <unit / build / e2e / DoD> | <pass / fail> | <one short note> |
+| Unit test | PASS | 24 test berhasil |
+| Type-check | PASS | Tidak ada error |
+| Build | PASS | Production build berhasil |
+| E2E | NOT RUN | Belum dijalankan karena <alasan> |
+
+## Catatan
+
+<risiko, keterbatasan, atau hal yang masih belum terverifikasi>
 
 ## Keputusan Diperlukan
-- <action point, only if needed>
 
-## Detail
-```text
-<raw log here>
+<hanya tampilkan jika memang membutuhkan keputusan dari maintainer>
 ```
-````
+
+For very small tasks, the response may be shorter. Do not force all sections when they add no useful information.
+
+### 16.12 Technical detail is secondary
+
+Technical details should support understanding, not replace it.
+
+Use this priority:
+
+**Outcome → Change → Reason → Impact → Verification → Technical detail**
+
+Not:
+
+**Implementation → Internal abstraction → Commands → Logs → Outcome**
+
+The maintainer should be able to understand the result without reading the raw logs.
+
+### 16.13 Final self-check before responding
+
+Before sending the response, verify:
+
+* Could a developer understand what changed without opening the diff?
+* Did the response explain why the change matters?
+* Did it distinguish verified results from assumptions?
+* Did it explain important technical terms instead of hiding behind them?
+* Did it avoid vague phrases such as "improved", "refined", or "optimized" without concrete explanation?
+* Did it clearly state anything that remains unverified?
+* Could the response be understood by someone who did not perform the implementation?
+
+If any answer is "no", rewrite the explanation before responding.
+
+```
+
+### Kenapa ini lebih cocok untuk kasus Muse Spark
+
+Menurut saya, ini justru lebih efektif daripada sekadar menyuruh model **"gunakan bahasa yang sederhana"**. Instruksi seperti itu terlalu subjektif dan model masih bisa merasa kalimat seperti *"implemented a resilient state reconciliation flow"* adalah bahasa sederhana.
+
+Di versi di atas, kita memberi model **aturan translasi** yang lebih operasional:
+
+**Technical implementation**  
+→ **what actually happens**  
+→ **why it matters**  
+→ **what the maintainer needs to know**
+
+Contohnya, daripada agent mengatakan:
+
+> `Implemented fallback handling for IndexedDB persistence failures.`
+
+dia diarahkan untuk menghasilkan:
+
+> **Storage sekarang punya penanganan ketika penyimpanan IndexedDB gagal.**  
+> Draft tidak langsung hilang ketika penyimpanan gagal.  
+> Kasus storage penuh juga sudah dimasukkan ke test.
+
+Itu masih teknis, tetapi tidak lagi abstrak.
+
+### Satu perubahan yang menurut saya paling penting
+
+Saya juga akan **mengubah nama §16** dari:
+
+> `Agent report format`
+
+menjadi:
+
+> `Agent response and report format`
+
+Karena problem kamu ternyata terjadi **di response secara keseluruhan**, bukan hanya completion report. Agent bisa saja menyelesaikan task dengan benar, tetapi tetap memberi penjelasan yang buruk.
+
+Jadi §16 harus mengatur **communication contract**, bukan cuma **report template**.
+
+Dan ini cocok dengan AGENTS kamu yang memang sudah cukup ketat di sisi architecture, testing, schema, privacy, dan DoD. Yang masih kurang adalah *human-readable communication layer* setelah agent selesai bekerja.
+```
