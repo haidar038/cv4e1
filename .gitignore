@@ -35,6 +35,8 @@ playwright/.cache
 # Additional ignore rules for your project below
 .zcode
 additional
+CI-logs
+
 # Vendor AI docs (referensi lokal maintainer, bukan milik repo)
 docs/groq-docs/
 

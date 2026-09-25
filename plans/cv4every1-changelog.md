@@ -1480,3 +1480,16 @@ Keputusan maintainer atas review: kata kerja kepemimpinan terdengar janggal seba
 | `docs/01-product/roadmap.md` | Baris impor Fase 3 → [x] |
 
 **Verifikasi:** `bun run build` hijau · `bun run check:budget` hijau semua +0,0% (peringatan absolut = utang berdokumen, bukan gerbang) · `verify` hijau: lint 0 error, format ✅ (8 berkas T3a sesi lalu belum lolos prettier — diperbaiki mekanis `prettier --write`, murni wrapping tanpa perubahan semantik), typecheck ✅, boundaries ✅, **unit 75 file / 673 test hijau** (paralel: 1 unhandled flake pra-ada `App.dom.test.tsx` teardown; hijau bersih `--pool=forks --maxWorkers=1`), build ✅, privacy ✅, budget ✅ · `e2e/import-pdf.spec.ts` **6/6** Chromium + Firefox via `node` (paralel: 1 flake upload Firefox; hijau bersih `--workers=1`, pdf.js asli tanpa mock).
+
+### Perbaikan kontras StorageNotice — CI e2e kembali hijau (2026-09-26)
+**Requirement:** NFR aksesibilitas (WCAG 2.2 AA, visi P8); tanpa perubahan `ResumeDocument`; tanpa dependensi baru
+**Status: SELESAI.**
+
+CI pada `4991f4e` gagal di job e2e Chromium Linux: 6 test lolos 42, gagal 6 — semuanya rule `color-contrast` axe pada dua elemen `StorageNotice` (teks `text-info` di atas latar `bg-info/10`, banner + footer). Terukur: rasio 4,04:1, di bawah ambang 4,5:1 untuk teks kecil. Bukan spesifik Linux — reproduksi lokal Windows Chromium gagal identik (5/5 `a11y.spec.ts`).
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/index.css` | Token `--info` digelapkan `oklch(0.55 0.16 240)` → `oklch(0.48 0.16 240)` (rasio terhitung 5,29:1) + komentar penjaga agar tidak dicerahkan tanpa menjalankan `e2e/a11y.spec.ts`. Satu-satunya pemakai `text-info`/`bg-info`/`border-info` di kode produk adalah `StorageNotice`; tidak ada pemakaian `bg-info` solid yang terdampak. Mode gelap tak tersentuh (tidak diuji spec). |
+| `docs/07-quality/accessibility-plan.md` | §3 dicatat penutupan utang kontras info-token |
+
+**Verifikasi:** `prettier --check` ✅ · `bun run build` ✅ · `check:budget` ✅ (css tak berubah pada presisi metrik) · lint 0 error (24 warning pra-ada) · `e2e/a11y.spec.ts` + `e2e/ats-print.spec.ts` Chromium lokal **8/8 hijau** (6 test yang gagal di CI + 2 pendampingnya). Unit tak dijalankan ulang — perubahan hanya satu token CSS, tak menyentuh logika JS/TS.

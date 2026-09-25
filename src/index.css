@@ -52,7 +52,9 @@
   --muted-foreground: oklch(0.552 0.016 285.938);
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.21 0.006 285.885);
-  --info: oklch(0.55 0.16 240);
+  /* Text-info on bg-info/10 must stay ≥ 4.5:1 (WCAG AA) — verified by
+     e2e/a11y.spec.ts. Do not lighten without re-running that spec. */
+  --info: oklch(0.48 0.16 240);
   --info-foreground: oklch(0.985 0.01 240);
   --info-muted: oklch(0.94 0.035 240);
   --success: oklch(0.55 0.15 150);

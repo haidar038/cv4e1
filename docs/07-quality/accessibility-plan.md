@@ -31,6 +31,9 @@
 - [x] Kontras teks minimal 4.5:1 — diuji `e2e/a11y.spec.ts` pada build produksi (axe rule
       `color-contrast`, desktop + 360 px). jsdom hanya bisa melaporkan "incomplete", jadi bukti
       otomatisnya harus dari peramban nyata; spec menolak lulus bila rule kontras tidak dievaluasi.
+      Insiden 2026-09-26: token `--info` (`oklch(0.55 …)`, rasio 4,04:1) menjatuhkan 6 test e2e di CI;
+      digelapkan ke `oklch(0.48 0.16 240)` (rasio 5,29:1) — satu-satunya pemakai token teks-info
+      adalah `StorageNotice`.
 - [ ] Indikator fokus terlihat jelas di mana-mana
 - [ ] Jangan andalkan warna saja untuk menyampaikan makna
 - [ ] Hormati `prefers-reduced-motion`
