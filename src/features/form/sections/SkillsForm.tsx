@@ -2,6 +2,7 @@ import { PlusIcon, XIcon } from '@phosphor-icons/react'
 import type { SkillGroup } from '../../../core/schema'
 import { Button } from '@/components/ui/button'
 import { addSectionItem, removeSectionItem, updateSectionItem } from '../../store/actions'
+import { TailoringTrigger } from '../../ai/TailoringTrigger'
 import { useMicrocopy } from '../useMicrocopy'
 import { FormField } from '../fields/FormField'
 import { StringListEditor } from '../fields/StringListEditor'
@@ -27,6 +28,7 @@ export function SkillsForm() {
           {pack.actions.addGroup}
         </Button>
       </div>
+      <TailoringTrigger section="skills" sectionLabel={pack.sections.skills} />
     </div>
   )
 }

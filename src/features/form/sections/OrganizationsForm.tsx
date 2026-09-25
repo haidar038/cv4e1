@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { addSectionItem } from '../../store/actions'
 import { ExperienceItemEditor } from './ExperienceForm'
+import { TailoringTrigger } from '../../ai/TailoringTrigger'
 import { useMicrocopy } from '../useMicrocopy'
 import { useSectionItems } from './useSectionItems'
 
@@ -41,6 +42,7 @@ export function OrganizationsForm() {
           {`${pack.actions.addItem} ${pack.sections.organizations}`}
         </Button>
       </div>
+      <TailoringTrigger section="organizations" sectionLabel={pack.sections.organizations} />
     </div>
   )
 }

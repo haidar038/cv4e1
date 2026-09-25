@@ -7,6 +7,7 @@ import {
   extractJsonFromText,
   validateBulletOutput,
   validatePolishOutput,
+  validateTailoringOutput,
 } from './validation'
 
 function catchAiError(fn: () => unknown): AIProviderError {
@@ -281,6 +282,129 @@ describe('validatePolishOutput', () => {
     expectCode(
       () => validatePolishOutput(JSON.stringify({ text: 'Valid.', warnings: [] }), polishInput),
       'malformed-output',
+    )
+  })
+})
+
+describe('validateTailoringOutput shape (T3b, FR-601/602)', () => {
+  const jd = 'Dicari staf administrasi yang menguasai Microsoft Excel dan komunikasi.'
+  const excerpt = 'Magang administrasi: menyusun laporan Microsoft Excel dan komunikasi tim.'
+
+  function envelope(overrides: Record<string, unknown> = {}): string {
+    return JSON.stringify({
+      matchedKeywords: ['Excel', 'komunikasi'],
+      unsupportedKeywords: ['menguasai'],
+      sectionsToStrengthen: ['projects'],
+      clarifyingQuestions: [],
+      warnings: [],
+      ...overrides,
+    })
+  }
+
+  it('accepts a grounded envelope and ignores unknown fields', () => {
+    const result = validateTailoringOutput(
+      envelope({ inventedFutureField: 'ignored' }),
+      jd,
+      excerpt,
+    )
+    expect(result.matchedKeywords).toEqual(['Excel', 'komunikasi'])
+    expect(result.unsupportedKeywords).toEqual(['menguasai'])
+    expect(result.sectionsToStrengthen).toEqual(['projects'])
+  })
+
+  it('rejects missing, mistyped, and unknown-section envelopes', () => {
+    expectCode(() => validateTailoringOutput('{}', jd, excerpt), 'malformed-output')
+    expectCode(
+      () => validateTailoringOutput(JSON.stringify({ matchedKeywords: 'Excel' }), jd, excerpt),
+      'malformed-output',
+    )
+    expectCode(
+      () => validateTailoringOutput(envelope({ sectionsToStrengthen: ['galaxy'] }), jd, excerpt),
+      'malformed-output',
+    )
+    expectCode(
+      () =>
+        validateTailoringOutput(
+          envelope({ matchedKeywords: [], unsupportedKeywords: [], clarifyingQuestions: [] }),
+          jd,
+          excerpt,
+        ),
+      'malformed-output',
+    )
+  })
+})
+
+describe('validateTailoringOutput grounding (T3b two-way rule, FR-602)', () => {
+  const jd = 'Dicari staf administrasi yang menguasai Microsoft Excel.'
+  const excerpt = 'Magang administrasi: menyusun laporan Microsoft Excel.'
+
+  function envelope(overrides: Record<string, unknown> = {}): string {
+    return JSON.stringify({
+      matchedKeywords: ['Excel'],
+      unsupportedKeywords: ['magang'],
+      sectionsToStrengthen: [],
+      clarifyingQuestions: [],
+      warnings: [],
+      ...overrides,
+    })
+  }
+
+  it('rejects matches missing from either input', () => {
+    expectCode(
+      () => validateTailoringOutput(envelope({ matchedKeywords: ['Kubernetes'] }), jd, excerpt),
+      'grounding-violation',
+    )
+    // In the JD but not the excerpt: a gap, never a match.
+    expectCode(
+      () => validateTailoringOutput(envelope({ matchedKeywords: ['Dicari'] }), jd, excerpt),
+      'grounding-violation',
+    )
+  })
+
+  it('rejects gaps missing from the JD or present in the excerpt', () => {
+    expectCode(
+      () => validateTailoringOutput(envelope({ unsupportedKeywords: ['Kubernetes'] }), jd, excerpt),
+      'grounding-violation',
+    )
+    expectCode(
+      () => validateTailoringOutput(envelope({ unsupportedKeywords: ['Excel'] }), jd, excerpt),
+      'grounding-violation',
+    )
+  })
+
+  it('rejects questions asserting facts absent from both inputs', () => {
+    expectCode(
+      () =>
+        validateTailoringOutput(
+          envelope({ clarifyingQuestions: ['Kapan Anda memimpin 50 orang di PT Maju Jaya?'] }),
+          jd,
+          excerpt,
+        ),
+      'grounding-violation',
+    )
+  })
+
+  it('allows sentence-initial capitals when every other word is grounded', () => {
+    const result = validateTailoringOutput(
+      envelope({
+        unsupportedKeywords: [],
+        clarifyingQuestions: ['Apakah pengalaman administrasi mencakup Excel?'],
+      }),
+      jd,
+      excerpt,
+    )
+    expect(result.clarifyingQuestions).toEqual(['Apakah pengalaman administrasi mencakup Excel?'])
+  })
+
+  it('rejects injection payloads that escape into structured fields', () => {
+    expectCode(
+      () =>
+        validateTailoringOutput(
+          envelope({ matchedKeywords: ['SEMPURNA'], unsupportedKeywords: [] }),
+          jd,
+          excerpt,
+        ),
+      'grounding-violation',
     )
   })
 })

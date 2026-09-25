@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv4every1/output-schema/tailoring.v1.json",
+  "title": "TailoringOutput v1",
+  "description": "Canonical output shape for T3b job tailoring (FR-601/602, ADR-0011). Runtime validation is hand-written in src/ai/validation.ts; this file is the versioned contract the prompt points at.",
+  "type": "object",
+  "required": [
+    "matchedKeywords",
+    "unsupportedKeywords",
+    "sectionsToStrengthen",
+    "clarifyingQuestions",
+    "warnings"
+  ],
+  "properties": {
+    "matchedKeywords": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "JD keywords also present in the resume excerpt. Each must substring-match both inputs."
+    },
+    "unsupportedKeywords": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "JD keywords absent from the resume excerpt. Never presented as user skills."
+    },
+    "sectionsToStrengthen": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["education", "experience", "organizations", "projects", "skills", "certifications"]
+      },
+      "description": "Sections relevant to the JD that carry little or no matched keywords."
+    },
+    "clarifyingQuestions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Questions that assert no facts — no numbers or entities absent from both inputs."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Truncation notes or unused-input notes, or empty."
+    }
+  }
+}

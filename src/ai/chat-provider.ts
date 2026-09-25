@@ -10,7 +10,7 @@ import type {
   PolishSuggestion,
   TailoringResult,
 } from './types'
-import { validateBulletOutput, validatePolishOutput } from './validation'
+import { validateBulletOutput, validatePolishOutput, validateTailoringOutput } from './validation'
 
 /**
  * Shared OpenAI-compatible chat transport (Task 18).
@@ -40,6 +40,15 @@ export function buildBulletPayload(input: BulletGenerationInput): Record<string,
 
 export function buildPolishPayload(input: PolishInput): Record<string, unknown> {
   return { text: input.text, mode: input.mode }
+}
+
+export function buildTailoringPayload(input: JobTailoringInput): Record<string, unknown> {
+  return {
+    jobDescription: input.jobDescription,
+    section: input.section,
+    locale: input.locale,
+    resumeExcerpt: input.allowedFacts,
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -127,8 +136,9 @@ export abstract class BaseChatProvider implements AIProvider {
     return validatePolishOutput(content, input)
   }
 
-  /** Job tailoring is Fase 3 (C3). */
-  async tailorToJob(_input: JobTailoringInput): Promise<TailoringResult> {
-    throw new AIProviderError('capability-not-implemented')
+  /** Job tailoring (T3b, FR-601/602): JD travels as data, never as instructions. */
+  async tailorToJob(input: JobTailoringInput): Promise<TailoringResult> {
+    const content = await this.complete(this.options.systemPrompt, buildTailoringPayload(input))
+    return validateTailoringOutput(content, input.jobDescription, input.allowedFacts)
   }
 }

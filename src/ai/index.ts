@@ -33,6 +33,7 @@ export {
   BaseChatProvider,
   buildBulletPayload,
   buildPolishPayload,
+  buildTailoringPayload,
   extractAssistantContent,
 } from './chat-provider'
 export type { ChatProviderOptions } from './chat-provider'
@@ -49,4 +50,5 @@ export {
   extractJsonFromText,
   validateBulletOutput,
   validatePolishOutput,
+  validateTailoringOutput,
 } from './validation'

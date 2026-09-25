@@ -237,6 +237,37 @@ export interface MicrocopyPack {
     /** Session banner above AI-generated candidates — review before applying. */
     aiGeneratedNote: string
   }
+  aiTailoring: {
+    /** Trigger and panel names — structural, kept for every locale. */
+    triggerLabel: string
+    /** Hover/long-press explanation for the trigger. */
+    triggerTooltip: string
+    panelTitle: string
+    jdLabel: string
+    jdPlaceholder: string
+    generateAction: string
+    closeAction: string
+    /** Result list headings — structural, kept for every locale. */
+    matchedLabel: string
+    unsupportedLabel: string
+    sectionsLabel: string
+    questionsLabel: string
+    /** Guidance prose — blanked for non-id locales. */
+    hint: string
+    emptyInputNote: string
+    loadingNote: string
+    readyNote: string
+    staticNote: string
+    consentNote: string
+    unconfiguredNote: string
+    errorNote: string
+    rateLimitedNote: string
+    timeoutNote: string
+    /** Session banner above AI-generated candidates — review, never auto-apply. */
+    aiGeneratedNote: string
+    /** Shown when a pasted ad exceeds the input budget. */
+    truncatedNote: string
+  }
   aiPolish: {
     /** Trigger, panel, and mode names — structural, kept for every locale. */
     triggerLabel: string
@@ -736,6 +767,33 @@ export const microcopyId: MicrocopyPack = {
     aiGeneratedNote:
       'Daftar ini dibuat AI — tinjau kembali sebelum menerapkan. AI dapat membuat kesalahan.',
   },
+  aiTailoring: {
+    triggerLabel: 'Sesuaikan dengan lowongan',
+    triggerTooltip: 'Tempel deskripsi lowongan — lihat kata kunci mana yang didukung data Anda.',
+    panelTitle: 'Sesuaikan dengan lowongan',
+    jdLabel: 'Deskripsi lowongan',
+    jdPlaceholder: 'mis. Dicari staf administrasi yang menguasai Microsoft Excel…',
+    generateAction: 'Analisis kecocokan',
+    closeAction: 'Tutup',
+    matchedLabel: 'Kata kunci yang didukung data',
+    unsupportedLabel: 'Kata kunci yang belum didukung',
+    sectionsLabel: 'Bagian yang perlu diperkuat',
+    questionsLabel: 'Pertanyaan klarifikasi',
+    hint: 'Tempel deskripsi lowongan, lalu lihat kata kunci mana yang sudah didukung data Anda. Hasilnya hanya bahan tinjauan — CV Anda tidak berubah.',
+    emptyInputNote: 'Tempel dulu deskripsi lowongannya, lalu hasilnya muncul di sini.',
+    loadingNote: 'Menganalisis kecocokan…',
+    readyNote: 'Hasil siap. CV Anda tidak berubah.',
+    staticNote: 'Menampilkan hasil pencocokan manual yang tetap bisa dipakai.',
+    consentNote: 'Persetujuan ditolak — menampilkan hasil manual. Tidak ada data yang dikirim.',
+    unconfiguredNote: 'Belum ada kunci — menampilkan hasil manual yang tetap bisa dipakai.',
+    errorNote: 'AI tidak menjawab — menampilkan hasil manual. Draft Anda tidak berubah.',
+    rateLimitedNote:
+      'Batas pemakaian AI tercapai — menampilkan hasil manual. Draft Anda tidak berubah; coba lagi nanti.',
+    timeoutNote:
+      'AI tidak menjawab tepat waktu — menampilkan hasil manual. Draft Anda tidak berubah.',
+    aiGeneratedNote: 'Daftar ini dibuat AI — tinjau kembali. AI dapat membuat kesalahan.',
+    truncatedNote: 'Deskripsi lowongan dipotong hingga 10.000 karakter.',
+  },
   aiPolish: {
     triggerLabel: 'Poles teks dengan AI',
     panelTitle: 'Poles teks',
@@ -1062,6 +1120,23 @@ export const microcopyStructural: MicrocopyPack = {
     rateLimitedNote: '',
     timeoutNote: '',
     aiGeneratedNote: '',
+  },
+  aiTailoring: {
+    ...microcopyId.aiTailoring,
+    triggerTooltip: '',
+    jdPlaceholder: '',
+    hint: '',
+    emptyInputNote: '',
+    loadingNote: '',
+    readyNote: '',
+    staticNote: '',
+    consentNote: '',
+    unconfiguredNote: '',
+    errorNote: '',
+    rateLimitedNote: '',
+    timeoutNote: '',
+    aiGeneratedNote: '',
+    truncatedNote: '',
   },
   aiPolish: {
     ...microcopyId.aiPolish,

@@ -15,12 +15,15 @@ import {
   clearAchievementState,
   clearBulletState,
   clearPolishState,
+  clearTailoringState,
   resolveAchievementRequest,
   resolveBulletRequest,
   resolvePolishRequest,
+  resolveTailoringRequest,
   startAchievementRequest,
   startBulletRequest,
   startPolishRequest,
+  startTailoringRequest,
 } from './ai-store'
 import {
   addSectionItem,
@@ -512,6 +515,11 @@ describe('AI store (Task 19, FR-401)', () => {
       achievementSuggestions: [],
       achievementSource: null,
       achievementErrorCode: null,
+      tailoringScope: null,
+      tailoringStatus: 'idle',
+      tailoringResult: null,
+      tailoringSource: null,
+      tailoringErrorCode: null,
     })
   })
 })
@@ -623,6 +631,61 @@ describe('AI store achievement slice (unified flow, FR-401)', () => {
     expect(aiStore.getState().achievementScope).toBeNull()
     expect(aiStore.getState().bulletStatus).toBe('idle')
     expect(aiStore.getState().polishStatus).toBe('idle')
+  })
+})
+
+describe('AI store tailoring slice (T3b, FR-601/603)', () => {
+  const scope = {
+    section: 'experience' as const,
+    jobDescription: 'Dicari staf Excel.',
+  }
+
+  const emptyResult = {
+    matchedKeywords: [],
+    unsupportedKeywords: [],
+    sectionsToStrengthen: [],
+    clarifyingQuestions: [],
+    warnings: [],
+  }
+
+  beforeEach(() => {
+    clearTailoringState()
+  })
+
+  it('starts empty and records a loading request', () => {
+    expect(aiStore.getState().tailoringStatus).toBe('idle')
+    startTailoringRequest(scope)
+    expect(aiStore.getState().tailoringStatus).toBe('loading')
+    expect(aiStore.getState().tailoringScope).toEqual(scope)
+    expect(aiStore.getState().tailoringResult).toBeNull()
+  })
+
+  it('resolves the outcome for the current scope only (stale responses dropped)', () => {
+    startTailoringRequest(scope)
+    resolveTailoringRequest(
+      {
+        result: { ...emptyResult, matchedKeywords: ['Excel'] },
+        source: 'ai',
+        errorCode: null,
+      },
+      scope,
+    )
+    expect(aiStore.getState().tailoringStatus).toBe('ready')
+    expect(aiStore.getState().tailoringResult?.matchedKeywords).toEqual(['Excel'])
+
+    // A late response for an older scope must not overwrite the current one.
+    startTailoringRequest({ ...scope, jobDescription: 'Lowongan lain.' })
+    resolveTailoringRequest({ result: emptyResult, source: 'ai', errorCode: null }, scope)
+    expect(aiStore.getState().tailoringStatus).toBe('loading')
+  })
+
+  it('clears back to idle without touching the other slices', () => {
+    startTailoringRequest(scope)
+    clearTailoringState()
+    expect(aiStore.getState().tailoringStatus).toBe('idle')
+    expect(aiStore.getState().tailoringScope).toBeNull()
+    expect(aiStore.getState().bulletStatus).toBe('idle')
+    expect(aiStore.getState().achievementStatus).toBe('idle')
   })
 })
 

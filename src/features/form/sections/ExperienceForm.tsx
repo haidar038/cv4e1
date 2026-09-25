@@ -6,6 +6,7 @@ import { addSectionItem, removeSectionItem, updateSectionItem } from '../../stor
 import { useMicrocopy } from '../useMicrocopy'
 import { ActionVerbSuggestions } from '../ActionVerbSuggestions'
 import { AchievementTrigger } from '../../ai/AchievementTrigger'
+import { TailoringTrigger } from '../../ai/TailoringTrigger'
 import { BulletGenerator } from '../../ai/BulletGenerator'
 import { PolishTrigger } from '../../ai/PolishTrigger'
 import { FormField } from '../fields/FormField'
@@ -36,6 +37,7 @@ export function ExperienceForm() {
           {`${pack.actions.addItem} ${pack.sections.experience}`}
         </Button>
       </div>
+      <TailoringTrigger section="experience" sectionLabel={pack.sections.experience} />
     </div>
   )
 }

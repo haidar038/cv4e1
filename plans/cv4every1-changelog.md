@@ -1493,3 +1493,43 @@ CI pada `4991f4e` gagal di job e2e Chromium Linux: 6 test lolos 42, gagal 6 — 
 | `docs/07-quality/accessibility-plan.md` | §3 dicatat penutupan utang kontras info-token |
 
 **Verifikasi:** `prettier --check` ✅ · `bun run build` ✅ · `check:budget` ✅ (css tak berubah pada presisi metrik) · lint 0 error (24 warning pra-ada) · `e2e/a11y.spec.ts` + `e2e/ats-print.spec.ts` Chromium lokal **8/8 hijau** (6 test yang gagal di CI + 2 pendampingnya). Unit tak dijalankan ulang — perubahan hanya satu token CSS, tak menyentuh logika JS/TS.
+
+### ADR-0011 diterima + FR-6xx + task spec T3b (2026-09-25)
+**Requirement:** C3 (`ai-product-spec`), AB-3; tanpa perubahan `ResumeDocument`
+**Status: KEPUTUSAN DITERIMA — implementasi T3b menunggu persetujuan task spec + plan.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `docs/adr/0011-job-tailoring-grounding.md` | Status `Proposed` → Accepted (hibrida berlapis: matcher statis default + LLM opsional; JD transien; grounding invariant; sanitasi injection) |
+| `docs/adr/README.md` | Indeks 0011 → Accepted; baris kandidat tailoring dihapus (pemicu "Sebelum T3b" terpenuhi) |
+| `docs/02-requirements/srs.md` | Bagian FR-6xx baru: FR-601 (hasil ditinjau, P2) · FR-602 (tanpa skill/fakta baru, tanpa mutasi langsung, P0) · FR-603 (JD transien + nota pemotongan, P1) · FR-604 (jalur statis offline wajib, P1) |
+
+### T3b — Penyesuaian lowongan: celah kata kunci + grounding (FR-601–604)
+**Requirement:** FR-601/FR-602/FR-603/FR-604 (C3, ADR-0011 Accepted); tanpa perubahan `ResumeDocument`; tanpa dependensi baru
+**Status: SELESAI — T3b diklaim Done.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `prompts/id/tailoring.v1.md` + `prompts/shared/tailoring-output-schema.v1.json` (baru) | Prompt berversi append-only + kontrak schema keluaran; JD-sebagai-data (§4–5), contoh valid/tidak-valid + injection |
+| `src/features/ai/tailoring-prompts.ts` + test (10 test) | Loader versi pin v1, cap JD 10.000 + token 800 + cap daftar 20, truncate bertanda `[dipotong]`, drift-guard mirror grounding |
+| `src/features/ai/tailoring-matcher.ts` + test (10 test) | Matcher statis deterministik: tokenisasi ID/EN + stopwords, split word-boundary, section hints tanpa noise education; korpus per-section, excerpt datar satu sumber grounding |
+| `src/ai/validation.ts` (+7 test) | `validateTailoringOutput`: shape guard SectionKey + aturan kutipan dua arah + checkGrounding gabungan; huruf awal kalimat bukan penegasan |
+| `src/features/ai/tailoring-generator.ts` + test (20 test) | Orkestrator: korpus + excerpt DF-6 tanpa identitas/kontak, statis default, LLM di belakang gate Task 18 + retry, slice daftar, nota truncation FR-408 |
+| `StaticSuggestionProvider` + `chat-provider` (+barrel) | `tailorToJob` statis (korpus satu section) dan LLM (transport + validasi); Groq/OpenAI-compatible mewarisi; test deferral Fase 3 diganti perilaku |
+| `src/features/store/ai-store.ts` (+store test) | `TailoringScope` (section + snapshot JD, memory-only = transien struktural) + start/resolve/clear; stale-scope dibuang |
+| `src/content/microcopy/id.ts` | Grup `aiTailoring` (22 string) + blanking FR-204; tersapu frasa terlarang otomatis |
+| `TailoringTrigger.tsx` + `TailoringPanel.tsx` + dom test (8 test) | Trigger per-section pola C1b (tooltip + long-press + Escape + focus) di 4 form (experience, organizations, projects, skills); panel read-only tanpa Apply (FR-602 struktural) + ConsentDialog + axe |
+| `fixtures/ai-eval/tailoring-grounding-{accept,violations}.json` + 2 test | Set terima 4 kasus (3-arah: statis bersih, mock tervalidasi, orkestrator kirim AI) + set tolak 5 kelas termasuk injection-echo; grow-only pin |
+| `e2e/tailoring.spec.ts` (baru, 4 test) | Production build, jalur statis offline + AI route-mock + consent + banner, empty-guard, offline-penuh (reload tanpa jaringan, nol off-origin) + bukti tanpa-mutasi via hitungan baris |
+| Docs | ai-product-spec C3 dicentang; AC-601-a–604-a; roadmap Fase 3 baris lowongan → [x]; performance-budget entri T3b (tanpa re-baseline) |
+
+**Keputusan implementasi:**
+
+- **Summary bukan SectionKey:** headline/ringkasan ikut excerpt sebagai kosakata matchable tetapi tanpa entri korpus — tidak pernah dinamai sebagai section (panel me-render `pack.sections[key]` yang hanya mengenal 6 kunci).
+- **Satu sumber grounding:** matcher menerima teks excerpt penuh (bukan hanya korpus) agar jalur statis dan validator LLM memakai kosakata identik — inkonsistensi ini ditangkap test sebelum merge.
+- **Tanpa Apply:** panel T3b tidak punya tombol Terapkan; "suggestion, not mutation" berlaku struktural karena tidak ada jalur tulis sama sekali.
+- **Kegagalan milik saya (jujur):** `summary` di enum schema prompt + `push('summary')` ditolak typecheck (bukan SectionKey) — diperbaiki jadi excerpt; mock `unsupported` yang ternyata ada di excerpt; `not.toContain` substring vs word-boundary pada test (bukan bug matcher).
+
+**Angka bundle (tanpa re-baseline, baseline TIDAK diubah):** `initialJsGzip` +0,9% ✅; `jsGzip` +0,8% ✅; `transferGzip` +0,7% ✅ (30 berkas dist, chunk lazy `tailoring-generator` baru).
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pra-ada) · `format` OK (12 berkas baru diformat mekanis) · `check:boundaries` OK (260 berkas) · **unit 81 file / 744 test** (75/673 + 71 baru; paralel hijau bersih tanpa flake) · build OK · `check:privacy` OK · **`check:budget` hijau** (di atas) · `test:e2e` tailoring **8/8** (Chromium + Firefox via `node`, `--workers=1`; termasuk offline-penuh AC-604-a).

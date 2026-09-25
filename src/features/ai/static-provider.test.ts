@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AIProviderError, NoopProvider } from '../../ai'
+import { NoopProvider } from '../../ai'
 import type { AIProvider, BulletGenerationInput } from '../../ai'
 import { getVerbsForSection } from '../../content/action-verbs'
 import { StaticSuggestionProvider } from './static-provider'
@@ -220,16 +220,17 @@ describe('StaticSuggestionProvider polish fallback (Task 20, FR-403)', () => {
   })
 })
 
-describe('StaticSuggestionProvider unimplemented capabilities', () => {
-  it('rejects tailoring with capability-not-implemented (Fase 3)', async () => {
+describe('StaticSuggestionProvider tailoring (T3b, FR-601/604)', () => {
+  it('intersects the ad with the excerpt deterministically, offline', async () => {
     const provider = new StaticSuggestionProvider()
-    await expect(
-      provider.tailorToJob({
-        jobDescription: 'Contoh lowongan.',
-        section: 'experience',
-        locale: 'id',
-        allowedFacts: 'Contoh fakta.',
-      }),
-    ).rejects.toBeInstanceOf(AIProviderError)
+    const result = await provider.tailorToJob({
+      jobDescription: 'Contoh lowongan Excel.',
+      section: 'experience',
+      locale: 'id',
+      allowedFacts: 'Contoh fakta Excel.',
+    })
+    expect(result.matchedKeywords).toEqual(['contoh', 'excel'])
+    expect(result.unsupportedKeywords).toEqual(['lowongan'])
+    expect(result.clarifyingQuestions).toEqual([])
   })
 })

@@ -1,4 +1,3 @@
-import { AIProviderError } from '../../ai'
 import type {
   AIProvider,
   BulletGenerationInput,
@@ -144,8 +143,17 @@ export class StaticSuggestionProvider implements AIProvider {
     return { text, changes: [...checklist], warnings: [...avoided] }
   }
 
-  /** Job tailoring is Fase 3 (C3). */
-  async tailorToJob(_input: JobTailoringInput): Promise<TailoringResult> {
-    throw new AIProviderError('capability-not-implemented')
+  /**
+   * Job tailoring, static path (T3b, FR-601/604): deterministic keyword
+   * intersection between the pasted ad and the caller-supplied excerpt.
+   * The excerpt arrives flat, so the corpus carries the requested section
+   * only — the orchestrator (tailoring-generator.ts) builds the full
+   * per-section corpus from the document and merges section hints there.
+   */
+  async tailorToJob(input: JobTailoringInput): Promise<TailoringResult> {
+    const { matchTailoringKeywords } = await import('./tailoring-matcher')
+    return matchTailoringKeywords(input.jobDescription, [
+      { section: input.section, text: input.allowedFacts },
+    ])
   }
 }

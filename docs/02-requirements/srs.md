@@ -93,6 +93,15 @@ Format tiap requirement: ID · Pernyataan · Prioritas · Sumber · Dapat diveri
 | FR-501 | Hasil ekstraksi CV harus ditampilkan untuk ditinjau sebelum disimpan | P2 |
 | FR-502 | Hasil ekstraksi tidak boleh langsung masuk ke resume final | P2 |
 
+### FR-6xx — Penyesuaian lowongan (Fase 3, ADR-0011)
+
+| ID | Pernyataan | Prio |
+| :-- | :-- | :-- |
+| FR-601 | Hasil penyesuaian (kata kunci didukung/belum, section yang perlu diperkuat, pertanyaan klarifikasi) harus ditampilkan untuk ditinjau sebelum ada perubahan | P2 |
+| FR-602 | Hasil penyesuaian tidak boleh menambah skill atau fakta baru dan tidak boleh langsung masuk ke resume final | P0 |
+| FR-603 | Deskripsi lowongan bersifat transien: tidak disimpan, tidak di-log, dan pemotongan panjang harus disertai nota jujur | P1 |
+| FR-604 | Jalur pencocokan statis offline harus selalu tersedia sebagai fallback jalur LLM | P1 |
+
 ---
 
 ## 4. Non-Functional Requirements

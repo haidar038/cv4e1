@@ -4,7 +4,9 @@ import type {
   BulletSuggestion,
   PolishInput,
   PolishSuggestion,
+  TailoringResult,
 } from './types'
+import type { SectionKey } from '../core/view-models'
 
 /**
  * Structured-output validation pipeline (FR-404, FR-405, structured-output-spec.md §3):
@@ -206,4 +208,120 @@ export function validatePolishOutput(raw: string, input: PolishInput): PolishSug
   const violations = checkGrounding([parsed.text], input.text)
   if (violations.length > 0) throw new AIProviderError('grounding-violation', undefined, violations)
   return { text: parsed.text, changes: parsed.changes, warnings: parsed.warnings }
+}
+
+// --- T3b tailoring (FR-601/602, ADR-0011) ---
+
+/**
+ * Known section keys, mirroring `SectionKey` in core/view-models.ts.
+ * Typed (not stringly) so an unknown key is a compile error here, not a
+ * silent pass — `summary` is deliberately absent: it lives in basics and
+ * can never name a section to strengthen.
+ */
+const TAILORING_SECTION_KEYS: readonly SectionKey[] = [
+  'education',
+  'experience',
+  'organizations',
+  'projects',
+  'skills',
+  'certifications',
+]
+
+interface TailoringOutputJSON {
+  readonly matchedKeywords: string[]
+  readonly unsupportedKeywords: string[]
+  readonly sectionsToStrengthen: SectionKey[]
+  readonly clarifyingQuestions: string[]
+  readonly warnings: string[]
+}
+
+function isTailoringOutputJSON(value: unknown): value is TailoringOutputJSON {
+  return (
+    isRecord(value) &&
+    isStringArray(value.matchedKeywords) &&
+    isStringArray(value.unsupportedKeywords) &&
+    Array.isArray(value.sectionsToStrengthen) &&
+    value.sectionsToStrengthen.every(
+      (section): section is SectionKey =>
+        typeof section === 'string' &&
+        (TAILORING_SECTION_KEYS as readonly string[]).includes(section),
+    ) &&
+    isStringArray(value.clarifyingQuestions) &&
+    isStringArray(value.warnings)
+  )
+}
+
+/**
+ * Word-boundary containment (case-insensitive). Mirrors the matcher in
+ * features/ai/tailoring-matcher.ts so both paths are held to one rule;
+ * duplicated here for the same dependency-free reason as the section list.
+ */
+function containsWord(haystack: string, needle: string): boolean {
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`\\b${escaped}\\b`, 'iu').test(haystack)
+}
+
+/**
+ * Sentence-initial capitals state no fact ("Apakah …?" asks; it does not
+ * claim). The checker lowers the first letter so natural questions are not
+ * rejected for their casing — every other capitalized word is still held
+ * to the input vocabulary.
+ */
+function lowerSentenceInitial(question: string): string {
+  return question.replace(/^\p{Lu}/u, (initial) => initial.toLowerCase())
+}
+
+/**
+ * Validates a tailoring response against the output schema, then grounding.
+ *
+ * Two-way citation rule (prompt §4.6, ADR-0011): every matched keyword must
+ * appear in the JD *and* the resume excerpt; every unsupported keyword must
+ * appear in the JD and *not* in the excerpt. Questions and warnings pass
+ * the standard number/entity containment against both inputs combined.
+ * An all-empty content envelope is rejected — a model that says nothing
+ * about a real ad has failed, and the caller falls back to static.
+ */
+export function validateTailoringOutput(
+  raw: string,
+  sentJobDescription: string,
+  resumeExcerpt: string,
+): TailoringResult {
+  const parsed = extractJsonFromText(raw)
+  if (!isRecord(parsed) || !isTailoringOutputJSON(parsed)) {
+    throw new AIProviderError('malformed-output')
+  }
+  const violations: string[] = []
+  for (const keyword of parsed.matchedKeywords) {
+    if (!containsWord(sentJobDescription, keyword) || !containsWord(resumeExcerpt, keyword)) {
+      violations.push(`kutipan "${keyword}" tidak ada di kedua input`)
+    }
+  }
+  for (const keyword of parsed.unsupportedKeywords) {
+    if (!containsWord(sentJobDescription, keyword)) {
+      violations.push(`celah "${keyword}" tidak ada di deskripsi lowongan`)
+    } else if (containsWord(resumeExcerpt, keyword)) {
+      violations.push(`celah "${keyword}" ternyata didukung data`)
+    }
+  }
+  violations.push(
+    ...checkGrounding(
+      [...parsed.clarifyingQuestions.map(lowerSentenceInitial), ...parsed.warnings],
+      `${sentJobDescription}\n${resumeExcerpt}`,
+    ),
+  )
+  if (violations.length > 0) throw new AIProviderError('grounding-violation', undefined, violations)
+  if (
+    parsed.matchedKeywords.length === 0 &&
+    parsed.unsupportedKeywords.length === 0 &&
+    parsed.clarifyingQuestions.length === 0
+  ) {
+    throw new AIProviderError('malformed-output')
+  }
+  return {
+    matchedKeywords: [...parsed.matchedKeywords],
+    unsupportedKeywords: [...parsed.unsupportedKeywords],
+    sectionsToStrengthen: [...parsed.sectionsToStrengthen],
+    clarifyingQuestions: [...parsed.clarifyingQuestions],
+    warnings: [...parsed.warnings],
+  }
 }

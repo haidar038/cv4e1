@@ -362,6 +362,33 @@ AC-502-a  (FR-502: ekstraksi tidak menyentuh resume final)
   Then resume final tidak berubah
 ```
 
+## FR-6xx — Penyesuaian lowongan (Fase 3, ADR-0011)
+
+```gherkin
+AC-601-a  (FR-601: hasil penyesuaian ditinjau sebelum ada perubahan)
+  Given deskripsi lowongan ditempel pada satu section
+  When hasil penyesuaian siap
+  Then kata kunci didukung/belum, section yang perlu diperkuat, dan
+    pertanyaan klarifikasi ditampilkan untuk ditinjau
+  And tidak ada perubahan pada draft sebelum dan sesudah tinjauan
+
+AC-602-a  (FR-602: tanpa skill/fakta baru, tanpa mutasi langsung)
+  Given hasil penyesuaian ditampilkan
+  When pengguna meninjau seluruh daftar
+  Then tidak ada tombol atau aksi yang menulis ke resume final
+  And setiap kata kunci yang dikutip cocok dengan input sumbernya
+
+AC-603-a  (FR-603: deskripsi lowongan transien)
+  Given sesi penyesuaian selesai atau dibatalkan
+  When draft disimpan, dimuat ulang, diekspor, atau dihapus total
+  Then teks lowongan tidak ditemukan di storage mana pun
+
+AC-604-a  (FR-604: fallback statis offline)
+  Given jaringan dimatikan dan tanpa kunci AI
+  When deskripsi lowongan dianalisis
+  Then daftar celah kata kunci tetap tampil dari pencocokan statis
+```
+
 ## NFR — Non-functional
 
 ```gherkin

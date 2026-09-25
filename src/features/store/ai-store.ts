@@ -1,7 +1,8 @@
 import { createStore } from 'zustand/vanilla'
-import type { AIErrorCode, BulletSuggestion, PolishSuggestion } from '../../ai'
+import type { AIErrorCode, BulletSuggestion, PolishSuggestion, TailoringResult } from '../../ai'
 import type { AchievementSectionKey } from '../ai/achievement-generator'
 import type { BulletSectionKey } from '../ai/bullet-generator'
+import type { SectionKey } from '../../core/view-models'
 
 /**
  * Suggestion basket for Phase 2 (ADR-0005, state-management.md §7).
@@ -52,6 +53,20 @@ export interface AchievementScope {
 
 export type AchievementStatus = 'idle' | 'loading' | 'ready'
 
+/**
+ * Tailoring scope (T3b, FR-601/603). One request per section: the section
+ * plus the JD snapshot guard against stale responses like the other
+ * scopes do. The pasted ad lives here in memory only — this store has no
+ * persist middleware, so the JD can never reach IndexedDB, localStorage,
+ * or an export (FR-603 transience holds structurally).
+ */
+export interface TailoringScope {
+  readonly section: SectionKey
+  readonly jobDescription: string
+}
+
+export type TailoringStatus = 'idle' | 'loading' | 'ready'
+
 export interface AiState {
   readonly bulletScope: BulletScope | null
   readonly bulletStatus: BulletStatus
@@ -68,6 +83,11 @@ export interface AiState {
   readonly achievementSuggestions: readonly BulletSuggestion[]
   readonly achievementSource: BulletSource | null
   readonly achievementErrorCode: AIErrorCode | null
+  readonly tailoringScope: TailoringScope | null
+  readonly tailoringStatus: TailoringStatus
+  readonly tailoringResult: TailoringResult | null
+  readonly tailoringSource: BulletSource | null
+  readonly tailoringErrorCode: AIErrorCode | null
 }
 
 const initialAiState: AiState = {
@@ -86,6 +106,11 @@ const initialAiState: AiState = {
   achievementSuggestions: [],
   achievementSource: null,
   achievementErrorCode: null,
+  tailoringScope: null,
+  tailoringStatus: 'idle',
+  tailoringResult: null,
+  tailoringSource: null,
+  tailoringErrorCode: null,
 }
 
 export const aiStore = createStore<AiState>()(() => ({ ...initialAiState }))
@@ -217,5 +242,47 @@ export function clearAchievementState(): void {
     achievementSuggestions: [],
     achievementSource: null,
     achievementErrorCode: null,
+  })
+}
+
+export function startTailoringRequest(scope: TailoringScope): void {
+  aiStore.setState({
+    tailoringScope: scope,
+    tailoringStatus: 'loading',
+    tailoringResult: null,
+    tailoringSource: null,
+    tailoringErrorCode: null,
+  })
+}
+
+export interface TailoringOutcome {
+  readonly result: TailoringResult
+  readonly source: BulletSource
+  readonly errorCode: AIErrorCode | null
+}
+
+function sameTailoringScope(left: TailoringScope, right: TailoringScope): boolean {
+  return left.section === right.section && left.jobDescription === right.jobDescription
+}
+
+/** Records a result unless a newer request has superseded its scope. */
+export function resolveTailoringRequest(outcome: TailoringOutcome, scope: TailoringScope): void {
+  const current = aiStore.getState().tailoringScope
+  if (current === null || !sameTailoringScope(current, scope)) return
+  aiStore.setState({
+    tailoringStatus: 'ready',
+    tailoringResult: outcome.result,
+    tailoringSource: outcome.source,
+    tailoringErrorCode: outcome.errorCode,
+  })
+}
+
+export function clearTailoringState(): void {
+  aiStore.setState({
+    tailoringScope: null,
+    tailoringStatus: 'idle',
+    tailoringResult: null,
+    tailoringSource: null,
+    tailoringErrorCode: null,
   })
 }

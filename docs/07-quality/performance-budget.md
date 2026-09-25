@@ -204,6 +204,13 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   Utang absolut (JS awal, semua-JS, transfer di atas target) tetap
   tercatat sebagai advisory, bukan gerbang. Aset OCR (±6,7 MB) tetap
   on-demand + ter-cache, nol di metrik.
+- **T3b penyesuaian lowongan (FR-601–604, ADR-0011, tanpa re-baseline):**
+  `initialJsGzip` 217,3 → **219,3 KB** (+0,9% ✅ — trigger + panel +
+  microcopy `aiTailoring` di JS awal); `jsGzip` 909,3 → **916,5 KB**
+  (+0,8% ✅ — chunk lazy `tailoring-generator` + prompt v1 + matcher);
+  `transferGzip` 1031,7 → **1038,9 KB** (+0,7% ✅); css/font datar.
+  Baseline JSON **tidak** diubah (semua ratchet hijau). Pola lazy
+  C1b/C2 terbukti: orkestrator + prompt + validasi di luar JS awal.
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`

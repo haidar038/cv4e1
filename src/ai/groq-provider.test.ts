@@ -177,17 +177,27 @@ describe('GroqProvider', () => {
     expect(grounding.details.length).toBeGreaterThan(0)
   })
 
-  it('defers tailoring to Fase 3', async () => {
-    const provider = new GroqProvider({ apiKey: 'k', systemPrompt: SYSTEM_PROMPT })
-    await expect(
-      catchError(
-        provider.tailorToJob({
-          jobDescription: 'x',
-          section: 'experience',
-          locale: 'id',
-          allowedFacts: 'x',
+  it('tailors to the job through the shared transport (T3b)', async () => {
+    const provider = new GroqProvider({
+      apiKey: 'k',
+      systemPrompt: SYSTEM_PROMPT,
+      fetchImpl: chatResponder(
+        JSON.stringify({
+          matchedKeywords: ['Excel'],
+          unsupportedKeywords: ['staf'],
+          sectionsToStrengthen: [],
+          clarifyingQuestions: [],
+          warnings: [],
         }),
       ),
-    ).resolves.toMatchObject({ code: 'capability-not-implemented' })
+    })
+    const result = await provider.tailorToJob({
+      jobDescription: 'Dicari staf Excel.',
+      section: 'experience',
+      locale: 'id',
+      allowedFacts: 'Laporan Excel.',
+    })
+    expect(result.matchedKeywords).toEqual(['Excel'])
+    expect(result.unsupportedKeywords).toEqual(['staf'])
   })
 })

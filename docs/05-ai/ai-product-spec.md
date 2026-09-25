@@ -43,10 +43,10 @@
 - [x] Prompt: `prompts/id/achievement-bullets.v1.md` (append-only); orkestrator memakai kontrak `generateBullets` yang sama tanpa perubahan interface
 
 ### C3 — Penyesuaian dengan deskripsi lowongan *(Fase 3)*
-- [ ] Output: kata kunci yang ditemukan, kata kunci yang belum didukung data, section yang perlu diperkuat, pertanyaan klarifikasi
-- [ ] **Tidak pernah mengklaim skill baru untuk pengguna**
-- [ ] **Risiko keamanan:** teks lowongan yang ditempel adalah input tak tepercaya — lihat `../06-security/abuse-cases.md`
-- [ ] Fallback: pencocokan kata kunci sederhana tanpa AI
+- [x] Output: kata kunci yang ditemukan, kata kunci yang belum didukung data, section yang perlu diperkuat, pertanyaan klarifikasi (T3b: `tailoring-matcher.ts` + `tailoring-generator.ts` + `TailoringPanel`, tanpa jalur Apply — FR-602 struktural)
+- [x] **Tidak pernah mengklaim skill baru untuk pengguna** (T3b: aturan kutipan dua arah di `validateTailoringOutput` + set evaluasi grounding + probe injection)
+- [x] **Risiko keamanan:** teks lowongan yang ditempel adalah input tak tepercaya (T3b: JD-sebagai-data di prompt v1 §4–5, pemeriksa grounding lokal, JD transien FR-603 — lihat `../06-security/abuse-cases.md`)
+- [x] Fallback: pencocokan kata kunci sederhana tanpa AI (T3b: matcher deterministik = default; e2e offline jalur statis)
 
 ### C4 — Impor CV / OCR *(Fase 3, eksperimental)*
 ```text
