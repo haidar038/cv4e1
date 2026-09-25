@@ -37,6 +37,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * F4a (NFR-007): honor `prefers-reduced-motion` globally. The dialog,
+ * accordion, and skeleton primitives animate by default; users who ask
+ * for reduced motion get instant state changes instead. Scoped to
+ * animations/transitions only — layout and opacity from print stylesheets
+ * are untouched.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
@@ -63,7 +80,10 @@
   --warning: oklch(0.7 0.16 75);
   --warning-foreground: oklch(0.2 0.04 75);
   --warning-muted: oklch(0.95 0.04 75);
-  --destructive: oklch(0.577 0.245 27.325);
+  /* Text-destructive on bg-destructive/10 must stay ≥ 4.5:1 (WCAG AA),
+     same rule as --info above — verified by e2e/a11y.spec.ts. Darkened
+     0.577 → 0.52 (F4a): the restyle value scored 3.99:1 on the tint. */
+  --destructive: oklch(0.52 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.705 0.015 286.067);
