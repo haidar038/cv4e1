@@ -24,6 +24,7 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | [0009](0009-unknown-fields-and-asset-policy.md) | Field tak dikenal + kebijakan aset ekspor | Accepted (2026-09-26) |
 | [0010](0010-ocr-runtime-assets.md) | Aset runtime OCR: CDN berversi + Cache Storage | Accepted (2026-09-26) |
 | [0011](0011-job-tailoring-grounding.md) | Penyesuaian lowongan T3b: celah kata kunci + grounding + sanitasi injection | Accepted (2026-09-25) |
+| [0012](0012-locale-en-i18n.md) | Pengalih bahasa ID/EN: pack bertipe + fallback aman + lint dwibahasa | Accepted (2026-09-25) |
 
 ## Kandidat ADR berikutnya
 
@@ -34,4 +35,3 @@ Satu keputusan per berkas. Menjelaskan **mengapa**, bukan **apa** — "apa" ada 
 | Lisensi proyek | Sebelum rilis publik (pertanyaan terbuka Q1) |
 | Strategi multi-tab | Sebelum Fase 1 |
 | Kebijakan dependensi pihak ketiga | Berkelanjutan |
-| Locale EN / i18n | Sebelum T3c |

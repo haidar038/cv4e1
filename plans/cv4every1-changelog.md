@@ -1533,3 +1533,43 @@ CI pada `4991f4e` gagal di job e2e Chromium Linux: 6 test lolos 42, gagal 6 — 
 **Angka bundle (tanpa re-baseline, baseline TIDAK diubah):** `initialJsGzip` +0,9% ✅; `jsGzip` +0,8% ✅; `transferGzip` +0,7% ✅ (30 berkas dist, chunk lazy `tailoring-generator` baru).
 
 **Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pra-ada) · `format` OK (12 berkas baru diformat mekanis) · `check:boundaries` OK (260 berkas) · **unit 81 file / 744 test** (75/673 + 71 baru; paralel hijau bersih tanpa flake) · build OK · `check:privacy` OK · **`check:budget` hijau** (di atas) · `test:e2e` tailoring **8/8** (Chromium + Firefox via `node`, `--workers=1`; termasuk offline-penuh AC-604-a).
+
+### ADR-0012 diterima + FR-7xx + task spec T3c (2026-09-25)
+**Requirement:** P9 + Q6 (`vision.md`), F-G5; tanpa perubahan `ResumeDocument`
+**Status: KEPUTUSAN DITERIMA — implementasi T3c menunggu persetujuan task spec + plan.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `docs/adr/0012-locale-en-i18n.md` | Status `Proposed` → Accepted (pack bertipe mirror + fallback per-kunci; pack EN manual; tanggal/plural via `Intl` bawaan; Action Verbs EN katalog terpisah; lint dwibahasa; preferensi `localStorage` default `id`) |
+| `docs/adr/README.md` | Indeks 0012 → Accepted; baris kandidat locale dihapus (pemicu "Sebelum T3c" terpenuhi) |
+| `docs/02-requirements/srs.md` | Bagian FR-7xx baru: FR-701 (switcher persisten default `id`, P1) · FR-702 (pack EN manual + blanking ID, P1) · FR-703 (fallback + format ikut locale, P1) · FR-704 (lint frasa terlarang dwibahasa, P1) |
+| `docs/02-requirements/acceptance-criteria.md` | AC-701-a/b–704-a Gherkin; AC-703-b dipersempit jujur (tak ada permukaan format tanggal — paritas placeholder sebagai kontrak teruji) |
+| `docs/02-requirements/use-cases.md` | UC-013 "Mengganti bahasa antarmuka" ditulis; bullet pending dihapus (dicentang) |
+
+### T3c — Pengalih bahasa ID/EN: pack bertipe + fallback + switcher (FR-701–704)
+**Requirement:** FR-701/FR-702/FR-703/FR-704 (P9, F-G5, ADR-0012 Accepted); tanpa perubahan `ResumeDocument`; tanpa dependensi baru
+**Status: SELESAI — T3c diklaim Done.**
+
+| Berkas | Peran |
+| :-- | :-- |
+| `src/content/microcopy/en.ts` (baru) | Pack EN manual penuh + `withIdFallback` (fallback per-kunci, blank disengaja dipertahankan) + `PartialMicrocopyPack`; 15 path blank ID-spesifik didokumentasikan |
+| `src/content/microcopy/id.ts` | Grup `locale` baru (interface + nilai ID + blanking lewat); `microcopyEn` teresolusi + `getMicrocopy('en')`; `import type` se-modul (terhapus saat kompilasi, nol ke bundle) |
+| `src/content/microcopy/microcopy.test.ts` (+11 test) | Pack EN struktural, allowlist blanking persis-15, resolver fallback (utuh/parsial/blank), paritas placeholder 7 template, lint frasa terlarang dwibahasa (ID + EN) |
+| `src/content/action-verbs/en.json` (baru, 73) + `index.ts` | Katalog EN terpisah (verba + frasa + kategori Inggris, section sama persis); getter sadar-locale default `id` (pemanggil lama tak berubah) + test paritas |
+| `ActionVerbSuggestionsPanel.tsx` | Saran verbs mengikuti bahasa antarmuka (kategori + daftar EN saat locale `en`) |
+| `src/features/store/actions.ts` | `setLocale`/`readStoredLocale`/`initLocalePreference` (`cv4every1:locale`); preferensi tersimpan menang atas mirror `meta.locale` saat buka draft; storage diblokir → sesi saja |
+| `LocaleSwitcher.tsx` + dom test (9 test) | Radio native pola `ModeToggle` (legend, panah keyboard, `role=status`, sinkron `documentElement.lang`); persistensi + axe |
+| `src/App.tsx` | Mount switcher di shell (tampil tanpa draft) + init preferensi |
+| `EducationForm.dom.test.tsx` + `StorageNotice.dom.test.tsx` | Kontrak T3c: label EN (`GPA`, `Graduated`), guidance ID hilang; notice generic diterjemahkan, verbatim ID tak bocor |
+| `e2e/locale.spec.ts` (baru, 7 test) | Default ID, flip EN, kembali ID, persist reload, keyboard + pengumuman, offline-penuh nol off-origin, axe halaman EN |
+| Docs | Roadmap Fase 3 locale → [x]; performance-budget entri T3c (tanpa re-baseline); plan T3c AC + DoR dicentang |
+
+**Keputusan implementasi:**
+
+- **`import type` se-modul di content/:** `en.ts` memakai tipe `MicrocopyPack` dari `id.ts` (bukan salinan lokal 60-grup yang bisa drift — justru kegagalan yang dijaga D15). Type-only terhapus saat kompilasi; `check:boundaries` melihat edge se-modul yang diizinkan. Aturan "mirror lokal" tetap berlaku untuk tipe lintas-lapis (core), bukan antar-berkas content.
+- **AC-703-b dipersempit jujur:** grep membuktikan tak ada permukaan pemformat tanggal/angka di produk (nol call-site `Intl`/`toLocale*`; tanggal CV verbatim, timestamp tak dirender). AC ditulis ulang ke kontrak teruji: paritas placeholder 7 template di kedua pack + digit apa adanya; aturan `Intl` ADR berlaku saat permukaan format pertama hadir.
+- **Kegagalan milik saya (jujur):** ekor `en.ts` sirkular (`const` memakai dirinya sendiri — diperbaiki: literal penuh diekspor, resolusi di `id.ts`); klik radio `sr-only` ditolak hit-test Playwright (ikuti pola `getByText` mode-switch); `toBeFocused` bukan matcher repo ini (`toHaveFocus`); test switch-back salah klik opsi yang sudah aktif; 2 ekspektasi FR-204 lama kedaluwarsa oleh desain T3c (diperbarui, bukan dihapus).
+
+**Angka bundle (tanpa re-baseline, baseline TIDAK diubah):** `initialJsGzip` +4,5% ✅ (217,3 → 227,0 KB — bahasa kedua adalah teks wajib-baca di JS awal); `jsGzip` +1,6% ✅; `transferGzip` +1,4% ✅; css/font datar (30 berkas dist).
+
+**Verifikasi:** `typecheck` bersih · lint 0 error (24 warning pra-ada) · `format:check` repo-wide OK · `check:boundaries` OK (263 berkas) · **unit 82 file / 768 test hijau** (81/744 + 24 baru − 0; satu flake beban-paralel hilang saat isolasi/ulang) · build OK · `check:privacy` OK · **`check:budget` hijau** (di atas) · `test:e2e` locale **14/14** (7 Chromium + 7 Firefox via `node`, `--workers=1`) · suite e2e penuh **116 lolos / 2 skip pra-ada Firefox / 0 gagal** (Chromium + Firefox).

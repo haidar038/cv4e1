@@ -389,6 +389,51 @@ AC-604-a  (FR-604: fallback statis offline)
   Then daftar celah kata kunci tetap tampil dari pencocokan statis
 ```
 
+## FR-7xx — Pengalih bahasa (Fase 3, ADR-0012)
+
+```gherkin
+AC-701-a  (FR-701: pengalih ID/EN, default id)
+  Given aplikasi dibuka pertama kali tanpa preferensi tersimpan
+  When bahasa antarmuka tampil
+  Then locale aktif adalah id
+  And pengalih ID/EN terlihat dan dapat dioperasikan
+
+AC-701-b  (FR-701: preferensi bertahan setelah tab ditutup)
+  Given pengguna memilih locale en
+  When tab ditutup dan aplikasi dibuka kembali
+  Then locale aktif tetap en
+  And alur inti tetap berfungsi offline
+
+AC-702-a  (FR-702: locale en menyembunyikan micro-copy Indonesia)
+  Given locale en
+  When form pendidikan tampil
+  Then micro-copy khusus Indonesia tidak tampil
+  And label antarmuka tampil dalam Bahasa Inggris
+
+AC-702-b  (FR-702: locale id utuh)
+  Given locale id
+  When form pendidikan tampil
+  Then micro-copy khusus Indonesia tampil
+  (kontrak sama dengan AC-204-b)
+
+AC-703-a  (FR-703: kunci hilang fallback tanpa layar kosong)
+  Given pack EN kehilangan sebagian kunci
+  When permukaan yang memakai kunci itu tampil
+  Then teks Bahasa Indonesia tampil sebagai fallback
+  And tidak ada crash atau permukaan kosong
+
+AC-703-b  (FR-703: template angka/placeholder utuh di kedua locale)
+  Given template berisi angka atau placeholder pada locale aktif apa pun
+  When template dirender
+  Then placeholder ({mode}, {count}, {filename}, {current}, {total}, {remainder}, {verb}) utuh di kedua pack
+  And digit tampil apa adanya — tidak ada pemformat tanggal/angka hardcode satu locale (aturan `Intl` ADR-0012 berlaku saat permukaan format pertama hadir)
+
+AC-704-a  (FR-704: copy EN lolos lint frasa terlarang)
+  Given seluruh string pack ID dan pack EN
+  When pemeriksaan frasa terlarang glossary §6 dijalankan
+  Then tidak ada frasa terlarang di kedua pack
+```
+
 ## NFR — Non-functional
 
 ```gherkin

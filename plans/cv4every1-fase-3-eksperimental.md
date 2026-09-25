@@ -2,8 +2,8 @@
 
 | Field | Value             |
 | :-- | :--               |
-| Status | **Rencana — menunggu ADR + keputusan budget C1b** |
-| Terakhir diperbarui | 2026-09-24 |
+| Status | **Berjalan — T3a Done, T3b Done, T3c Done (2026-09-25)** |
+| Terakhir diperbarui | 2026-09-25 |
 | Prasyarat | Gerbang Fase 2 ditutup (lihat `plans/cv4every1-changelog.md` entri penundaan); `scripts/bundle-baseline.json` hanya berubah via keputusan sadar |
 | Gerbang keluar | Ditandai eksperimental; hasil selalu lewat tinjauan manusia (`docs/01-product/roadmap.md` Fase 3) |
 
@@ -127,52 +127,75 @@ Pengguna menempel deskripsi lowongan dan menerima kata kunci, celah, dan saran s
 
 ## Requirement
 
-FR-204/AC-204-a/b (hanya gating micro-copy) ADA; switcher penuh = requirement baru, belum ada di SRS. `use-cases.md` mencatat "Mengganti bahasa antarmuka" sebagai UC yang perlu ditulis.
+FR-204/AC-204-a/b (gating micro-copy) ADA; switcher penuh = requirement
+baru — diusulkan FR-7xx mengikuti preseden FR-5xx/FR-6xx, diputus bersama
+penerimaan ADR. `use-cases.md` mencatat "Mengganti bahasa antarmuka" (belum
+dicentang); F-G5 (`feature-catalog.md`, P1).
 
 ## Context
 
-Struktur locale disiapkan sejak Task 13a; aturan di `docs/01-product/localization-guide.md` §5–§6; preferensi `locale` tinggal di `localStorage` per ADR-0002 (bukan data CV).
+Struktur locale terbentuk berbeda dari sketsa awal: microcopy tinggal di
+`src/content/microcopy/id.ts` (typed pack + `microcopyStructural` blanking
+FR-204), bukan `src/content/locales/*.json` — JANGAN ikuti layout
+`localization-guide.md` §5 mentah-mentah (masih outline). Yang sudah ada:
+`ui-store.locale` (default `id`), `meta.locale`, hook `useMicrocopy`,
+output AI berbahasa Inggris (polish `en`/`translate-en`,
+`prompts/en/polish.v1.md`). Yang belum ada: pack EN, komponen switcher,
+dan ADR "Locale EN / i18n" (kandidat masih terbuka — prasyarat seperti T3b).
 
 ## Goal
 
-Pengguna mengganti bahasa antarmuka ID↔EN dengan fallback aman bila kunci terjemahan hilang.
+Pengguna mengganti bahasa antarmuka ID↔EN dengan fallback aman bila kunci
+terjemahan hilang.
 
 ## Requirements
 
-- Switcher ID/EN yang persisten (preferensi kecil di `localStorage`); default `id`.
-- Locale `en` menonaktifkan micro-copy khas Indonesia (AC-204-a); locale `id` menampilkannya (AC-204-b).
-- Kunci hilang → fallback ID tanpa crash; format tanggal/angka mengikuti locale aktif.
-- Copy EN lolos lint frasa terlarang yang sama (`localization-guide.md` §6).
+- Switcher ID/EN yang persisten (preferensi kecil di `localStorage`,
+  ADR-0002); default `id`.
+- Pack EN ditulis manual (dilarang machine-translate, §12); guidance khas
+  Indonesia tetap blank (FR-204/AC-204-a); locale `id` utuh (AC-204-b).
+- Kunci hilang → fallback ID tanpa crash; format tanggal/angka mengikuti
+  locale aktif.
+- Copy EN lolos lint frasa terlarang yang sama (glossary §6,
+  `localization-guide.md` §6).
+- Bobot pack EN diukur (pelajaran C1b: teks yang wajib dibaca = byte).
 
 ## Non-goals
 
-- Terjemahan isi CV otomatis (`translate-en` tetap degradasi graceful hingga desain dwibahasa selesai); pluralisasi sempurna; locale ketiga.
+- Terjemahan isi CV otomatis (`translate-en` tetap degradasi graceful
+  hingga desain dwibahasa selesai); pluralisasi sempurna; locale ketiga.
 
 ## Acceptance criteria
 
-- [ ] Given locale `en` → micro-copy ID hilang, label EN tampil; Given kembali `id` → sebaliknya.
-- [ ] Kunci hilang → fallback + tanpa layar kosong (diuji).
-- [ ] Preferensi bertahan setelah tab ditutup; alur inti tetap offline.
-- [ ] Keyboard-only mencapai dan mengoperasikan switcher; audit axe bersih di permukaannya.
+- [x] Given locale `en` → micro-copy ID hilang, label EN tampil; Given kembali `id` → sebaliknya (e2e `locale.spec.ts` 7/7 Chromium + 7/7 Firefox).
+- [x] Kunci hilang → fallback + tanpa layar kosong (unit `withIdFallback`: pack lengkap identik, parsial jatuh per-kunci, blank disengaja tetap blank).
+- [x] Preferensi bertahan setelah tab ditutup; alur inti tetap offline (e2e reload + offline-penuh, nol off-origin).
+- [x] Keyboard-only mencapai dan mengoperasikan switcher; audit axe bersih di permukaannya (dom test + axe jsdom + axe halaman EN).
 
 ## Edge cases to handle
 
-- Kunci terjemahan hilang sebagian, format tanggal ID vs EN, katalog Action Verbs EN (terpisah vs pemetaan — putusan ADR), teks panjang Jermanik memecah layout.
+- Kunci terjemahan hilang sebagian, format tanggal ID vs EN, katalog
+  Action Verbs EN (terpisah vs pemetaan — putusan ADR), teks panjang
+  Jermanik memecah layout, interplay EN dengan fitur AI yang sudah ada.
 
 ## Files likely affected
 
-- `src/content/locales/id/*.json`, `en/...` (baru/isi), switcher UI, `src/content/microcopy/*`, lint frasa terlarang dwibahasa, `e2e/locale.spec.ts`.
+- `src/content/microcopy/en.ts` (baru, typed mirror `id.ts`), `useMicrocopy`,
+  komponen switcher (baru; titik mount diputus saat desain), test microcopy
+  (sweep + blanking), `e2e/locale.spec.ts` (baru).
+- Sentuh hanya bila ADR memutuskan: katalog Action Verbs EN.
 
 ## Docs to read first
 
-- `docs/01-product/localization-guide.md`, `docs/00-project-context/glossary.md` §6, `docs/adr/0002-indexeddb-over-localstorage.md`, `docs/02-requirements/acceptance-criteria.md` AC-204.
+- `docs/01-product/localization-guide.md`, `docs/00-project-context/glossary.md` §6–§7, `docs/adr/0002-indexeddb-over-localstorage.md`, `docs/02-requirements/acceptance-criteria.md` AC-204, `docs/02-requirements/use-cases.md`.
 
 ## Definition of Ready (T3c)
 
-- [ ] FR + AC switcher baru — BELUM (perlu SRS + UC).
-- [ ] Dampak `ResumeDocument`: none — TERISI (locale = preferensi UI).
+- [x] ADR Locale EN/i18n Accepted 2026-09-25 (`docs/adr/0012-locale-en-i18n.md`: pack bertipe, fallback per-kunci, pack EN manual, `Intl` bawaan, verbs EN terpisah, lint dwibahasa).
+- [x] FR-701–704 + AC-701–704 + UC-013 ditulis dan berlaku (SRS, acceptance-criteria, use-cases).
+- [ ] Dampak `ResumeDocument`: none (locale = preferensi UI) — TERISI.
 - [ ] Dampak offline: none (paket lokal) — TERISI, waspadai bobot bundle (pelajaran C1b).
-- [ ] Dampak aksesibilitas: switcher keyboard + pengumuman locale — BELUM diuji.
+- [ ] Dampak aksesibilitas: switcher keyboard + pengumuman locale — TERUJI (dom test arrows + `role=status`, axe jsdom + axe halaman EN).
 - [ ] Dampak privasi: tidak ada egress — TERISI.
 - [ ] Edge cases utama — terdaftar di atas.
 - [ ] Dependensi baru — tidak ada (tanpa framework i18n kecuali dijustifikasi).
@@ -183,6 +206,6 @@ Pengguna mengganti bahasa antarmuka ID↔EN dengan fallback aman bila kunci terj
 
 1. **Pipeline impor PDF/OCR** — ✅ drafted `docs/adr/0008-pdf-import-ocr-pipeline.md` (Proposed 2026-09-25, justifikasi dependensi digabung); T3a menunggu Accepted.
 2. **Tailoring lowongan** — schema input/output, minimisasi data, sanitasi injection, grounding-sebagai-kode, fallback keyword-matcher, consent per operasi, kenapa bukan skor (§6).
-3. **Locale EN / i18n** — struktur `src/content/locales/`, fallback kunci hilang, cakupan terjemah vs khusus-`id`, tanggal/plural, strategi Action Verbs EN, lint dwibahasa.
+3. **Locale EN / i18n** — ✅ drafted `docs/adr/0012-locale-en-i18n.md` (Proposed 2026-09-25, FR-701–704 + AC-701–704 + UC-013 diusulkan bersama); T3c menunggu Accepted.
 4. **Kebijakan field tak dikenal + aset base64** — ✅ drafted `docs/adr/0009-unknown-fields-and-asset-policy.md` (Proposed 2026-09-25); menutup TODO `import-export-spec.md` §4–§5.
 5. **Justifikasi dependensi runtime baru** — ✅ digabung ke ADR-0008 (pdfjs-dist + tesseract.js, angka final via spike T3a).

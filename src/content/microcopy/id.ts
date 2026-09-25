@@ -12,6 +12,7 @@
  * Tone rules (target-users.md §6): guide, never condescend — warnings are
  * help, not failure. Forbidden phrases (glossary.md §6) are enforced by test.
  */
+import { microcopyEnDraft, withIdFallback } from './en'
 
 export type LocaleKey = 'id' | 'en'
 
@@ -448,6 +449,14 @@ export interface MicrocopyPack {
   }
   skip: {
     toPreview: string
+  }
+  locale: {
+    /** Switcher legend and option labels — structural, kept for every locale. */
+    label: string
+    indonesian: string
+    english: string
+    /** Screen-reader announcement when the locale changes; `{locale}` is replaced. */
+    status: string
   }
 }
 
@@ -1009,6 +1018,12 @@ export const microcopyId: MicrocopyPack = {
   skip: {
     toPreview: 'Lewati ke pratinjau CV',
   },
+  locale: {
+    label: 'Bahasa antarmuka',
+    indonesian: 'Indonesia',
+    english: 'Inggris',
+    status: 'Bahasa {locale} aktif',
+  },
 }
 
 /**
@@ -1168,9 +1183,20 @@ export const microcopyStructural: MicrocopyPack = {
 }
 
 /**
- * FR-204: Indonesian-specific microcopy is inactive for other locales. The
- * English pack arrives in Fase 3 (F-G5); callers must handle the null case.
+ * FR-204: Indonesian-specific microcopy is inactive for other locales. Since
+ * T3c (ADR-0012, FR-702) the English pack below carries the full interface
+ * copy; callers keep the null fallback for unknown future locales.
  */
 export function getMicrocopy(locale: LocaleKey): MicrocopyPack | null {
-  return locale === 'id' ? microcopyId : null
+  if (locale === 'id') return microcopyId
+  if (locale === 'en') return microcopyEn
+  return null
 }
+
+/**
+ * English pack resolved against the Indonesian pack at module load (ADR-0012,
+ * FR-703): the authored draft is complete, so it resolves unchanged — and any
+ * key a future edit drops falls back per-key through `withIdFallback` instead
+ * of crashing. Exported for the sweep tests; components use `getMicrocopy`.
+ */
+export const microcopyEn: MicrocopyPack = withIdFallback(microcopyId, microcopyEnDraft)

@@ -1,7 +1,9 @@
 import type { KeyboardEvent } from 'react'
+import { useStore } from 'zustand'
 import type { SectionKey } from '../../core/view-models'
-import type { ActionVerbEntry } from '../../content/action-verbs'
+import type { AnyActionVerbEntry, CatalogLocale } from '../../content/action-verbs'
 import { getVerbCategories, getVerbsForSection } from '../../content/action-verbs'
+import { uiStore } from '../store/ui-store'
 import { useMicrocopy } from './useMicrocopy'
 
 /** Sections whose bullets get verb suggestions — exactly the catalog's target sections. */
@@ -19,7 +21,7 @@ export interface ActionVerbSuggestionsPanelProps {
    * guarantees entries for all three sections; asserted in
    * action-verbs.test.ts).
    */
-  verbs?: readonly ActionVerbEntry[]
+  verbs?: readonly AnyActionVerbEntry[]
 }
 
 /**
@@ -28,9 +30,10 @@ export interface ActionVerbSuggestionsPanelProps {
  * (no DOM) so the grouping contract is testable directly.
  */
 export function groupVerbsByCategory(
-  verbs: readonly ActionVerbEntry[],
-): Array<{ category: string; verbs: ActionVerbEntry[] }> {
-  return getVerbCategories()
+  verbs: readonly AnyActionVerbEntry[],
+  locale: CatalogLocale = 'id',
+): Array<{ category: string; verbs: AnyActionVerbEntry[] }> {
+  return getVerbCategories(locale)
     .map((category) => ({
       category,
       verbs: verbs.filter((entry) => entry.category === category),
@@ -54,7 +57,9 @@ export function ActionVerbSuggestionsPanel({
   verbs,
 }: ActionVerbSuggestionsPanelProps) {
   const pack = useMicrocopy()
-  const groups = groupVerbsByCategory(verbs ?? getVerbsForSection(section))
+  // FR-702: the suggestion catalog follows the interface language.
+  const locale = useStore(uiStore, (s) => s.locale)
+  const groups = groupVerbsByCategory(verbs ?? getVerbsForSection(section, locale), locale)
 
   if (groups.length === 0) {
     return <p className="px-1 py-2 text-muted-foreground">{pack.actionVerbs.emptyState}</p>

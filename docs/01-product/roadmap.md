@@ -64,7 +64,7 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 - [x] Impor CV: ekstraksi lapisan teks PDF → fallback OCR → ekstraksi field → UI tinjauan (T3a Done 2026-09-26: re-baseline sadar opsi (a), `check:budget` hijau semua +0,0%; ADR-0010 Accepted)
 - [x] Pencocokan deskripsi lowongan (T3b Done: hibrida statis-default + LLM opsional, JD transien, grounding invariant + probe injection; tanpa re-baseline — semua ratchet hijau)
-- [ ] Locale Bahasa Inggris
+- [x] Pengalih bahasa ID/EN (T3c Done 2026-09-25: pack EN bertipe + fallback per-kunci + katalog verbs EN terpisah + switcher persisten `localStorage`; ADR-0012 Accepted, FR-701–704; tanpa re-baseline — semua ratchet hijau)
 
 **Gerbang keluar:** ditandai eksperimental; hasil selalu lewat tinjauan manusia.
 

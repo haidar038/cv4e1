@@ -109,16 +109,19 @@ describe('EducationForm', () => {
     await runAxe(container)
   })
 
-  it('hides the Indonesia-specific guidance when the locale is not id (FR-204)', async () => {
+  it('hides the Indonesia-specific guidance when the locale is not id (FR-204, FR-702)', async () => {
     const user = userEvent.setup()
     uiStore.setState({ locale: 'en' })
     renderForm()
-    await user.click(screen.getByRole('button', { name: 'Tambah Pendidikan' }))
-    await user.type(screen.getByLabelText('IPK'), '3.52')
+    await user.click(screen.getByRole('button', { name: 'Add Education' }))
+    await user.type(screen.getByLabelText('GPA'), '3.52')
 
+    // Indonesia-specific copy is gone, not translated.
     expect(screen.queryByText(/Skala IPK belum ditulis/)).not.toBeInTheDocument()
-    // Labels stay programmatic even without the domain pack.
-    expect(screen.getByLabelText('IPK')).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Lulus' })).not.toBeInTheDocument()
+    // Structural labels arrive in English instead.
+    expect(screen.getByLabelText('GPA')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Graduated' })).toBeInTheDocument()
   })
 })
 

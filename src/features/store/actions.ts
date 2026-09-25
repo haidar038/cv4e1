@@ -27,6 +27,7 @@ import { ImportError, type ImportErrorReason } from '../../storage/export-import
 import { documentStore } from './document-store'
 import { draftStore } from './draft-store'
 import { uiStore, type ResumeMode } from './ui-store'
+import type { LocaleKey } from '../../content/microcopy/id'
 
 // --- User-facing storage messages (Bahasa Indonesia, D21 tone: guide, never blame) ---
 
@@ -83,7 +84,12 @@ function reportStorageFailure(error: unknown): void {
 // --- Internal helpers ---
 
 function mirrorDocumentPreferences(doc: ValidatedResumeDocument): void {
-  uiStore.setState({ mode: doc.meta?.mode ?? 'ats', locale: doc.meta?.locale ?? 'id' })
+  // A stored user choice wins over the document mirror (ADR-0012): opening a
+  // draft must not clobber an explicit language switch made earlier.
+  uiStore.setState({
+    mode: doc.meta?.mode ?? 'ats',
+    locale: readStoredLocale() ?? doc.meta?.locale ?? 'id',
+  })
 }
 
 /**
@@ -497,6 +503,38 @@ export function setMode(mode: ResumeMode): void {
 
 export function setOpenPanel(panel: string | null): void {
   uiStore.setState({ openPanel: panel })
+}
+
+/**
+ * UI language preference (T3c, FR-701, ADR-0012): a small localStorage value
+ * (ADR-0002) — never resume content, never written into `ResumeDocument`.
+ * A blocked storage only narrows the preference to this tab's session.
+ */
+const LOCALE_STORAGE_KEY = 'cv4every1:locale'
+
+export function readStoredLocale(): LocaleKey | null {
+  try {
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
+    return stored === 'id' || stored === 'en' ? stored : null
+  } catch {
+    return null
+  }
+}
+
+/** Applies the stored preference at startup; the store default is already `id`. */
+export function initLocalePreference(): void {
+  const stored = readStoredLocale()
+  if (stored !== null) uiStore.setState({ locale: stored })
+}
+
+export function setLocale(locale: LocaleKey): void {
+  uiStore.setState({ locale })
+  try {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  } catch {
+    // Storage blocked (FR-111 spirit): the ui-store update above still
+    // applies, so the switch works for this session.
+  }
 }
 
 /** Dismisses the Task 12 ATS photo notice for the rest of this tab's session. */

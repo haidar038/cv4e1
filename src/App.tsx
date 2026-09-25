@@ -6,8 +6,14 @@ import { FormLayout } from './features/form/FormLayout'
 import { useMicrocopy } from './features/form/useMicrocopy'
 import { OfflineIndicator } from './features/offline/OfflineIndicator'
 import { PreviewPane } from './features/preview/PreviewPane'
+import { LocaleSwitcher } from './features/settings/LocaleSwitcher'
 import { StorageNoticeBanner, StorageNoticeFooter } from './features/settings/StorageNotice'
-import { initStoreSync, loadDraftAction, refreshDrafts } from './features/store/actions'
+import {
+  initLocalePreference,
+  initStoreSync,
+  loadDraftAction,
+  refreshDrafts,
+} from './features/store/actions'
 import { documentStore } from './features/store/document-store'
 
 /**
@@ -37,6 +43,7 @@ function App() {
 
   useEffect(() => {
     initStoreSync()
+    initLocalePreference()
     void refreshDrafts()
     const lastDraftId = localStorage.getItem(LAST_DRAFT_KEY)
     if (lastDraftId !== null) void loadDraftAction(lastDraftId)
@@ -75,6 +82,8 @@ function App() {
           {/* Task 15 (FR-109): prominent once after the first save; the footer
             below is the permanent home. */}
           <StorageNoticeBanner />
+          {/* T3c (FR-701): global chrome, visible with and without a draft. */}
+          <LocaleSwitcher />
           {hasDocument && <MobileTabs mobileView={mobileView} onChange={setMobileView} />}
           <div className="flex min-w-0 flex-1 flex-col gap-4 lg:flex-row">
             <main

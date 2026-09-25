@@ -1,0 +1,440 @@
+[
+  {
+    "verb": "Led",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Led [number] [roles] in [project/event] to [outcome]"
+  },
+  {
+    "verb": "Managed",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Managed [resources/budget] worth [value] for [purpose]"
+  },
+  {
+    "verb": "Coordinated",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Coordinated [number] [committees/parties] in [activity] attended by [number] participants"
+  },
+  {
+    "verb": "Directed",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Directed a [field] team of [number] people toward [outcome]"
+  },
+  {
+    "verb": "Delegated",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Delegated [tasks] to [number] members by expertise"
+  },
+  {
+    "verb": "Prioritized",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Prioritized [work list] so [target] finished on time"
+  },
+  {
+    "verb": "Evaluated",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Evaluated [process/performance] and produced [improvement]"
+  },
+  {
+    "verb": "Budgeted",
+    "category": "Managerial",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Budgeted [amount] for [activity]"
+  },
+  {
+    "verb": "Supervised",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Supervised [stages/process] so [standard] was met"
+  },
+  {
+    "verb": "Decided",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Decided [subject] based on [data/field conditions]"
+  },
+  {
+    "verb": "Planned",
+    "category": "Managerial",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Planned [activity] in [number] stages over [time]"
+  },
+  {
+    "verb": "Mediated",
+    "category": "Managerial",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Mediated [situation] between [parties] to reach [agreement]"
+  },
+  {
+    "verb": "Developed",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Developed [feature/system] with [technology] for [need]"
+  },
+  {
+    "verb": "Implemented",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Implemented [solution] that reduced [problem] by [impact]"
+  },
+  {
+    "verb": "Built",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Built [app/prototype] with [technology] for [users]"
+  },
+  {
+    "verb": "Tested",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Tested [component/system] and found [number] defects before release"
+  },
+  {
+    "verb": "Debugged",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Debugged [issue] in [component] until recovery within [time]"
+  },
+  {
+    "verb": "Automated",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Automated [manual process] to save [time] per week"
+  },
+  {
+    "verb": "Integrated",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Integrated [system A] with [system B] via [method]"
+  },
+  {
+    "verb": "Configured",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Configured [device/service] for [need]"
+  },
+  {
+    "verb": "Deployed",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Deployed [app] to [environment] with [method]"
+  },
+  {
+    "verb": "Maintained",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Maintained [system/network] to keep [availability] steady"
+  },
+  {
+    "verb": "Migrated",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Migrated [data/system] from [old] to [new] with zero data loss"
+  },
+  {
+    "verb": "Documented",
+    "category": "Technical",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Documented [process/code] so [readers] can [continue]"
+  },
+  {
+    "verb": "Optimized",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Optimized [performance/process] so [metric] rose by [figure]"
+  },
+  {
+    "verb": "Secured",
+    "category": "Technical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Secured [system/data] with [safeguards]"
+  },
+  {
+    "verb": "Analyzed",
+    "category": "Analytical",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Analyzed [data/problem] and found [finding]"
+  },
+  {
+    "verb": "Researched",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Researched [topic] with [method] to reach [conclusion]"
+  },
+  {
+    "verb": "Reviewed",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Reviewed [literature/policy] for [purpose]"
+  },
+  {
+    "verb": "Mapped",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Mapped [process/needs] into [deliverable]"
+  },
+  {
+    "verb": "Measured",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Measured [metric] with [tool] and reported [result]"
+  },
+  {
+    "verb": "Audited",
+    "category": "Analytical",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Audited [documents/process] and recommended [fix]"
+  },
+  {
+    "verb": "Formulated",
+    "category": "Analytical",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Formulated [solution/strategy] from [data]"
+  },
+  {
+    "verb": "Identified",
+    "category": "Analytical",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Identified [cause/opportunity] from [source]"
+  },
+  {
+    "verb": "Validated",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Validated [data/result] through [method]"
+  },
+  {
+    "verb": "Calculated",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Calculated [figure] for [need]"
+  },
+  {
+    "verb": "Simulated",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Simulated [scenario] for [purpose]"
+  },
+  {
+    "verb": "Diagnosed",
+    "category": "Analytical",
+    "applicableSections": ["experience", "projects"],
+    "examplePhrase": "Diagnosed [fault/problem] down to [root cause]"
+  },
+  {
+    "verb": "Designed",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Designed [interface/material] for [audience] with [principle]"
+  },
+  {
+    "verb": "Architected",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Architected [system/activity] serving [number] users"
+  },
+  {
+    "verb": "Initiated",
+    "category": "Creative",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Initiated [program idea] with [impact]"
+  },
+  {
+    "verb": "Wrote",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Wrote [content type] for [medium/audience]"
+  },
+  {
+    "verb": "Edited",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Edited [document/material] to improve [quality]"
+  },
+  {
+    "verb": "Produced",
+    "category": "Creative",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Produced [content/event] with [resources]"
+  },
+  {
+    "verb": "Illustrated",
+    "category": "Creative",
+    "applicableSections": ["projects"],
+    "examplePhrase": "Illustrated [concept] as [visual form]"
+  },
+  {
+    "verb": "Packaged",
+    "category": "Creative",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Packaged [message/identity] for [audience] recall"
+  },
+  {
+    "verb": "Curated",
+    "category": "Creative",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Curated [content/works] for [event/publication]"
+  },
+  {
+    "verb": "Created",
+    "category": "Creative",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Created [work/mechanism] bringing [novelty]"
+  },
+  {
+    "verb": "Made",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Made [product/material] for [need]"
+  },
+  {
+    "verb": "Compiled",
+    "category": "Creative",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Compiled [document/report/plan] that [result]"
+  },
+  {
+    "verb": "Presented",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Presented [result] before an audience of [number]"
+  },
+  {
+    "verb": "Published",
+    "category": "Communication",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Published [content] on [medium] reaching [number] readers"
+  },
+  {
+    "verb": "Facilitated",
+    "category": "Communication",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Facilitated [discussion/meeting] with [number] participants"
+  },
+  {
+    "verb": "Negotiated",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Negotiated with [party] to reach [agreement]"
+  },
+  {
+    "verb": "Collaborated",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Collaborated with [team/party] for [outcome]"
+  },
+  {
+    "verb": "Advocated",
+    "category": "Communication",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Advocated [issue] to [party] resulting in [change]"
+  },
+  {
+    "verb": "Explained",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Explained [technical topic] to [non-technical audience]"
+  },
+  {
+    "verb": "Contacted",
+    "category": "Communication",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Contacted [number] sponsors and secured [impact]"
+  },
+  {
+    "verb": "Reported",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Reported [progress] to [stakeholders] on a [frequency] basis"
+  },
+  {
+    "verb": "Consulted",
+    "category": "Communication",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Consulted [experts] for [decision]"
+  },
+  {
+    "verb": "Interviewed",
+    "category": "Communication",
+    "applicableSections": ["organizations", "projects"],
+    "examplePhrase": "Interviewed [number] sources for [publication/research]"
+  },
+  {
+    "verb": "Executed",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Executed [plan/activity] per [schedule/budget]"
+  },
+  {
+    "verb": "Scheduled",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Scheduled [activity] for [number] participants"
+  },
+  {
+    "verb": "Archived",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Archived [documents] for faster [retrieval]"
+  },
+  {
+    "verb": "Summarized",
+    "category": "Operational",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Summarized [data] from [number] sources"
+  },
+  {
+    "verb": "Served",
+    "category": "Operational",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Served [number] [users/participants] per [period]"
+  },
+  {
+    "verb": "Administered",
+    "category": "Operational",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Administered [process/documents] for the committee"
+  },
+  {
+    "verb": "Prepared",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Prepared [supplies/logistics] for [activity]"
+  },
+  {
+    "verb": "Arranged",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Arranged [flow/checks] to improve [efficiency]"
+  },
+  {
+    "verb": "Inspected",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Inspected [output/completeness] against [standard]"
+  },
+  {
+    "verb": "Handled",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations"],
+    "examplePhrase": "Handled [complaints/process] with [solution]"
+  },
+  {
+    "verb": "Ran",
+    "category": "Operational",
+    "applicableSections": ["experience", "organizations", "projects"],
+    "examplePhrase": "Ran [program/system] for [period]"
+  },
+  {
+    "verb": "Recorded",
+    "category": "Operational",
+    "applicableSections": ["organizations"],
+    "examplePhrase": "Recorded [transactions/decisions] by [method]"
+  }
+]

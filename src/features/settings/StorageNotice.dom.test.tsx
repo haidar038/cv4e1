@@ -79,7 +79,7 @@ describe('StorageNotice (Task 15, FR-109)', () => {
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()
   })
 
-  it('renders nothing domain-specific for non-id locales (FR-204)', () => {
+  it('shows the translated notice for the en locale instead of blanking generic guidance (FR-702)', () => {
     openSavedDocument()
     uiStore.setState({ locale: 'en' })
     render(
@@ -89,8 +89,12 @@ describe('StorageNotice (Task 15, FR-109)', () => {
       </>,
     )
 
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument()
+    const englishNotice =
+      'Your data is stored in the browser on this device. Clearing browser data, private mode, or automatic cleanup can delete your drafts. Use Export to keep a backup copy.'
+    expect(screen.getByRole('status')).toHaveTextContent(englishNotice)
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(englishNotice)
+    // The Indonesian verbatim never leaks into the English interface.
+    expect(screen.queryByText(VERBATIM)).not.toBeInTheDocument()
   })
 
   it('passes the axe audit with the banner visible', async () => {

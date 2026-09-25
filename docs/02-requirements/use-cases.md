@@ -56,8 +56,17 @@
 ## UC-012 — Mengimpor CV lama (Fase 3)
 - [ ] FR terkait: FR-501, FR-502
 
+## UC-013 — Mengganti bahasa antarmuka (Fase 3, ADR-0012)
+- [ ] Aktor: pengguna yang membutuhkan antarmuka Bahasa Inggris
+- [ ] Prakondisi: aplikasi terbuka pada locale apa pun
+- [ ] Pemicu: pengguna memilih bahasa lain pada pengalih
+- [ ] Alur utama: pilih bahasa → antarmuka tampil dalam bahasa itu → preferensi tersimpan
+- [ ] Alternatif: kunci EN hilang → fallback Bahasa Indonesia tampil, tanpa crash (FR-703)
+- [ ] **Poskondisi kritis:** data sumber tidak berubah; preferensi bertahan setelah tab ditutup
+- [ ] FR terkait: FR-701, FR-702, FR-703, FR-704
+- [ ] Pengecualian: localStorage diblokir — preferensi hanya berlaku sesi itu
+
 ## Use case yang perlu ditambahkan
 - [ ] Mengelola beberapa draft
 - [ ] Pemulihan setelah pengusiran storage
 - [ ] Beberapa tab terbuka bersamaan
-- [ ] Mengganti bahasa antarmuka

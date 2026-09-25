@@ -102,6 +102,15 @@ Format tiap requirement: ID · Pernyataan · Prioritas · Sumber · Dapat diveri
 | FR-603 | Deskripsi lowongan bersifat transien: tidak disimpan, tidak di-log, dan pemotongan panjang harus disertai nota jujur | P1 |
 | FR-604 | Jalur pencocokan statis offline harus selalu tersedia sebagai fallback jalur LLM | P1 |
 
+### FR-7xx — Pengalih bahasa (Fase 3, ADR-0012)
+
+| ID | Pernyataan | Prio |
+| :-- | :-- | :-- |
+| FR-701 | Sistem harus menyediakan pengalih bahasa antarmuka ID/EN yang persisten, dengan default `id` | P1 |
+| FR-702 | Pack Bahasa Inggris harus ditulis manual dan micro-copy khusus Indonesia tetap nonaktif pada locale `en` | P1 |
+| FR-703 | Kunci terjemahan yang hilang harus fallback ke Bahasa Indonesia tanpa crash, dan format tanggal/angka harus mengikuti locale aktif | P1 |
+| FR-704 | Copy Bahasa Inggris harus lolos pemeriksaan frasa terlarang yang sama dengan copy Bahasa Indonesia | P1 |
+
 ---
 
 ## 4. Non-Functional Requirements

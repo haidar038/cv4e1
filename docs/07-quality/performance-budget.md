@@ -211,6 +211,12 @@ Vite 8.3 · `bun run build`, diukur `scripts/check-bundle-size.ts`; baseline di
   `transferGzip` 1031,7 → **1038,9 KB** (+0,7% ✅); css/font datar.
   Baseline JSON **tidak** diubah (semua ratchet hijau). Pola lazy
   C1b/C2 terbukti: orkestrator + prompt + validasi di luar JS awal.
+- **T3c pengalih bahasa ID/EN (FR-701–704, ADR-0012, tanpa re-baseline):**
+  `initialJsGzip` 217,3 → **227,0 KB** (+4,5% ✅ — pack EN + katalog verbs
+  EN + switcher menumpang JS awal; bahasa kedua adalah teks wajib-baca,
+  pelajaran C1b); `jsGzip` 909,3 → **924,2 KB** (+1,6% ✅);
+  `transferGzip` 1031,7 → **1046,6 KB** (+1,4% ✅); css/font datar.
+  Baseline JSON **tidak** diubah (semua ratchet hijau, jauh dari fatal +10%).
 - **Penyelesaian utang font + transfer (2026-09-20, lebih awal dari Task 10):** impor paket
   `@fontsource-variable/*` menarik **semua** subset (cyrillic, cyrillic-ext, greek, vietnamese,
   latin-ext) — 12 berkas woff2 / 393,5 KB, padahal produk hanya menulis teks Latin. `src/index.css`
