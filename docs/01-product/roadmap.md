@@ -70,12 +70,13 @@ Membuktikan asumsi yang, jika salah, membatalkan rencana. Lihat `../00-project-c
 
 ## Fase 4 — Kesiapan produksi
 
-- [ ] Audit aksesibilitas penuh
-- [ ] Uji lintas peramban terhadap matriks
-- [ ] Tinjauan keamanan dan privasi
-- [ ] Proses rilis, rollback, runbook
-- [ ] Dokumentasi publik dan halaman pendaratan
+- [x] Audit aksesibilitas penuh — F4a Done 2026-09-26 (e2e 26/26 + keyboard walkthrough; uji SR manual terbuka)
+- [x] Uji lintas peramban terhadap matriks — F4b Done 2026-09-26 (matriks v1.0; Chromium/FF/WebKit-probe/Pixel; fisik manual terbuka)
+- [x] Tinjauan keamanan dan privasi — F4c Done 2026-09-26 (SafeLink + CSP definitif + ADR-0014; pasang header menunggu Q2)
+- [x] Proses rilis, rollback, runbook — F4d Done 2026-09-26 (prosedur v1.0 + vercel.json + dry-run hijau)
+- [x] Dokumentasi publik dan halaman pendaratan — F4e Done 2026-09-26 (landing ID/EN + footer legal + README)
 - [x] Keputusan lisensi (Q1) — AGPL-3.0, ADR-0013 (2026-09-26)
+- [x] Desain dwibahasa translate-en — F4g Done 2026-09-26 (konten CV mengikuti locale dokumen; tanpa FR baru)
 
 ## Yang secara sengaja tidak dijadwalkan
 - Akun dan sinkronisasi cloud
