@@ -10,6 +10,7 @@ import type {
 import { EducationItem } from './sections/EducationItem'
 import { ExperienceItem } from './sections/ExperienceItem'
 import { ProjectItem } from './sections/ProjectItem'
+import { SafeLink } from '../SafeLink'
 import { CertificationItem, SkillsGroup } from './sections/SkillsCertifications'
 import './print.css'
 
@@ -61,8 +62,11 @@ function LinksLine({ vm }: { vm: ATSViewModel }) {
         <span key={link.url}>
           {index > 0 && ' · '}
           {/* The URL itself stays visible as text: parsers must find it
-              even when they never follow the anchor (ats-test-plan §1). */}
-          <a href={link.url}>{link.label === link.url ? link.url : `${link.label}: ${link.url}`}</a>
+              even when they never follow the anchor (ats-test-plan §1).
+              SafeLink keeps non-http(s) schemes unclickable (F4c). */}
+          <SafeLink url={link.url}>
+            {link.label === link.url ? link.url : `${link.label}: ${link.url}`}
+          </SafeLink>
         </span>
       ))}
     </p>

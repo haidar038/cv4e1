@@ -1,4 +1,5 @@
 import type { CertificationDisplay, SkillGroupDisplay } from '../../../core/view-models'
+import { SafeLink } from '../../SafeLink'
 import { joinMeta } from '../../ats/sections/display'
 import styles from '../templates/default/styles.module.css'
 
@@ -23,7 +24,7 @@ export function CertificationItem({ item }: { item: CertificationDisplay }) {
       {meta !== undefined && <p className={styles.itemMeta}>{meta}</p>}
       {item.url !== undefined && (
         <p className={styles.itemMeta}>
-          <a href={item.url}>{item.url}</a>
+          <SafeLink url={item.url}>{item.url}</SafeLink>
         </p>
       )}
     </article>

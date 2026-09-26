@@ -10,6 +10,7 @@ import type {
 import { EducationItem } from '../../sections/EducationItem'
 import { ExperienceItem } from '../../sections/ExperienceItem'
 import { ProjectItem } from '../../sections/ProjectItem'
+import { SafeLink } from '../../../SafeLink'
 import { CertificationItem, SkillsGroup } from '../../sections/SkillsCertifications'
 import styles from './styles.module.css'
 
@@ -75,10 +76,11 @@ export function TemplateDefault({ vm, resolvePhotoUrl }: TemplateDefaultProps) {
           {vm.links.map((link) => (
             <p className={styles.linkLine} key={link.url}>
               {/* Same `label: url` composition as the ATS renderer: the URL
-                  stays visible text for parsers (AC-001-a same field values). */}
-              <a href={link.url}>
+                  stays visible text for parsers (AC-001-a same field values).
+                  SafeLink keeps non-http(s) schemes unclickable (F4c). */}
+              <SafeLink url={link.url}>
                 {link.label === link.url ? link.url : `${link.label}: ${link.url}`}
-              </a>
+              </SafeLink>
             </p>
           ))}
           {skills !== undefined && <CreativeSection section={skills} />}

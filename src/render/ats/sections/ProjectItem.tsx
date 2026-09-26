@@ -1,4 +1,5 @@
 import type { ProjectDisplay } from '../../../core/view-models'
+import { SafeLink } from '../../SafeLink'
 import { dateRangeText } from './display'
 
 export function ProjectItem({ item }: { item: ProjectDisplay }) {
@@ -13,7 +14,7 @@ export function ProjectItem({ item }: { item: ProjectDisplay }) {
       {dates !== undefined && <p className="cv-ats-item-meta">{dates}</p>}
       {item.url !== undefined && (
         <p className="cv-ats-item-meta">
-          <a href={item.url}>{item.url}</a>
+          <SafeLink url={item.url}>{item.url}</SafeLink>
         </p>
       )}
       {item.highlights.length > 0 && (

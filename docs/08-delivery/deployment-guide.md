@@ -24,11 +24,11 @@ npm run build   # menghasilkan dist/ — aset statis
 - [ ] Wajib HTTPS
 
 ## 4. Header wajib
-- [ ] Content-Security-Policy → `../06-security/security-requirements.md`
+- [ ] Content-Security-Policy → kebijakan definitif di `../06-security/security-requirements.md` §1 (F4c); pasang per hosting setelah Q2 diputus
 - [ ] Strict-Transport-Security
 - [ ] X-Content-Type-Options: nosniff
 - [ ] Referrer-Policy
-- [ ] TODO: berkas konfigurasi per penyedia hosting
+- [ ] TODO: berkas konfigurasi per penyedia hosting (menunggu Q2)
 
 ## 5. Aturan caching
 - [ ] Aset dengan hash: cache lama
