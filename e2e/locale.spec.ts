@@ -122,3 +122,36 @@ test('the English page passes the WCAG 2.2 AA audit', async ({ page }) => {
   expect(report, report).toBe('')
   expect(results.passes.length, 'axe evaluated no rules').toBeGreaterThan(0)
 })
+
+/**
+ * F4g bilingual CV content (FR-701–704 family, ADR-0012).
+ *
+ * The rendered CV follows the *document* locale, not the live interface:
+ * a draft created while the UI is English carries meta.locale 'en' and
+ * renders English headings/labels. Switching the interface back never
+ * rewrites the document — the English CV keeps English headings under an
+ * Indonesian UI.
+ */
+test('a CV created in English renders English headings and labels (F4g)', async ({ page }) => {
+  await page.goto('/')
+  await switchToEnglish(page)
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+
+  await page.getByRole('button', { name: 'Create my first CV' }).click()
+  await page.getByRole('button', { name: 'Education', exact: true }).click()
+  await page.getByRole('button', { name: 'Add Education' }).click()
+  await page.getByLabel('Institution name').fill('Contoh University')
+  await page.getByLabel('Education status').selectOption('graduated')
+
+  const preview = page.locator('#cv-preview')
+  await expect(preview.getByRole('heading', { name: 'EDUCATION' })).toBeVisible({
+    timeout: 15_000,
+  })
+  await expect(preview).toContainText('Graduated')
+  await expect(preview).not.toContainText('PENDIDIKAN')
+
+  await page.getByText('Indonesian', { exact: true }).click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'id')
+  await expect(preview.getByRole('heading', { name: 'EDUCATION' })).toBeVisible()
+  await expect(preview).not.toContainText('PENDIDIKAN')
+})

@@ -41,6 +41,19 @@ const STATUS_LABELS_ID: Record<string, string> = {
 }
 
 /**
+ * F4g: rendered-CV language follows the document locale (meta.locale), the
+ * same parameter dates already use. Wording mirrors the EN form labels
+ * (`microcopyEnDraft.educationStatus`) so the preview shows what the user
+ * picked — never machine-translated here, curated once.
+ */
+const STATUS_LABELS_EN: Record<string, string> = {
+  graduated: 'Graduated',
+  'awaiting-ceremony': 'Graduated (pending ceremony)',
+  'in-progress': 'In progress',
+  discontinued: 'Discontinued',
+}
+
+/**
  * Employment types reach the view model as display strings, never as raw
  * enum tokens — the CV is user-facing text (same rule as STATUS_LABELS_ID;
  * mirrors the labels the form select shows, glossary-consistent Bahasa).
@@ -54,6 +67,16 @@ const EMPLOYMENT_TYPE_LABELS_ID: Record<string, string> = {
   organization: 'Organisasi',
 }
 
+/** F4g: mirrors `microcopyEnDraft.employmentType` (see STATUS_LABELS_EN note). */
+const EMPLOYMENT_TYPE_LABELS_EN: Record<string, string> = {
+  'full-time': 'Full-time',
+  'part-time': 'Part-time',
+  internship: 'Internship',
+  freelance: 'Freelance',
+  volunteer: 'Volunteer',
+  organization: 'Organization',
+}
+
 export const SECTION_HEADINGS_ID: Record<SectionKey, string> = {
   education: 'PENDIDIKAN',
   experience: 'PENGALAMAN KERJA',
@@ -61,6 +84,20 @@ export const SECTION_HEADINGS_ID: Record<SectionKey, string> = {
   projects: 'PROYEK',
   skills: 'KEAHLIAN',
   certifications: 'SERTIFIKASI',
+}
+
+/**
+ * F4g: standard English ATS headings (same controlled-vocabulary rationale as
+ * the ID set — machine-readable, not translated prose). Selected by the
+ * document locale in `buildOrderedSections`, like dates already are.
+ */
+export const SECTION_HEADINGS_EN: Record<SectionKey, string> = {
+  education: 'EDUCATION',
+  experience: 'WORK EXPERIENCE',
+  organizations: 'ORGANIZATIONS',
+  projects: 'PROJECTS',
+  skills: 'SKILLS',
+  certifications: 'CERTIFICATIONS',
 }
 
 export function formatDate(
@@ -155,7 +192,8 @@ export function buildEducationDisplays(
     if (item.degree !== undefined) display.degree = item.degree
     if (item.field !== undefined) display.field = item.field
     if (item.location !== undefined) display.location = item.location
-    const status = item.status ? (STATUS_LABELS_ID[item.status] ?? item.status) : undefined
+    const statusLabels = locale === 'id' ? STATUS_LABELS_ID : STATUS_LABELS_EN
+    const status = item.status ? (statusLabels[item.status] ?? item.status) : undefined
     if (status !== undefined) display.status = status
     if (item.gpa) display.gpa = formatGpa(item.gpa)
     return display
@@ -177,7 +215,8 @@ export function buildExperienceDisplays(
     }
     if (item.role !== undefined) display.role = item.role
     if (item.employmentType !== undefined) {
-      display.employmentType = EMPLOYMENT_TYPE_LABELS_ID[item.employmentType] ?? item.employmentType
+      const typeLabels = locale === 'id' ? EMPLOYMENT_TYPE_LABELS_ID : EMPLOYMENT_TYPE_LABELS_EN
+      display.employmentType = typeLabels[item.employmentType] ?? item.employmentType
     }
     if (item.location !== undefined) display.location = item.location
     return display
@@ -253,12 +292,13 @@ export function buildOrderedSections(
     certifications: () => buildCertificationDisplays(sections.certifications, locale),
   }
   const result: OrderedSection<AnySectionItem>[] = []
+  const headings = locale === 'id' ? SECTION_HEADINGS_ID : SECTION_HEADINGS_EN
   for (const key of order) {
     const builder = builders[key as SectionKey]
     if (!builder) continue
     const items = builder()
     if (items.length === 0) continue
-    result.push({ key: key as SectionKey, heading: SECTION_HEADINGS_ID[key as SectionKey], items })
+    result.push({ key: key as SectionKey, heading: headings[key as SectionKey], items })
   }
   return result
 }

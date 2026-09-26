@@ -97,10 +97,15 @@ function mirrorDocumentPreferences(doc: ValidatedResumeDocument): void {
  * in memory always carry their locale/mode. Without this, the first `setMode`
  * on a meta-less document would materialize `meta.locale` as a side effect and
  * break the "only meta.mode changes" invariant.
+ *
+ * F4g: a document without a locale inherits the ACTIVE UI locale, so a CV
+ * created while the interface is English renders English content. Switching
+ * the interface later never rewrites existing documents (ADR-0012) — each
+ * draft keeps the language it was born with.
  */
 function withMaterializedMeta(doc: ValidatedResumeDocument): ValidatedResumeDocument {
   if (doc.meta !== undefined) return doc
-  return { ...doc, meta: { locale: 'id', mode: 'ats' } }
+  return { ...doc, meta: { locale: uiStore.getState().locale, mode: 'ats' } }
 }
 
 /**
