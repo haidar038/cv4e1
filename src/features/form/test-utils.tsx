@@ -21,6 +21,7 @@ export async function resetFormStores(): Promise<void> {
   uiStore.setState({
     mode: 'ats',
     locale: 'id',
+    paperSize: 'a4',
     openPanel: null,
     autosaveStatus: 'idle',
     storageMessage: null,

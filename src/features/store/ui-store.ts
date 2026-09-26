@@ -4,6 +4,9 @@ import type { StorageStatus } from '../../storage'
 
 export type ResumeMode = ResumeMeta['mode']
 
+/** Preview paper size — a UI preference, never resume content. */
+export type PaperSize = 'a4' | 'letter'
+
 export interface UiState {
   /**
    * Mirror of the open document's `meta.mode` — the truth lives per draft in
@@ -11,6 +14,9 @@ export interface UiState {
    */
   mode: ResumeMode
   locale: 'id' | 'en'
+  /** Preview paper frame: A4 or Letter. Screen display only — the browser
+      print dialog stays the paper-size control for the actual PDF. */
+  paperSize: PaperSize
   /** Identifier of the currently open side panel/drawer, if any. */
   openPanel: string | null
   /** Direct passthrough of `AutoSaveManager` status callbacks. */
@@ -28,6 +34,7 @@ export interface UiState {
 export const uiStore = createStore<UiState>()(() => ({
   mode: 'ats',
   locale: 'id',
+  paperSize: 'a4',
   openPanel: null,
   autosaveStatus: 'idle',
   storageMessage: null,

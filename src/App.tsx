@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from 'zustand'
 import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import { DraftPanel } from './features/drafts/DraftPanel'
 import { FormLayout } from './features/form/FormLayout'
 import { useMicrocopy } from './features/form/useMicrocopy'
@@ -10,6 +11,7 @@ import { LocaleSwitcher } from './features/settings/LocaleSwitcher'
 import { StorageNoticeBanner, StorageNoticeFooter } from './features/settings/StorageNotice'
 import {
   initLocalePreference,
+  initPaperSizePreference,
   initStoreSync,
   loadDraftAction,
   refreshDrafts,
@@ -44,6 +46,7 @@ function App() {
   useEffect(() => {
     initStoreSync()
     initLocalePreference()
+    initPaperSizePreference()
     void refreshDrafts()
     const lastDraftId = localStorage.getItem(LAST_DRAFT_KEY)
     if (lastDraftId !== null) void loadDraftAction(lastDraftId)
@@ -76,6 +79,13 @@ function App() {
     <div className="mx-auto flex min-h-dvh w-full max-w-none flex-col gap-4 p-4 print:min-h-0 xl:px-8">
       <div className="flex min-w-0 flex-1 flex-col gap-4 lg:flex-row">
         <DraftPanel />
+        {/* Static divider between the menu column and the workspace —
+            desktop only; the columns stack on mobile and in print. */}
+        <Separator
+          orientation="vertical"
+          aria-hidden="true"
+          className="hidden lg:block print:hidden"
+        />
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           {/* Task 14 (F-G3): silent while online, a live region while offline. */}
           <OfflineIndicator />
@@ -93,6 +103,15 @@ function App() {
             >
               <FormLayout />
             </main>
+            {/* Static divider between the form and preview columns —
+                desktop only; mobile shows one pane at a time. */}
+            {hasDocument && (
+              <Separator
+                orientation="vertical"
+                aria-hidden="true"
+                className="hidden lg:block print:hidden"
+              />
+            )}
             {hasDocument && (
               // Print renders at paper width (below `lg`), where `hidden` would
               // win and blank the PDF — `print:block` keeps the document

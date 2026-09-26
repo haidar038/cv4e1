@@ -318,6 +318,10 @@ export interface MicrocopyPack {
     formLabel: string
     /** Dismiss label for the dismissable ATS photo notice (Task 12). */
     dismissNotice: string
+    /** Paper-size selector legend + options — structural, kept for every locale. */
+    paperSizeLabel: string
+    paperA4: string
+    paperLetter: string
   }
   print: {
     /** Print button + help opener — structural, kept for every locale. */
@@ -451,6 +455,8 @@ export interface MicrocopyPack {
   }
   progress: {
     sectionProgress: string
+    /** Completeness count with `{filled}`/`{total}` — never a quality score (glossary §6). */
+    sectionCompleted: string
   }
   common: {
     selectEmpty: string
@@ -874,6 +880,9 @@ export const microcopyId: MicrocopyPack = {
     previewTab: 'Pratinjau',
     formLabel: 'Formulir CV',
     dismissNotice: 'Tutup pemberitahuan',
+    paperSizeLabel: 'Ukuran kertas pratinjau',
+    paperA4: 'A4',
+    paperLetter: 'Letter',
   },
   print: {
     button: 'Cetak / Simpan PDF',
@@ -1025,6 +1034,7 @@ export const microcopyId: MicrocopyPack = {
   },
   progress: {
     sectionProgress: 'Bagian {current} dari {total}',
+    sectionCompleted: '{filled} dari {total} bagian terisi',
   },
   common: {
     selectEmpty: 'Belum dipilih',

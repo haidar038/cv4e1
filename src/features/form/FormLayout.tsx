@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Progress, ProgressLabel } from '@/components/ui/progress'
 import type { SectionKey } from '../../core/view-models'
+import { getSectionProgress } from '../../core/section-progress'
 import { createDraft, setOpenPanel, setSectionOrder } from '../store/actions'
 import { documentStore } from '../store/document-store'
 import { uiStore } from '../store/ui-store'
@@ -58,8 +59,10 @@ function normalizeOrder(order: readonly string[] | undefined): SectionKey[] {
 
 /**
  * The guided form shell: section navigation as an accordion (one section open
- * at a time), progress indicator, autosave status, soft CV-length warning, and
- * the guided empty state when no draft is open. The skip link to the preview
+ * at a time), completeness progress, autosave status, soft CV-length warning,
+ * and the guided empty state when no draft is open. The progress indicator
+ * counts filled sections from the document itself — opening or collapsing a
+ * panel never moves it. The skip link to the preview
  * region renders unconditionally here because Task 12 mounts `#cv-preview`
  * whenever a draft is open — never a dead link (the Task 9 effect-based
  * existence check is gone with it, along with its lint warning).
@@ -77,11 +80,12 @@ export function FormLayout() {
     { key: 'basics', label: pack.sections.basics },
     ...order.map((key) => ({ key, label: pack.sections[key] })),
   ]
-  const total = navItems.length
-  const openIndex = Math.max(
-    0,
-    navItems.findIndex((item) => item.key === openPanel),
-  )
+  // Completeness progress: derived from document content, never from which
+  // accordion panel is open — collapsing a section leaves the count untouched.
+  const progress = getSectionProgress(document)
+  const progressLabel = `${pack.progress.sectionCompleted
+    .replace('{filled}', String(progress.filled))
+    .replace('{total}', String(progress.total))} (${progress.percent}%)`
   const showLengthWarning =
     estimateCvPages(document) > SOFT_WARNING_PAGES && pack.cvLength.softWarning !== ''
 
@@ -101,18 +105,8 @@ export function FormLayout() {
       <SkipLink />
       <header className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
-          <Progress
-            value={((openIndex + 1) / total) * 100}
-            aria-label={pack.progress.sectionProgress
-              .replace('{current}', String(openIndex + 1))
-              .replace('{total}', String(total))}
-            className="flex-1"
-          >
-            <ProgressLabel>
-              {pack.progress.sectionProgress
-                .replace('{current}', String(openIndex + 1))
-                .replace('{total}', String(total))}
-            </ProgressLabel>
+          <Progress value={progress.percent} aria-label={progressLabel} className="flex-1">
+            <ProgressLabel>{progressLabel}</ProgressLabel>
           </Progress>
           <AutoSaveIndicator />
         </div>

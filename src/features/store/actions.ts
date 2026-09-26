@@ -26,7 +26,7 @@ import { importResumeLazy } from '../../storage/export-import-lazy'
 import { ImportError, type ImportErrorReason } from '../../storage/export-import-types'
 import { documentStore } from './document-store'
 import { draftStore } from './draft-store'
-import { uiStore, type ResumeMode } from './ui-store'
+import { uiStore, type PaperSize, type ResumeMode } from './ui-store'
 import type { LocaleKey } from '../../content/microcopy/id'
 
 // --- User-facing storage messages (Bahasa Indonesia, D21 tone: guide, never blame) ---
@@ -545,6 +545,38 @@ export function setLocale(locale: LocaleKey): void {
 /** Dismisses the Task 12 ATS photo notice for the rest of this tab's session. */
 export function dismissPhotoNotice(): void {
   uiStore.setState({ photoNoticeDismissed: true })
+}
+
+/**
+ * Preview paper-size preference: a small localStorage value like the locale
+ * (never resume content, never written into `ResumeDocument`). A blocked
+ * storage only narrows the preference to this tab's session.
+ */
+const PAPER_STORAGE_KEY = 'cv4every1:paperSize'
+
+export function readStoredPaperSize(): PaperSize | null {
+  try {
+    const stored = localStorage.getItem(PAPER_STORAGE_KEY)
+    return stored === 'a4' || stored === 'letter' ? stored : null
+  } catch {
+    return null
+  }
+}
+
+/** Applies the stored preference at startup; the store default is already `a4`. */
+export function initPaperSizePreference(): void {
+  const stored = readStoredPaperSize()
+  if (stored !== null) uiStore.setState({ paperSize: stored })
+}
+
+export function setPaperSize(paperSize: PaperSize): void {
+  uiStore.setState({ paperSize })
+  try {
+    localStorage.setItem(PAPER_STORAGE_KEY, paperSize)
+  } catch {
+    // Storage blocked: the ui-store update above still applies, so the
+    // switch works for this session.
+  }
 }
 
 /**

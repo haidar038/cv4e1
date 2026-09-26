@@ -445,6 +445,9 @@ export const microcopyEnDraft: MicrocopyPack = {
     previewTab: 'Preview',
     formLabel: 'CV form',
     dismissNotice: 'Dismiss notice',
+    paperSizeLabel: 'Preview paper size',
+    paperA4: 'A4',
+    paperLetter: 'Letter',
   },
   print: {
     button: 'Print / Save PDF',
@@ -591,6 +594,7 @@ export const microcopyEnDraft: MicrocopyPack = {
   },
   progress: {
     sectionProgress: 'Section {current} of {total}',
+    sectionCompleted: '{filled} of {total} sections filled',
   },
   common: {
     selectEmpty: 'Not selected yet',

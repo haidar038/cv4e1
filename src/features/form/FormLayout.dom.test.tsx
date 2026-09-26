@@ -55,7 +55,29 @@ describe('section navigation (keyboard-first)', () => {
     ]) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
     }
-    expect(screen.getByText('Bagian 1 dari 7')).toBeInTheDocument()
+    expect(screen.getByText('0 dari 7 bagian terisi (0%)')).toBeInTheDocument()
+  })
+
+  it('keeps the progress count across navigation — only data moves it', async () => {
+    const user = userEvent.setup()
+    openTestDocument()
+    render(
+      <main>
+        <FormLayout />
+      </main>,
+    )
+
+    // Opening a panel is navigation, not content: the count stays at 0.
+    await user.click(screen.getByRole('button', { name: 'Data Diri' }))
+    expect(screen.getByText('0 dari 7 bagian terisi (0%)')).toBeInTheDocument()
+
+    // Typing a name fills the basics section: 1 of 7 (14%).
+    await user.type(screen.getByLabelText('Nama lengkap'), 'Budi Santoso')
+    expect(screen.getByText('1 dari 7 bagian terisi (14%)')).toBeInTheDocument()
+
+    // Moving to another section leaves the count untouched.
+    await user.click(screen.getByRole('button', { name: 'Pendidikan' }))
+    expect(screen.getByText('1 dari 7 bagian terisi (14%)')).toBeInTheDocument()
   })
 
   it('walkthrough: keyboard-only user opens a section and fills a field (NFR-005)', async () => {

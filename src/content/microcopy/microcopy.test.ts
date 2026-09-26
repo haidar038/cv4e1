@@ -230,10 +230,19 @@ describe('placeholder parity across packs (AC-703-b)', () => {
       [microcopyId.importPdf.unmappedNote, microcopyEn.importPdf.unmappedNote],
       [microcopyId.print.filenameNote, microcopyEn.print.filenameNote],
       [microcopyId.progress.sectionProgress, microcopyEn.progress.sectionProgress],
+      [microcopyId.progress.sectionCompleted, microcopyEn.progress.sectionCompleted],
       [microcopyId.dataSafety.partial, microcopyEn.dataSafety.partial],
       [microcopyId.aiStatic.rationaleTemplate, microcopyEn.aiStatic.rationaleTemplate],
     ]
-    const placeholders = ['{mode}', '{locale}', '{count}', '{filename}', '{current}', '{total}']
+    const placeholders = [
+      '{mode}',
+      '{locale}',
+      '{count}',
+      '{filename}',
+      '{current}',
+      '{total}',
+      '{filled}',
+    ]
     for (const [id, en] of pairs) {
       for (const placeholder of placeholders) {
         // A placeholder dropped by either side breaks the rendering component.

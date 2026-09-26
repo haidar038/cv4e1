@@ -121,3 +121,38 @@ describe('PreviewPane', () => {
     expect(summary, summary).toBe('')
   })
 })
+
+describe('preview paper frame', () => {
+  it('frames the canvas with a bordered A4 sheet by default', async () => {
+    openNamedDocument()
+    render(<PreviewPane />)
+    await screen.findByRole('heading', { level: 1 })
+
+    const preview = document.getElementById('cv-preview')
+    expect(preview).not.toBeNull()
+    expect(preview?.getAttribute('data-paper')).toBe('a4')
+    expect(preview?.className).toContain('border')
+    const frame = preview?.querySelector('.cv-paper-frame') as HTMLElement | null
+    expect(frame).not.toBeNull()
+    expect(frame?.style.maxWidth).toBe('210mm')
+    // A4 is the pre-selected paper size.
+    expect(screen.getByRole('radio', { name: 'A4' })).toBeChecked()
+  })
+
+  it('switches the frame to Letter width without touching the document', async () => {
+    const user = userEvent.setup()
+    openNamedDocument()
+    render(<PreviewPane />)
+    await screen.findByRole('heading', { level: 1 })
+
+    await user.click(screen.getByRole('radio', { name: 'Letter' }))
+
+    const preview = document.getElementById('cv-preview')
+    expect(preview?.getAttribute('data-paper')).toBe('letter')
+    const frame = preview?.querySelector('.cv-paper-frame') as HTMLElement | null
+    expect(frame?.style.maxWidth).toBe('216mm')
+    // The renderer output itself is unchanged — only the frame moved.
+    expect(document.querySelector('#cv-preview .cv-ats')).not.toBeNull()
+    expect(localStorage.getItem('cv4every1:paperSize')).toBe('letter')
+  })
+})
