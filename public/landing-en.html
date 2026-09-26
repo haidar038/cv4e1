@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cv4every1 — Free, offline, no-account CV builder</title>
+    <meta
+      name="description"
+      content="cv4every1 is a free, open-source CV builder that runs on your device: no account, no server, with ATS-oriented and Creative versions from a single source of data."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1c1917;
+        --muted: #57534e;
+        --accent: #0f766e;
+        --line: #e7e5e4;
+        --wash: #f5f5f4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        color: var(--ink);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 1rem 1.25rem 3rem;
+      }
+      nav.top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      nav.top strong {
+        font-size: 1.125rem;
+      }
+      nav.top a {
+        color: var(--accent);
+      }
+      .cta {
+        display: inline-block;
+        margin: 0.25rem 0.5rem 0.25rem 0;
+        padding: 0.6rem 1.2rem;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .cta.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent);
+      }
+      h1 {
+        font-size: 1.75rem;
+        line-height: 1.25;
+      }
+      h2 {
+        margin-top: 2.25rem;
+        font-size: 1.25rem;
+      }
+      table.modes {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+      table.modes th,
+      table.modes td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.5rem;
+        border: 1px solid var(--line);
+      }
+      table.modes th {
+        background: var(--wash);
+      }
+      .honest {
+        background: var(--wash);
+        border-left: 4px solid var(--accent);
+        padding: 0.75rem 1rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="top" aria-label="Navigation">
+        <strong>cv4every1</strong>
+        <span><a href="/landing.html">Versi Bahasa Indonesia</a></span>
+      </nav>
+
+      <h1>A send-ready CV, built on your own device.</h1>
+      <p>
+        cv4every1 is a free, open-source CV builder for Indonesian job
+        seekers — fresh graduates first. No account, no server, no watermark.
+        Once loaded, the core features keep working offline.
+      </p>
+      <p>
+        <a class="cta" href="/">Open the app</a>
+        <a class="cta ghost" href="https://github.com/haidar038/cv4e1">Source code</a>
+      </p>
+
+      <h2>One source of data, two versions</h2>
+      <p>
+        Different openings call for different CVs. You enter your data once,
+        then switch modes with one click — no retyping, no lost data.
+      </p>
+      <table class="modes">
+        <tr>
+          <th scope="col">ATS-oriented mode</th>
+          <th scope="col">Creative mode</th>
+        </tr>
+        <tr>
+          <td>Single column, photo hidden automatically, restrained decoration — designed to be easy for tracking systems to read.</td>
+          <td>Optional photo, two columns, color accents — for startups, agencies, or direct applications to HR.</td>
+        </tr>
+      </table>
+      <p class="honest">
+        What we do not promise: no guaranteed ATS pass, no CV score. Tracking
+        systems differ and are closed; what we give you are verifiable
+        properties — extractable text, standard headings, predictable reading
+        order.
+      </p>
+
+      <h2>How to use it</h2>
+      <ol>
+        <li>Fill in the guided form (GPA, education status, campus organizations).</li>
+        <li>Pick the ATS or Creative mode and check the preview.</li>
+        <li>Export a PDF to send, export JSON for backup.</li>
+      </ol>
+
+      <h2>Your data stays yours</h2>
+      <ul>
+        <li>Your CV lives in this device's browser storage — not on our servers (there are none).</li>
+        <li>No analytics, no telemetry, no third-party scripts.</li>
+        <li>The optional AI features use your own key and never change data without approval.</li>
+        <li>An honest note: clearing browser data or private mode can delete drafts — use Export as backup, and full wipe is always available.</li>
+      </ul>
+
+      <h2>Questions</h2>
+      <p><strong>What does it cost?</strong><br />Nothing. Free software licensed under AGPL-3.0.</p>
+      <p><strong>Do I need the internet?</strong><br />Only for the first visit. Afterwards the core flow works offline.</p>
+      <p><strong>I have no work experience.</strong><br />Student organizations, committees, community service, and teaching assistance count as real experience, with result-oriented writing examples.</p>
+
+      <footer>
+        cv4every1 © 2026 M. Khaidar — free software licensed under
+        <a href="https://github.com/haidar038/cv4e1/blob/main/LICENSE">AGPL-3.0</a>.
+        <a href="https://github.com/haidar038/cv4e1">Source code</a> ·
+        <a href="/">Open the app</a>
+      </footer>
+    </div>
+  </body>
+</html>

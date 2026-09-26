@@ -372,6 +372,14 @@ export interface MicrocopyPack {
     /** Dismiss action — structural, kept for every locale. */
     dismiss: string
   }
+  legal: {
+    /** Copyright + license line in the app footer (F4e, AGPL Appropriate Legal Notices). */
+    notice: string
+    /** Link labels — structural, kept for every locale. */
+    license: string
+    source: string
+    about: string
+  }
   drafts: {
     title: string
     empty: string
@@ -912,6 +920,12 @@ export const microcopyId: MicrocopyPack = {
     notice:
       'Data Anda tersimpan di peramban pada perangkat ini. Membersihkan data peramban, mode penyamaran, atau pembersihan otomatis dapat menghapus draft Anda. Gunakan Ekspor Draft untuk membuat salinan cadangan.',
     dismiss: 'Mengerti',
+  },
+  legal: {
+    notice: 'cv4every1 © 2026 M. Khaidar — perangkat lunak bebas berlisensi AGPL-3.0.',
+    license: 'Lisensi',
+    source: 'Kode sumber',
+    about: 'Tentang',
   },
   drafts: {
     title: 'CV saya',

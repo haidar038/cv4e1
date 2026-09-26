@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cv4every1 — Pembuat CV gratis, offline, tanpa akun</title>
+    <meta
+      name="description"
+      content="cv4every1 adalah pembuat CV gratis dan open-source yang berjalan di perangkat Anda: tanpa akun, tanpa server, dengan versi ATS-oriented dan Creative dari satu data."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1c1917;
+        --muted: #57534e;
+        --accent: #0f766e;
+        --line: #e7e5e4;
+        --wash: #f5f5f4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        color: var(--ink);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 1rem 1.25rem 3rem;
+      }
+      nav.top {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      nav.top strong {
+        font-size: 1.125rem;
+      }
+      nav.top a {
+        color: var(--accent);
+      }
+      .cta {
+        display: inline-block;
+        margin: 0.25rem 0.5rem 0.25rem 0;
+        padding: 0.6rem 1.2rem;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .cta.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent);
+      }
+      h1 {
+        font-size: 1.75rem;
+        line-height: 1.25;
+      }
+      h2 {
+        margin-top: 2.25rem;
+        font-size: 1.25rem;
+      }
+      table.modes {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+      table.modes th,
+      table.modes td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.5rem;
+        border: 1px solid var(--line);
+      }
+      table.modes th {
+        background: var(--wash);
+      }
+      .honest {
+        background: var(--wash);
+        border-left: 4px solid var(--accent);
+        padding: 0.75rem 1rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="top" aria-label="Navigasi">
+        <strong>cv4every1</strong>
+        <span><a href="/landing-en.html">English version</a></span>
+      </nav>
+
+      <h1>CV yang siap dikirim, dibuat di perangkat Anda sendiri.</h1>
+      <p>
+        cv4every1 adalah pembuat CV gratis dan open-source untuk pelamar kerja
+        Indonesia — terutama fresh graduate. Tanpa akun, tanpa server, tanpa
+        watermark. Setelah terbuka, fitur inti tetap berjalan offline.
+      </p>
+      <p>
+        <a class="cta" href="/">Buka aplikasi</a>
+        <a class="cta ghost" href="https://github.com/haidar038/cv4e1">Kode sumber</a>
+      </p>
+
+      <h2>Satu data, dua versi</h2>
+      <p>
+        Lowongan yang berbeda membutuhkan CV yang berbeda. Anda mengisi data
+        sekali, lalu beralih mode dengan satu klik — tanpa mengetik ulang,
+        tanpa kehilangan data.
+      </p>
+      <table class="modes">
+        <tr>
+          <th scope="col">Mode ATS-oriented</th>
+          <th scope="col">Mode Creative</th>
+        </tr>
+        <tr>
+          <td>Satu kolom, foto disembunyikan otomatis, dekorasi dibatasi — dirancang agar mudah dibaca sistem pelacak lamaran.</td>
+          <td>Foto opsional, dua kolom, aksen warna — untuk startup, agensi, atau lamaran langsung ke HR.</td>
+        </tr>
+      </table>
+      <p class="honest">
+        Yang tidak kami janjikan: tidak ada jaminan lolos ATS dan tidak ada
+        skor CV. Sistem ATS berbeda-beda dan tertutup; yang kami beri adalah
+        properti yang bisa diverifikasi — teks terekstraksi, heading standar,
+        urutan baca yang dapat diprediksi.
+      </p>
+
+      <h2>Cara memakai</h2>
+      <ol>
+        <li>Isi form terpandu berbahasa Indonesia (IPK, status pendidikan, organisasi kampus).</li>
+        <li>Pilih mode ATS atau Creative dan lihat pratinjaunya.</li>
+        <li>Ekspor PDF untuk dikirim, ekspor JSON untuk cadangan.</li>
+      </ol>
+
+      <h2>Data Anda tetap milik Anda</h2>
+      <ul>
+        <li>CV tersimpan di IndexedDB peramban pada perangkat ini — bukan di server kami (tidak ada server).</li>
+        <li>Tidak ada analytics, tidak ada telemetri, tidak ada skrip pihak ketiga.</li>
+        <li>Fitur AI (opsional) memakai kunci milik Anda sendiri dan tidak pernah mengubah data tanpa persetujuan.</li>
+        <li>Catatan jujur: membersihkan data peramban atau mode penyamaran dapat menghapus draft — gunakan Ekspor sebagai cadangan, dan Hapus semua data selalu tersedia.</li>
+      </ul>
+
+      <h2>Tanya jawab</h2>
+      <p><strong>Berapa biayanya?</strong><br />Gratis. Perangkat lunak bebas berlisensi AGPL-3.0.</p>
+      <p><strong>Apakah perlu koneksi internet?</strong><br />Hanya untuk kunjungan pertama. Setelah itu alur inti berjalan offline.</p>
+      <p><strong>Saya tidak punya pengalaman kerja.</strong><br />Organisasi, kepanitiaan, KKN, dan asisten praktikum diperlakukan sebagai pengalaman yang sah, dengan contoh penulisan berorientasi hasil.</p>
+
+      <footer>
+        cv4every1 © 2026 M. Khaidar — perangkat lunak bebas berlisensi
+        <a href="https://github.com/haidar038/cv4e1/blob/main/LICENSE">AGPL-3.0</a>.
+        <a href="https://github.com/haidar038/cv4e1">Kode sumber</a> ·
+        <a href="/">Buka aplikasi</a>
+      </footer>
+    </div>
+  </body>
+</html>

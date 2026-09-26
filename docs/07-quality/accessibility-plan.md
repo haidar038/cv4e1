@@ -103,6 +103,12 @@ permukaan yang pernah diaudit, semuanya diperbaiki tanpa mengubah desain:
 Perubahan non-kontras di F4a: guard global `prefers-reduced-motion` di
 `src/index.css` (animasi/transisi menjadi instan bila pengguna memintanya).
 
+Susulan F4e (baris legal di footer): `text-muted-foreground` yang lolos di
+atas putih GAGAL di atas tint `bg-info/10` — tint menggelapkan background
+cukup untuk menjatuhkan rasio di bawah 4.5:1. Aturannya: warna teks di atas
+tint harus diukur terhadap tint itu, bukan terhadap putih. Baris legal
+memakai `text-info` (5,29:1, pasangan yang sudah terbukti).
+
 **Belum terverifikasi (butuh manusia):** uji pembaca layar NVDA + VoiceOver
 untuk alur inti (buat → isi → ganti mode → ekspor PDF → hapus data), dan
 walkthrough keyboard manual per rilis. Varian `.dark` tidak bisa diaudit

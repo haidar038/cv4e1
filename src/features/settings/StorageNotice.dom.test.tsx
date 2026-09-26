@@ -107,4 +107,31 @@ describe('StorageNotice (Task 15, FR-109)', () => {
     )
     await runAxe(document.body)
   })
+
+  it('shows the AGPL legal line with source, license, and about links (F4e)', () => {
+    openSavedDocument()
+    render(<StorageNoticeFooter />)
+
+    const footer = screen.getByRole('contentinfo')
+    expect(footer).toHaveTextContent('cv4every1 © 2026 M. Khaidar')
+    expect(footer).toHaveTextContent('AGPL-3.0')
+    expect(screen.getByRole('link', { name: 'Lisensi' })).toHaveAttribute(
+      'href',
+      'https://github.com/haidar038/cv4e1/blob/main/LICENSE',
+    )
+    expect(screen.getByRole('link', { name: 'Kode sumber' })).toHaveAttribute(
+      'href',
+      'https://github.com/haidar038/cv4e1',
+    )
+    expect(screen.getByRole('link', { name: 'Tentang' })).toHaveAttribute('href', '/landing.html')
+  })
+
+  it('points the about link at the English landing under the en locale (F4e)', () => {
+    openSavedDocument()
+    uiStore.setState({ locale: 'en' })
+    render(<StorageNoticeFooter />)
+
+    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/landing-en.html')
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('free software')
+  })
 })

@@ -490,6 +490,12 @@ export const microcopyEnDraft: MicrocopyPack = {
       'Your data is stored in the browser on this device. Clearing browser data, private mode, or automatic cleanup can delete your drafts. Use Export to keep a backup copy.',
     dismiss: 'Got it',
   },
+  legal: {
+    notice: 'cv4every1 © 2026 M. Khaidar — free software licensed under AGPL-3.0.',
+    license: 'License',
+    source: 'Source code',
+    about: 'About',
+  },
   drafts: {
     title: 'My CVs',
     empty: 'No CV stored yet.',

@@ -11,6 +11,8 @@ filling, and an offline action-verb catalog so writing help is never locked behi
 - **Product vision and principles:** [`docs/00-project-context/vision.md`](docs/00-project-context/vision.md)
 - **Working rules for contributors and AI agents:** [`AGENTS.md`](AGENTS.md)
 - **Full documentation index (Bahasa Indonesia):** [`docs/README.md`](docs/README.md)
+- **Public landing page:** [`public/landing.html`](public/landing.html)
+  ([English](public/landing-en.html)) — static, no JavaScript, no analytics
 
 ## What it is not
 
@@ -28,17 +30,12 @@ instead of dates on purpose.
 | :-- | :-- |
 | Phase −1 — risk spike | ✅ done — PDF pipeline decided in [ADR-0007](docs/adr/0007-pdf-export-pipeline.md): HTML + print CSS, no runtime PDF generator |
 | Phase 0 — data foundation | ✅ done — `ResumeDocument` schema, validation, normalization, IndexedDB storage, autosave, import/export, migrations, with tests |
-| Phase 1 — MVP | 🚧 in progress |
-| Phase 2 — optional AI | ⬜ not started (must not start before the Phase 1 gate) |
+| Phase 1 — MVP | ✅ done (2026-09-22) — guided form, ATS + Creative renderers, mode toggle, PDF export, PWA offline, full wipe |
+| Phase 2 — optional AI | ✅ done (2026-09-25) — BYO-key flow, bullet/polish/achievement generators with static fallbacks, grounding invariants |
+| Phase 3 — experimental | ✅ done (2026-09-26) — PDF import with review, job-description tailoring, ID/EN interface switch |
+| Phase 4 — production readiness | 🚧 in progress: license decided (AGPL-3.0, ADR-0013), accessibility audit, cross-browser matrix, security review, release process, public docs + landing |
 
-**Phase 1 progress:** testing rig + CI + strict TypeScript (Task 7) ✅ · state store (Task 8) ✅ ·
-micro-copy and action-verb catalog data (Task 13a) ✅ · guided multi-section form (Task 9) ✅.
-Still ahead: action-verb suggestion UI (13b), ATS renderer (10), Creative renderer (11), mode toggle
-and live preview (12), print-to-PDF flow and PWA service worker (14), delete-all-data flow (15).
-
-**Honest note on the current build:** the form, autosave, draft management and JSON import/export
-work today. The ATS/Creative renderers, PDF export and offline service worker are **planned, not
-shipped** — the app is not yet useful end-to-end.
+**Honest note on the current build:** the app works end-to-end (form → preview → PDF → offline). What is still ahead before the first public release: manual screen-reader and physical-device runs, plus the release itself.
 
 ## Non-negotiable constraints
 
@@ -121,7 +118,7 @@ Run `bun run check:boundaries` after moving files.
 ## Testing
 
 Every change ships with tests appropriate to what changed (see `AGENTS.md` §6). Current baseline:
-**230 unit tests** across 25 files plus Playwright smoke coverage. Measured wall-clock and the
+**780 unit tests** plus Playwright coverage (Chromium + Firefox locally, Chromium on CI). Measured wall-clock and the
 jsdom optimization are documented in
 [`docs/07-quality/test-strategy.md`](docs/07-quality/test-strategy.md) §7.
 
