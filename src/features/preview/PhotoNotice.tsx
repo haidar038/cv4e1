@@ -26,7 +26,7 @@ export function PhotoNotice({ hasPhoto }: { hasPhoto: boolean }) {
   return (
     <div role="status" className="flex items-start justify-between gap-3 border p-3">
       <p className="text-xs text-muted-foreground">{pack.photo.atsHiddenNotice}</p>
-      <Button type="button" variant="ghost" size="xs" onClick={dismissPhotoNotice}>
+      <Button type="button" variant="ghost" size="sm" onClick={dismissPhotoNotice}>
         {pack.preview.dismissNotice}
       </Button>
     </div>

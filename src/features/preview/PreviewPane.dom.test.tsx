@@ -130,16 +130,20 @@ describe('preview paper frame', () => {
 
     const preview = document.getElementById('cv-preview')
     expect(preview).not.toBeNull()
-    expect(preview?.getAttribute('data-paper')).toBe('a4')
-    expect(preview?.className).toContain('border')
-    const frame = preview?.querySelector('.cv-paper-frame') as HTMLElement | null
-    expect(frame).not.toBeNull()
-    expect(frame?.style.maxWidth).toBe('210mm')
+    // The document surface itself carries no chrome: the scroll area and
+    // the paper sheet wrap it from the outside (the ATS e2e gate forbids
+    // `<div` inside `#cv-preview`).
+    expect(preview?.querySelector('div')).toBeNull()
+    const sheet = document.querySelector('.cv-paper-sheet') as HTMLElement | null
+    expect(sheet).not.toBeNull()
+    expect(sheet?.style.maxWidth).toBe('210mm')
+    expect(sheet?.className).toContain('border')
+    expect(document.querySelector('.cv-paper-scroll')?.getAttribute('data-paper')).toBe('a4')
     // A4 is the pre-selected paper size.
     expect(screen.getByRole('radio', { name: 'A4' })).toBeChecked()
   })
 
-  it('switches the frame to Letter width without touching the document', async () => {
+  it('switches the sheet to Letter width without touching the document', async () => {
     const user = userEvent.setup()
     openNamedDocument()
     render(<PreviewPane />)
@@ -147,11 +151,10 @@ describe('preview paper frame', () => {
 
     await user.click(screen.getByRole('radio', { name: 'Letter' }))
 
-    const preview = document.getElementById('cv-preview')
-    expect(preview?.getAttribute('data-paper')).toBe('letter')
-    const frame = preview?.querySelector('.cv-paper-frame') as HTMLElement | null
-    expect(frame?.style.maxWidth).toBe('216mm')
-    // The renderer output itself is unchanged — only the frame moved.
+    expect(document.querySelector('.cv-paper-scroll')?.getAttribute('data-paper')).toBe('letter')
+    const sheet = document.querySelector('.cv-paper-sheet') as HTMLElement | null
+    expect(sheet?.style.maxWidth).toBe('216mm')
+    // The renderer output itself is unchanged — only the sheet moved.
     expect(document.querySelector('#cv-preview .cv-ats')).not.toBeNull()
     expect(localStorage.getItem('cv4every1:paperSize')).toBe('letter')
   })

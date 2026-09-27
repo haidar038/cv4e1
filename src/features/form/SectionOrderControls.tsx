@@ -31,7 +31,7 @@ export function SectionOrderControls({
         <Button
           type="button"
           variant="ghost"
-          size="icon-xs"
+          size="icon-sm"
           aria-label={`${pack.actions.moveUp} ${sectionLabel}`}
           onClick={() => onMove(section, 'up')}
         >
@@ -42,7 +42,7 @@ export function SectionOrderControls({
         <Button
           type="button"
           variant="ghost"
-          size="icon-xs"
+          size="icon-sm"
           aria-label={`${pack.actions.moveDown} ${sectionLabel}`}
           onClick={() => onMove(section, 'down')}
         >

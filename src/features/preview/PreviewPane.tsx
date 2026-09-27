@@ -51,9 +51,10 @@ const LazyCreativeRenderer = lazy(() =>
  * hide everything else), so the ATS/Creative extraction gates keep proving
  * document-only recovery without control text leaking into expectations.
  *
- * The paper frame around `#cv-preview` is also a features-level concern:
- * the border, padding, and max width never enter the renderers, so the ATS
- * stylesheet gates (single-column block flow) and the Creative gates keep
+ * The paper frame lives OUTSIDE `#cv-preview` for the same reason: the ATS
+ * e2e gate forbids `<div` inside the preview surface, so the scroll area and
+ * the paper sheet wrap it instead of sitting inside it. The renderers stay
+ * the only content of `#cv-preview`, and the ATS stylesheet gates keep
  * asserting against the renderer files alone.
  */
 export function PreviewPane() {
@@ -115,27 +116,30 @@ export function PreviewPane() {
           ATS/Creative extraction gates keep proving document-only recovery
           without control text leaking into expectations. The labelled region
           above keeps every control inside a landmark (axe `region` rule).
-          The frame gives the canvas a visible paper edge (border + width per
-          paper size) on screen; in print it collapses to nothing so the
-          document alone reaches the PDF. */}
+          The paper sheet below wraps `#cv-preview` from the OUTSIDE (never
+          inside — the ATS e2e gate forbids `<div` in the preview surface):
+          it gives the canvas a visible paper edge (border + width per paper
+          size) on screen, and collapses to nothing in print so the document
+          alone reaches the PDF. */}
       <div
-        id="cv-preview"
         data-paper={paperSize}
-        className="min-w-0 flex-1 overflow-x-auto border border-border bg-muted/40 p-2 sm:p-4 print:border-0 print:bg-transparent print:p-0"
+        className="cv-paper-scroll min-w-0 flex-1 overflow-x-auto border border-border bg-muted/40 p-2 sm:p-4 print:border-0 print:bg-transparent print:p-0"
       >
         <div
-          className="cv-paper-frame mx-auto border border-border bg-background shadow-sm print:border-0 print:shadow-none"
+          className="cv-paper-sheet mx-auto border border-border bg-background shadow-sm print:border-0 print:shadow-none"
           style={{ maxWidth: PAPER_MAX_WIDTH[paperSize] ?? '210mm' }}
         >
-          <Suspense fallback={null}>
-            {mode === 'creative' ? (
-              creativeVm === null ? null : (
-                <LazyCreativeRenderer vm={creativeVm} resolvePhotoUrl={resolvePhotoUrl} />
-              )
-            ) : atsVm === null ? null : (
-              <LazyATSRenderer vm={atsVm} />
-            )}
-          </Suspense>
+          <div id="cv-preview" className="min-w-0">
+            <Suspense fallback={null}>
+              {mode === 'creative' ? (
+                creativeVm === null ? null : (
+                  <LazyCreativeRenderer vm={creativeVm} resolvePhotoUrl={resolvePhotoUrl} />
+                )
+              ) : atsVm === null ? null : (
+                <LazyATSRenderer vm={atsVm} />
+              )}
+            </Suspense>
+          </div>
         </div>
       </div>
     </section>

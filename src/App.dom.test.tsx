@@ -39,8 +39,9 @@ describe('App workspace tabs', () => {
     const form = document.getElementById('cv-form')
     const preview = document.getElementById('cv-preview')
     // The visibility wrapper owns `hidden lg:block`: #cv-preview itself sits
-    // one level deeper (inside the labelled preview region), so climb two.
-    const previewPane = preview?.parentElement?.parentElement
+    // deeper (paper sheet + scroll area inside the labelled preview region),
+    // so climb to the preview region first, then to its wrapper.
+    const previewPane = preview?.closest('section')?.parentElement
     // Mobile shows the form tab: form plain `flex` (all breakpoints), preview
     // `hidden` on mobile and `lg:block` on desktop where both panes show.
     expect(form?.className).toContain('flex')
